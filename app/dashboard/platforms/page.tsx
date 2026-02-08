@@ -9,6 +9,7 @@ export default function PlatformsPage() {
     const connect = (platform: string) => {
         message.info(`Redirecting to ${platform} OAuth…`);
         window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/oauth/${platform}`;
+        console.log(`Connecting to ${platform}...`);
     };
 
 
