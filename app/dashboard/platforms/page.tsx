@@ -12,6 +12,8 @@ export default function PlatformsPage() {
         console.log(`Connecting to ${platform}...`);
     };
 
+    console.log("Rendering PlatformsPage");
+
 
 
     return (

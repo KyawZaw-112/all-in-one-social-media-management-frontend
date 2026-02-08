@@ -1,20 +1,24 @@
-import { NextResponse } from "next/server";
+const connectFacebook = () => {
+    const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
+    const redirectUri = `${process.env.NEXT_PUBLIC_API_URL}/api/oauth/facebook/callback`;
 
-export async function GET() {
-    const params = new URLSearchParams({
-        client_id: process.env.FACEBOOK_APP_ID!,
-        redirect_uri: `${process.env.BASE_URL}/api/oauth/facebook/callback`,
-        scope: [
-            "public_profile",
-            "email",
-            "pages_show_list",
-            "pages_read_engagement"
-        ].join(","),
-        response_type: "code",
-        state: "facebook_oauth"
-    });
+    const scopes = [
+        "public_profile",
+        "email",
+        "pages_show_list",
+        "pages_read_engagement",
+        "pages_manage_metadata",
+        "business_management",
+        "instagram_basic",
+        "instagram_manage_insights"
+    ].join(",");
 
-    return NextResponse.redirect(
-        `https://www.facebook.com/v24.0/dialog/oauth?${params.toString()}`
-    );
-}
+    const url =
+        `https://www.facebook.com/v24.0/dialog/oauth` +
+        `?client_id=${appId}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&scope=${scopes}` +
+        `&response_type=code`;
+
+    window.location.href = url;
+};
