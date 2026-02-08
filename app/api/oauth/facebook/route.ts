@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     const facebookAuthUrl =
-        "https://www.facebook.com/v19.0/dialog/oauth" +
+        "https://www.facebook.com/v24.0/dialog/oauth" +
         `?client_id=${process.env.FACEBOOK_APP_ID}` +
         `&redirect_uri=${encodeURIComponent(
             process.env.FB_REDIRECT_URI!
