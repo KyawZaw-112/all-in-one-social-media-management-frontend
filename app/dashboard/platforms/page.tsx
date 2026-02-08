@@ -8,9 +8,10 @@ const { Title, Text } = Typography;
 export default function PlatformsPage() {
     const connect = (platform: string) => {
         message.info(`Redirecting to ${platform} OAuth…`);
-        // backend OAuth URL
-        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/oauth/${platform}`;
+        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/oauth/${platform}`;
     };
+
+
 
     return (
         <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
@@ -42,5 +43,7 @@ export default function PlatformsPage() {
                 </Card>
             </Space>
         </div>
+
     );
+
 }
