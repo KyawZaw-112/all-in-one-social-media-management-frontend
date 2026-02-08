@@ -7,10 +7,10 @@ export async function GET() {
         throw new Error("Missing Facebook OAuth environment variables");
     }
     const facebookAuthUrl =
-        "https://www.facebook.com/v24.0/dialog/oauth" +
+        "https://www.facebook.com/v18.0/dialog/oauth" +
         `?client_id=${appId}` +
-        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-        "&scope=pages_manage_metadata,pages_read_engagement";
+        `&redirect_uri=https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook` +
+        "&scope=public_profile";
 
     return NextResponse.redirect(facebookAuthUrl);
 }

@@ -9,10 +9,10 @@ export async function GET(req: Request) {
     }
 
     const tokenRes = await fetch(
-        "https://graph.facebook.com/v24.0/oauth/access_token" +
+        "https://graph.facebook.com/v18.0/oauth/access_token" +
         `?client_id=${process.env.FACEBOOK_APP_ID}` +
         `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
-        `&redirect_uri=${process.env.FB_REDIRECT_URI}` +
+        `&redirect_uri=https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook` +
         `&code=${code}`
     );
 
