@@ -18,7 +18,7 @@ export default function PlatformsPage() {
 
     return (
         <div style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
-            <Title level={3}>Connected Platforms</Title>
+            <Title level={3}>Connected With Platforms</Title>
 
             <Space orientation="vertical" size={16} style={{ width: "100%" }}>
                 <Card>
