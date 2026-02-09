@@ -1,16 +1,16 @@
-// app/api/oauth/facebook/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET() {
-    const redirectUri =
-        "https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook/callback";
+    const params = new URLSearchParams({
+        client_id: process.env.FACEBOOK_APP_ID!,
+        redirect_uri:
+            "https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook/callback",
+        scope: "pages_show_list,pages_read_engagement",
+        response_type: "code",
+        state: crypto.randomUUID(), // CSRF protection
+    });
 
-    const facebookAuthUrl =
-        "https://www.facebook.com/v24.0/dialog/oauth" +
-        `?client_id=${process.env.FACEBOOK_APP_ID}` +
-        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-        `&scope=public_profile,email` +
-        `&response_type=code`;
-
-    return NextResponse.redirect(facebookAuthUrl);
+    return NextResponse.redirect(
+        `https://www.facebook.com/v18.0/dialog/oauth?${params.toString()}`
+    );
 }
