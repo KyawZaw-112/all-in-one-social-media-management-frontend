@@ -1,4 +1,5 @@
-// app/api/posts/stats/route.ts
+// app/api/posts/stats/
+//route.ts
 import { NextResponse } from "next/server";
 
 export async function OPTIONS() {

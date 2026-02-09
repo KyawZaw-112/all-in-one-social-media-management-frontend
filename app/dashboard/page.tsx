@@ -6,6 +6,7 @@ import { RocketOutlined, FacebookOutlined, ThunderboltOutlined } from "@ant-desi
 import { supabase } from "@/lib/supabase";
 import { fetchWithAuth } from "@/lib/api";
 import AuthGuard from "@/components/AuthGuard";
+import SubscriptionGuard from "@/components/SubscriptionGuard";
 
 export default function DashboardPage() {
     const [stats, setStats] = useState<any>({});
@@ -22,6 +23,7 @@ export default function DashboardPage() {
     }, []);
 
     return (
+        <SubscriptionGuard>
         <AuthGuard>
             <div style={{ padding: 24 }}>
                 {/* KPI */}
@@ -65,5 +67,6 @@ export default function DashboardPage() {
                 </Card>
             </div>
         </AuthGuard>
+        </SubscriptionGuard>
     );
 }

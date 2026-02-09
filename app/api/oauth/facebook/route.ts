@@ -5,7 +5,7 @@ export async function GET() {
         client_id: process.env.FACEBOOK_APP_ID!,
         redirect_uri:
             "https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook/callback",
-        scope: "pages_show_list,pages_read_engagement",
+        scope: "pages_show_list,pages_read_engagement,pages_manage_metadata,pages_manage_posts,public_profile",
         response_type: "code",
         state: crypto.randomUUID(), // CSRF protection
     });

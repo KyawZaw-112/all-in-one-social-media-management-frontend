@@ -2,51 +2,55 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { fetchWithAuth } from "@/lib/api";
-
-type SubscriptionStatus = "active" | "expired" | "none";
 
 export function useSubscription() {
-    const [status, setStatus] = useState<SubscriptionStatus>("none");
     const [loading, setLoading] = useState(true);
+    const [active, setActive] = useState(false);
+    const [subscription, setSubscription] = useState<any>(null);
 
     useEffect(() => {
         const load = async () => {
-            setLoading(true);
-
             const {
                 data: { session },
             } = await supabase.auth.getSession();
 
             if (!session) {
-                setStatus("none");
                 setLoading(false);
                 return;
             }
 
-            try {
-                const res = await fetchWithAuth(
-                    "/subscriptions/me",
-                    session.access_token
-                );
 
-                // expected backend response:
-                // { status: "active" | "expired" | "none" }
-                setStatus(res.status ?? "none");
-            } catch (err) {
-                console.error("Failed to load subscription", err);
-                setStatus("none");
-            } finally {
+            const { data, error } = await supabase
+                .from("subscriptions")
+                .select("*")
+                .eq("user_id", session.user.id)
+                .single();
+
+            if (error || !data) {
                 setLoading(false);
+                return;
             }
+
+            const now = new Date();
+            const expiresAt = data.expires_at
+                ? new Date(data.expires_at)
+                : null;
+
+            const isActive =
+                data.status === "active" &&
+                expiresAt !== null &&
+                expiresAt > now;
+
+            setSubscription(data);
+            setActive(isActive);
+            setLoading(false);
+    console.log(data)
         };
 
         load();
     }, []);
 
-    return {
-        loading,
-        status,
-        active: status === "active",
-    };
+
+
+    return { loading, active, subscription };
 }
