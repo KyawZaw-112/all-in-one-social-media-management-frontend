@@ -1,16 +1,16 @@
+// app/api/oauth/facebook/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET() {
-    const appId = process.env.FACEBOOK_APP_ID;
-    const redirectUri = process.env.FB_REDIRECT_URI;
-    if (!appId || !redirectUri) {
-        throw new Error("Missing Facebook OAuth environment variables");
-    }
+    const redirectUri =
+        "https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook/callback";
+
     const facebookAuthUrl =
-        "https://www.facebook.com/v18.0/dialog/oauth" +
-        `?client_id=${appId}` +
-        `&redirect_uri=https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook` +
-        "&scope=public_profile";
+        "https://www.facebook.com/v24.0/dialog/oauth" +
+        `?client_id=${process.env.FACEBOOK_APP_ID}` +
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&scope=public_profile,email` +
+        `&response_type=code`;
 
     return NextResponse.redirect(facebookAuthUrl);
 }

@@ -1,44 +1,52 @@
-// app/api/oauth/facebook/route.ts
+// app/api/oauth/facebook/callback/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-    console.log("🔥 /api/oauth/facebook HIT");
-    const { searchParams } = new URL(req.url);
-    const code = searchParams.get("code");
-    console.log("🧩 OAuth code:", code);
-    if (!code) {
-        return NextResponse.json({ error: "Missing code" }, { status: 400 });
-    }
+    const url = new URL(req.url);
+    const code = url.searchParams.get("code");
 
-    if (!process.env.FACEBOOK_APP_ID || !process.env.FACEBOOK_APP_SECRET) {
-        return NextResponse.json(
-            { error: "Facebook env vars missing" },
-            { status: 500 }
+    if (!code) {
+        return NextResponse.redirect(
+            new URL("/login?error=missing_code", url.origin)
         );
     }
 
-    const tokenUrl =
+    const redirectUri =
+        "https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook/callback";
+
+    // 🔁 Exchange code → access token
+    const tokenRes = await fetch(
         "https://graph.facebook.com/v24.0/oauth/access_token" +
         `?client_id=${process.env.FACEBOOK_APP_ID}` +
         `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
-        `&redirect_uri=https://all-in-one-social-media-management-ashy.vercel.app/api/oauth/facebook` +
-        `&code=${code}`;
+        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+        `&code=${code}`
+    );
 
-    const tokenRes = await fetch(tokenUrl);
-    const data = await tokenRes.json();
+    const tokenData = await tokenRes.json();
 
-    if (!data.access_token) {
-        console.error("❌ Facebook token error:", data);
+    if (!tokenData.access_token) {
+        console.error("❌ Token error:", tokenData);
         return NextResponse.redirect(
-            "https://all-in-one-social-media-management-ashy.vercel.app/auth/error"
+            new URL("/login?error=token_failed", url.origin)
         );
     }
 
-    console.log("✅ Facebook User Access Token:", data.access_token);
+    // (Optional but recommended) Fetch user profile
+    const profileRes = await fetch(
+        `https://graph.facebook.com/me?fields=id,name&access_token=${tokenData.access_token}`
+    );
 
-    // TODO: save token in DB or session here
+    const profile = await profileRes.json();
+
+    console.log("✅ Facebook connected:", profile);
+
+    // TODO:
+    // - Save access_token to DB
+    // - Link Facebook ID to user
+    // - Create session / cookie
 
     return NextResponse.redirect(
-        "https://all-in-one-social-media-management-ashy.vercel.app/dashboard?fb=connected"
+        new URL("/dashboard?fb=connected", url.origin)
     );
 }
