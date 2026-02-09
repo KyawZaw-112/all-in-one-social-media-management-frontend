@@ -8,17 +8,17 @@ export async function fetchWithAuth(
     token: string,
     options: RequestInit = {}
 ) {
-    const headers: HeadersInit = {
-        ...(options.headers || {}),
-    };
+    // Use a Headers instance so we can call .set(...) safely regardless of
+    // what form `options.headers` is (Headers, array, or plain object).
+    const headers = new Headers(options.headers as HeadersInit);
 
     // Only attach auth + JSON headers for real requests
     if (options.method && options.method !== "GET") {
-        headers["Content-Type"] = "application/json";
+        headers.set("Content-Type", "application/json");
     }
 
     if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+        headers.set("Authorization", `Bearer ${token}`);
     }
 
     const res = await fetch(path, {

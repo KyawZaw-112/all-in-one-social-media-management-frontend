@@ -1,10 +1,7 @@
-// app/admin/page.tsx
-
-export default function AdminPage() {
+export default function AdminHomePage() {
     return (
-        <div style={{ padding: 24 }}>
-            <h1>Admin Dashboard</h1>
-            <p>Welcome to the admin panel.</p>
+        <div className="p-6">
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         </div>
     );
 }
