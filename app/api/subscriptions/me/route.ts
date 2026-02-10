@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
         }
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/stats`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/subscriptions/me`,
             {
                 method: "GET",
                 headers: {
@@ -23,19 +23,22 @@ export async function GET(request: NextRequest) {
         );
 
         if (!response.ok) {
+            console.error("Backend subscription error:", response.status);
             return NextResponse.json(
-                { error: "Failed to fetch stats" },
-                { status: response.status }
+                { status: "none" },
+                { status: 200 }
             );
         }
 
         const data = await response.json();
         return NextResponse.json(data);
     } catch (error) {
-        console.error("Error fetching stats:", error);
+        console.error("Error fetching subscription:", error);
+        // Return default response so app doesn't crash
         return NextResponse.json(
-            { error: "Internal server error" },
-            { status: 500 }
+            { status: "none" },
+            { status: 200 }
         );
     }
 }
+

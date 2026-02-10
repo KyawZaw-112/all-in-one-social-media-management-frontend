@@ -19,37 +19,42 @@ export function useSubscription() {
                 return;
             }
 
+            try {
+                // Use backend API instead of direct Supabase query to avoid RLS issues
+                const response = await fetch("/api/subscriptions/me", {
+                    headers: {
+                        "Authorization": `Bearer ${session.access_token}`,
+                    },
+                });
 
-            const { data, error } = await supabase
-                .from("subscriptions")
-                .select("*")
-                .eq("user_id", session.user.id)
-                .single();
+                if (!response.ok) {
+                    console.error("Failed to fetch subscription:", response.status);
+                    setLoading(false);
+                    return;
+                }
 
-            if (error || !data) {
+                const data = await response.json();
+
+                // Backend returns { status, plan }
+                if (!data || data.status === "none") {
+                    setLoading(false);
+                    return;
+                }
+
+                const isActive = data.status === "active";
+
+                setSubscription(data);
+                setActive(isActive);
                 setLoading(false);
-                return;
+                console.log("Subscription:", data);
+            } catch (error) {
+                console.error("Error fetching subscription:", error);
+                setLoading(false);
             }
-
-            const now = new Date();
-            const expiresAt = data.expires_at
-                ? new Date(data.expires_at)
-                : null;
-
-            const isActive =
-                data.status === "active" &&
-                expiresAt !== null &&
-                expiresAt > now;
-
-            setSubscription(data);
-            setActive(isActive);
-            setLoading(false);
-    console.log(data)
         };
 
         load();
     }, []);
-
 
 
     return { loading, active, subscription };

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
         }
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/stats`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/recent`,
             {
                 method: "GET",
                 headers: {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
         if (!response.ok) {
             return NextResponse.json(
-                { error: "Failed to fetch stats" },
+                { error: "Failed to fetch posts" },
                 { status: response.status }
             );
         }
@@ -32,10 +32,11 @@ export async function GET(request: NextRequest) {
         const data = await response.json();
         return NextResponse.json(data);
     } catch (error) {
-        console.error("Error fetching stats:", error);
+        console.error("Error fetching recent posts:", error);
         return NextResponse.json(
             { error: "Internal server error" },
             { status: 500 }
         );
     }
 }
+

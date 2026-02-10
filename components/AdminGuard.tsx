@@ -19,7 +19,7 @@ export default function AdminGuard({
             } = await supabase.auth.getUser();
 
             if (!user) {
-                router.replace("/admin-login");
+                router.replace("/admin/login");
                 return;
             }
 
@@ -31,12 +31,12 @@ export default function AdminGuard({
                 .single();
 
             if (!data || data.role !== "admin") {
-                router.replace("/admin-login");
+                router.replace("/admin/login");
                 return;
             }
 
             if (!data) {
-                router.replace("/admin-login");
+                router.replace("/admin/login");
                 return;
             }
 

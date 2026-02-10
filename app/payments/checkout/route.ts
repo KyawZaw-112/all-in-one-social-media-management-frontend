@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export async function POST(req: Request) {
     try {
-        console.log("▶️ Checkout request received");
+
 
         if (!process.env.STRIPE_SECRET_KEY) {
             throw new Error("STRIPE_SECRET_KEY is missing");

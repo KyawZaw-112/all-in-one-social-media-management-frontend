@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
         }
 
         // check admin access
-        const { data: admin, error: adminError } = await supabase
+            const { data: admin, error: adminError } = await supabase
             .from("admin_users")
             .select("id")
             .eq("user_id", data.user.id)

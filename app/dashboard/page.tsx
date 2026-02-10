@@ -14,10 +14,28 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const load = async () => {
-            const { data } = await supabase.auth.getSession();
-            const token = data?.session?.access_token!;
-            setStats(await fetchWithAuth("/posts/stats", token));
-            setPosts(await fetchWithAuth("/posts/recent", token));
+            try {
+                const { data } = await supabase.auth.getSession();
+                const token = data?.session?.access_token!;
+
+                try {
+                    const statsData = await fetchWithAuth("/api/posts/stats", token);
+                    setStats(statsData || {});
+                } catch (error) {
+                    console.error("Failed to load stats:", error);
+                    setStats({ posts: 0, replies: 0, platforms: 0 });
+                }
+
+                try {
+                    const postsData = await fetchWithAuth("/api/posts/recent", token);
+                    setPosts(postsData || []);
+                } catch (error) {
+                    console.error("Failed to load posts:", error);
+                    setPosts([]);
+                }
+            } catch (error) {
+                console.error("Failed to load dashboard data:", error);
+            }
         };
         load();
     }, []);
