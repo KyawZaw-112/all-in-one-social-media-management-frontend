@@ -65,3 +65,8 @@ This keeps `profiles` and `admin_users` aligned for admin checks.
 
 - Remove admin role or set inactive in DB and retry `/admin/login`
 - Expected: blocked with `You do not have admin access`
+
+## Notes
+
+- Admin access now checks `admin_users` / `profiles` first, then falls back to backend admin authorization.
+- This prevents false denials when backend admin endpoints are temporarily unavailable or backend URL config is missing.
