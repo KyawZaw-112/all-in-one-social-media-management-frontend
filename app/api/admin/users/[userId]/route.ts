@@ -6,7 +6,7 @@ function unauthorized() {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 }
 
-async function proxyToBackend(request: Request, path: string, method: string, defaultError: string) {
+async function proxyToBackend(request: Request, userId: string, method: string, defaultError: string) {
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
         return unauthorized();
@@ -26,7 +26,7 @@ async function proxyToBackend(request: Request, path: string, method: string, de
         init.body = await request.text();
     }
 
-    const response = await fetch(getBackendUrl(path), init);
+    const response = await fetch(getBackendUrl(`/admin/users/${userId}`), init);
 
     if (!response.ok) {
         const details = await response.text();
@@ -42,18 +42,36 @@ async function proxyToBackend(request: Request, path: string, method: string, de
     });
 }
 
-export async function GET(request: Request) {
+type Context = {
+    params: Promise<{
+        userId: string;
+    }>;
+};
+
+export async function GET(request: Request, context: Context) {
     try {
-        return await proxyToBackend(request, "/admin/users", "GET", "Failed to load users");
+        const { userId } = await context.params;
+        return await proxyToBackend(request, userId, "GET", "Failed to load user");
     } catch (error) {
         const details = error instanceof Error ? error.message : String(error);
         return new Response(JSON.stringify({ error: "Internal error", details }), { status: 500 });
     }
 }
 
-export async function POST(request: Request) {
+export async function PUT(request: Request, context: Context) {
     try {
-        return await proxyToBackend(request, "/admin/users", "POST", "Failed to create user");
+        const { userId } = await context.params;
+        return await proxyToBackend(request, userId, "PUT", "Failed to update user");
+    } catch (error) {
+        const details = error instanceof Error ? error.message : String(error);
+        return new Response(JSON.stringify({ error: "Internal error", details }), { status: 500 });
+    }
+}
+
+export async function DELETE(request: Request, context: Context) {
+    try {
+        const { userId } = await context.params;
+        return await proxyToBackend(request, userId, "DELETE", "Failed to delete user");
     } catch (error) {
         const details = error instanceof Error ? error.message : String(error);
         return new Response(JSON.stringify({ error: "Internal error", details }), { status: 500 });

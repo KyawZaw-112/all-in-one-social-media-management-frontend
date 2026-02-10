@@ -12,9 +12,9 @@ const adminSections = [
         description: "Review and approve pending subscription payments.",
     },
     {
-        href: "/admin/users",
+        href: "/admin/dashboard",
         title: "User Management",
-        description: "Review users and manage account status.",
+        description: "Create, read, update, and delete users.",
     },
 ];
 

@@ -4,22 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Input, Button, Typography, message } from "antd";
 import { supabase } from "@/lib/supabase";
+import { checkCurrentSessionAdminAccess } from "@/lib/adminAccess";
 
 const { Title } = Typography;
-
-type AdminRecord = {
-    role?: string | null;
-    is_active?: boolean | null;
-};
-
-function hasAdminAccess(record: AdminRecord | null) {
-    if (!record) return false;
-
-    const roleAllowed = !record.role || record.role === "admin";
-    const activeAllowed = record.is_active !== false;
-
-    return roleAllowed && activeAllowed;
-}
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -30,7 +17,7 @@ export default function AdminLoginPage() {
     async function handleLogin() {
         setLoading(true);
 
-        const { data: authData, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
@@ -41,14 +28,9 @@ export default function AdminLoginPage() {
             return;
         }
 
-        const { data: adminData, error: adminError } = await supabase
-            .from("admin_users")
-            .select("*")
-            .eq("user_id", authData.user.id)
-            .limit(1)
-            .maybeSingle();
+        const hasAccess = await checkCurrentSessionAdminAccess();
 
-        if (adminError || !hasAdminAccess((adminData as AdminRecord | null) ?? null)) {
+        if (!hasAccess) {
             await supabase.auth.signOut();
             message.error("You do not have admin access");
             setLoading(false);
