@@ -7,6 +7,20 @@ import { supabase } from "@/lib/supabase";
 
 const { Title } = Typography;
 
+type AdminRecord = {
+    role?: string | null;
+    is_active?: boolean | null;
+};
+
+function hasAdminAccess(record: AdminRecord | null) {
+    if (!record) return false;
+
+    const roleAllowed = !record.role || record.role === "admin";
+    const activeAllowed = record.is_active !== false;
+
+    return roleAllowed && activeAllowed;
+}
+
 export default function AdminLoginPage() {
     const router = useRouter();
     const [email, setEmail] = useState("");
@@ -16,7 +30,7 @@ export default function AdminLoginPage() {
     async function handleLogin() {
         setLoading(true);
 
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data: authData, error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
@@ -27,8 +41,22 @@ export default function AdminLoginPage() {
             return;
         }
 
+        const { data: adminData, error: adminError } = await supabase
+            .from("admin_users")
+            .select("*")
+            .eq("user_id", authData.user.id)
+            .limit(1)
+            .maybeSingle();
+
+        if (adminError || !hasAdminAccess((adminData as AdminRecord | null) ?? null)) {
+            await supabase.auth.signOut();
+            message.error("You do not have admin access");
+            setLoading(false);
+            return;
+        }
+
         message.success("Admin login successful");
-        router.replace("/admin/payments");
+        router.replace("/admin");
     }
 
     return (

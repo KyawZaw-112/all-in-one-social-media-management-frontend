@@ -4,9 +4,23 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+type AdminRecord = {
+    role?: string | null;
+    is_active?: boolean | null;
+};
+
+function hasAdminAccess(record: AdminRecord | null) {
+    if (!record) return false;
+
+    const roleAllowed = !record.role || record.role === "admin";
+    const activeAllowed = record.is_active !== false;
+
+    return roleAllowed && activeAllowed;
+}
+
 export default function AdminGuard({
-                                       children,
-                                   }: {
+    children,
+}: {
     children: React.ReactNode;
 }) {
     const router = useRouter();
@@ -23,19 +37,14 @@ export default function AdminGuard({
                 return;
             }
 
-            const { data  } = await supabase
+            const { data, error } = await supabase
                 .from("admin_users")
-                .select("id, role")
+                .select("*")
                 .eq("user_id", user.id)
-                .eq("is_active", true)
-                .single();
+                .limit(1)
+                .maybeSingle();
 
-            if (!data || data.role !== "admin") {
-                router.replace("/admin/login");
-                return;
-            }
-
-            if (!data) {
+            if (error || !hasAdminAccess((data as AdminRecord | null) ?? null)) {
                 router.replace("/admin/login");
                 return;
             }
