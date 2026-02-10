@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { checkCurrentUserAdminAccess } from "@/lib/adminAccess";
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -26,14 +27,9 @@ export default function AdminLoginPage() {
             return;
         }
 
-        // check admin access
-            const { data: admin, error: adminError } = await supabase
-            .from("admin_users")
-            .select("id")
-            .eq("user_id", data.user.id)
-            .single();
+        const hasAccess = await checkCurrentUserAdminAccess(data.user.id);
 
-        if (adminError || !admin) {
+        if (!hasAccess) {
             await supabase.auth.signOut();
             setError("You do not have admin access");
             setLoading(false);
