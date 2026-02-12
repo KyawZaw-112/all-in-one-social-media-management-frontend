@@ -8,10 +8,10 @@ const supabase = createClient(
 
 export async function POST(
     req: NextRequest,
-    { params }: { params:Promise< { id: string }> }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = await params;
+        const { id } = await context.params;
 
         const { data: sub, error } = await supabase
             .from("subscriptions")
@@ -33,9 +33,7 @@ export async function POST(
 
         if (updateError) throw updateError;
 
-        return NextResponse.json({
-            success: true,
-        });
+        return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json(
             { success: false },
