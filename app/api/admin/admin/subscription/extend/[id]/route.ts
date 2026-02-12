@@ -33,10 +33,12 @@ export async function POST(
 
         if (updateError) throw updateError;
 
-        return NextResponse.json({ success: true });
-    } catch (err: any) {
+        return NextResponse.json({
+            success: true,
+        });
+    } catch (error) {
         return NextResponse.json(
-            { error: err.message },
+            { success: false },
             { status: 500 }
         );
     }
