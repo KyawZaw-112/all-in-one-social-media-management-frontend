@@ -8,8 +8,24 @@ const supabase = createClient(
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
-    await supabase.auth.admin.signOut(params.id);
-    return NextResponse.json({ success: true });
+    try {
+        const { id } = await context.params;
+
+        // Example: force logout by clearing session or marking user as logged_out
+        const { error } = await supabase
+            .from("users")
+            .update({ is_logged_in: false })
+            .eq("id", id);
+
+        if (error) throw error;
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        return NextResponse.json(
+            { success: false },
+            { status: 500 }
+        );
+    }
 }

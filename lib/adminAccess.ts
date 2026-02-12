@@ -27,7 +27,7 @@ export async function checkCurrentUserAdminAccess(userId: string) {
     console.log('Admin data query:', {adminData, adminError});
     console.log('Has admin access from admin_users:', hasAdminAccess(adminData));
 
-    if (!adminError && hasAdminAccess((adminData as AdminRecord | null) ?? null, "admin_users")) {
+    if (!adminError && hasAdminAccess((adminData as AdminRecord | null) ?? null)) {
         return true;
     }
 
@@ -42,5 +42,5 @@ export async function checkCurrentUserAdminAccess(userId: string) {
         return false;
     }
 
-    return hasAdminAccess((profileData as AdminRecord | null) ?? null, "profiles");
+    return hasAdminAccess((profileData as AdminRecord | null) ?? null);
 }

@@ -6,7 +6,13 @@ import supabase from "@/lib/supabase";
 import { Modal } from "antd";
 import Image from "next/image";
 const {Title} = Typography;
-
+interface Payment {
+    id: string;
+    user_id: string;
+    amount: number;
+    status: string;
+    proof_url:string;
+}
 export default function PaymentsPage() {
     const [payments, setPayments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -117,7 +123,7 @@ export default function PaymentsPage() {
         {title: "Amount", dataIndex: "amount",},
         {
             title: "Proof",
-            render: (_, record) => (
+            render: (_:unknown, record:Payment) => (
                 <Button
                     type="primary"
                     onClick={async () => {
@@ -147,7 +153,7 @@ export default function PaymentsPage() {
         },
         {
             title: "Actions",
-            render: (_: any, record: any) =>
+            render: (_: unknown, record: any) =>
                 record.status === "pending" && (
                     <Space>
                         <Button
