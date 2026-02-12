@@ -9,9 +9,6 @@ export async function GET(request: Request) {
         }
 
         const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/payments/pending`;
-        console.log("📡 Frontend API Route - Pending Payments");
-        console.log("🔗 Backend URL:", backendUrl);
-        console.log("🔑 Auth Header:", authHeader.substring(0, 30) + "...");
 
         // Forward to backend with the auth header
         let response;

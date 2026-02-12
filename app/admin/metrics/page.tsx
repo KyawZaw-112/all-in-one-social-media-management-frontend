@@ -2,20 +2,29 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { message } from "antd";
-import { supabase } from "@/lib/supabase";
+import  supabase  from "@/lib/supabase";
+import { getAdminUsers } from "@/lib/api";
+import { Card, Row, Col, Typography } from "antd";
+const { Title, Text } = Typography;
 
 type UserMetrics = {
     totalUsers?: number;
     activeUsers?: number;
     subscribedUsers?: number;
     churnedUsers?: number;
+    users?: number;
+    revenue?: number;
 };
+
+
 
 const metricsToShow: Array<{ key: keyof UserMetrics; label: string }> = [
     { key: "totalUsers", label: "Total Users" },
     { key: "activeUsers", label: "Active Users" },
     { key: "subscribedUsers", label: "Subscribed Users" },
     { key: "churnedUsers", label: "Churned Users" },
+    { key: "users", label: "Users" },
+    { key: "revenue", label: "Revenue" },
 ];
 
 export default function AdminMetricsPage() {
@@ -38,16 +47,7 @@ export default function AdminMetricsPage() {
                 return;
             }
 
-            const response = await fetch("/api/admin/metrics", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            if (!response.ok) {
-                message.error("Failed to load user metrics");
-                return;
-            }
-
-            const data = await response.json();
+            const data = await getAdminUsers(token);
             setMetrics(data ?? {});
         } catch {
             message.error("Failed to load user metrics");
@@ -61,19 +61,29 @@ export default function AdminMetricsPage() {
     }, [loadMetrics]);
 
     return (
-        <div className="p-6 space-y-4">
-            <h1 className="text-2xl font-bold">User Metrics</h1>
+        <div style={{ padding: 40, background: "#fafafa", minHeight: "100vh" }}>
+            <Title level={2} style={{ marginBottom: 40 }}>
+                User Metrics
+            </Title>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {metricsToShow.map(({ key, label }) => (
-                    <div key={key} className="rounded-lg border p-4">
-                        <div className="text-sm text-gray-500">{label}</div>
-                        <div className="mt-2 text-2xl font-semibold">
-                            {loading ? "..." : (metrics?.[key] ?? 0)}
-                        </div>
-                    </div>
+            <Row gutter={[24, 24]}>
+                {metricsToShow.map((item) => (
+                    <Col xs={24} sm={12} md={6} key={item.label}>
+                        <Card
+                            variant="outlined"
+                            style={{
+                                background: "#ffffff",
+                                padding: 24,
+                            }}
+                        >
+                            <Text type="secondary">{item.label}</Text>
+                            <Title level={2} style={{ marginTop: 8 }}>
+                                {metrics ? metrics[item.key] ?? 0 : 0}
+                            </Title>
+                        </Card>
+                    </Col>
                 ))}
-            </div>
+            </Row>
         </div>
     );
 }

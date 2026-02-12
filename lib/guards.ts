@@ -1,4 +1,5 @@
-import { supabase } from "./supabase";
+import  supabase  from "./supabase";
+import {checkCurrentUserAdminAccess} from "@/lib/adminAccess";
 
 export async function requireAdmin() {
     const {
@@ -7,13 +8,9 @@ export async function requireAdmin() {
 
     if (!session) throw new Error("Not authenticated");
 
-    const { data } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", session.user.id)
-        .single();
+    const hasAccess = await checkCurrentUserAdminAccess(session.user.id)
 
-    if (data?.role !== "admin") {
+    if (!hasAccess) {
         throw new Error("Admin only");
     }
 }

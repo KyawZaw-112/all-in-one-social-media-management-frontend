@@ -7,11 +7,15 @@ function getStripeClient(secretKey: string) {
 
 export async function POST(req: Request) {
     try {
-        if (!process.env.STRIPE_SECRET_KEY) {
-            throw new Error("STRIPE_SECRET_KEY is missing");
+        const secretKey = process.env.STRIPE_SECRET_KEY;
+        if (!secretKey) {
+            return NextResponse.json(
+                { error: "Server configuration error" },
+                { status: 500 }
+            );
         }
 
-        const stripe = getStripeClient(process.env.STRIPE_SECRET_KEY);
+        const stripe = new Stripe(secretKey);
 
         const auth = req.headers.get("authorization");
         if (!auth) {
@@ -19,7 +23,6 @@ export async function POST(req: Request) {
         }
 
         const { plan } = await req.json();
-        console.log("Plan:", plan);
 
         const priceId =
             plan === "monthly"
@@ -27,36 +30,32 @@ export async function POST(req: Request) {
                 : process.env.STRIPE_YEARLY_PRICE_ID;
 
         if (!priceId) {
-            throw new Error("Stripe price ID is missing");
+            return NextResponse.json(
+                { error: "Stripe price not configured" },
+                { status: 500 }
+            );
         }
 
-        if (!process.env.NEXT_PUBLIC_API_URL) {
-            throw new Error("NEXT_PUBLIC_API_URL is missing");
+        const appUrl = process.env.APP_URL;
+        if (!appUrl) {
+            return NextResponse.json(
+                { error: "APP_URL not configured" },
+                { status: 500 }
+            );
         }
-
-
-        console.log("Price ID:", priceId);
-
-        console.log("Using price:", priceId);
 
         const session = await stripe.checkout.sessions.create({
             mode: "subscription",
             line_items: [{ price: priceId, quantity: 1 }],
-            success_url: `${process.env.NEXT_PUBLIC_API_URL}/subscribe/success`,
-            cancel_url: `${process.env.NEXT_PUBLIC_API_URL}/subscribe`,
+            success_url: `${appUrl}/subscribe/success`,
+            cancel_url: `${appUrl}/subscribe`,
         });
 
-
-        console.log("Stripe session created:", session.id);
-
         return NextResponse.json({ url: session.url });
-    } catch (err: any) {
-        console.error("❌ Checkout error:", err);
 
+    } catch (err: any) {
         return NextResponse.json(
-            {
-                error: err.message || "Checkout failed",
-            },
+            { error: err.message || "Checkout failed" },
             { status: 500 }
         );
     }

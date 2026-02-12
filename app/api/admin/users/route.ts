@@ -1,29 +1,59 @@
-export async function GET(request: Request) {
-    try {
-        const authHeader = request.headers.get("authorization");
-        if (!authHeader) {
-            return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
-        }
+import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
 
-        const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/users`;
-        const response = await fetch(backendUrl, {
-            method: "GET",
-            headers: {
-                Authorization: authHeader,
-            },
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+export async function GET() {
+    try {
+        const { data: subs, error } = await supabase
+            .from("subscriptions")
+            .select("*");
+
+        if (error) throw error;
+
+        const { data: authData } =
+            await supabase.auth.admin.listUsers();
+
+        const { data: logs } = await supabase
+            .from("login_logs")
+            .select("*");
+
+        const users = subs.map((sub) => {
+            const authUser = authData.users.find(
+                (u) => u.id === sub.user_id
+            );
+
+            const userLogs = logs?.filter(
+                (l) => l.user_id === sub.user_id
+            );
+
+            const lastLogin =
+                userLogs?.sort(
+                    (a, b) =>
+                        new Date(b.created_at).getTime() -
+                        new Date(a.created_at).getTime()
+                )[0] || null;
+
+            return {
+                ...sub,
+                email: authUser?.email || "Unknown",
+                last_sign_in_at:
+                    authUser?.last_sign_in_at || null,
+                login_count: userLogs?.length,
+                device: lastLogin?.device || "-",
+                country: lastLogin?.country || "-",
+                browser: lastLogin?.browser || "-",
+            };
         });
 
-        if (!response.ok) {
-            const details = await response.text();
-            return new Response(JSON.stringify({ error: "Failed to load users", details }), {
-                status: response.status,
-            });
-        }
-
-        const data = await response.json();
-        return new Response(JSON.stringify(data), { status: 200 });
-    } catch (error) {
-        const details = error instanceof Error ? error.message : String(error);
-        return new Response(JSON.stringify({ error: "Internal error", details }), { status: 500 });
+        return NextResponse.json({ users });
+    } catch (err: any) {
+        return NextResponse.json(
+            { error: err.message },
+            { status: 500 }
+        );
     }
 }

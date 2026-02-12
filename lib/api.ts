@@ -1,73 +1,113 @@
-/**
- * Central API helper
- * Uses same-origin requests (NO CORS)
- */
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-export async function fetchWithAuth(
+if (!BASE_URL) {
+    throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
+}
+
+export async function fetchWithAuth<T = any>(
     path: string,
     token: string,
     options: RequestInit = {}
-) {
-    // Use a Headers instance so we can call .set(...) safely regardless of
-    // what form `options.headers` is (Headers, array, or plain object).
-    const headers = new Headers(options.headers as HeadersInit);
+): Promise<T> {
+    if (!token) {
+        throw new Error("No auth token provided");
+    }
 
-    // Only attach auth + JSON headers for real requests
+    const headers = new Headers(options.headers || {});
+
+    headers.set("Authorization", `Bearer ${token}`);
+
     if (options.method && options.method !== "GET") {
         headers.set("Content-Type", "application/json");
     }
 
-    if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-    }
+    const cleanPath = path.startsWith("/") ? path.slice(1) : path;
 
-    const res = await fetch(path, {
+    const res = await fetch(`${BASE_URL}/${cleanPath}`, {
         ...options,
         headers,
     });
 
     if (!res.ok) {
         let message = "Request failed";
+
         try {
             const error = await res.json();
             message = error.error || error.message || message;
         } catch {}
+
         throw new Error(message);
     }
 
     return res.json();
 }
 
-/**
- * Stripe checkout
- */
-export function createCheckoutSession(
+/* ===========================
+   ADMIN USERS
+=========================== */
+
+export function getAdminUsers(
     token: string,
-    plan: "monthly" | "yearly"
+    page = 1,
+    limit = 10,
+    search = ""
 ) {
-    return fetchWithAuth("/payments/checkout", token, {
+    const query = `admin/users?page=${page}&limit=${limit}&search=${search}`;
+    return fetchWithAuth(query, token);
+}
+
+export function createAdminUser(
+    token: string,
+    data: { email: string; role: string }
+) {
+    return fetchWithAuth("admin/users", token, {
         method: "POST",
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify(data),
     });
 }
 
-/**
- * Platforms
- */
+export function updateAdminUser(
+    token: string,
+    id: string,
+    data: { email?: string; role?: string }
+) {
+    return fetchWithAuth(`admin/users/${id}`, token, {
+        method: "PUT",
+        body: JSON.stringify(data),
+    });
+}
+
+export function deleteAdminUser(token: string, id: string) {
+    return fetchWithAuth(`admin/users/${id}`, token, {
+        method: "DELETE",
+    });
+}
+
+/* ===========================
+   OTHER EXAMPLES
+=========================== */
+
 export function getPlatforms(token: string) {
-    return fetchWithAuth("/platforms", token);
+    return fetchWithAuth("platforms", token);
 }
 
 export function connectPlatform(token: string, platform: string) {
-    return fetchWithAuth("/platforms/connect", token, {
+    return fetchWithAuth("platforms/connect", token, {
         method: "POST",
         body: JSON.stringify({ platform }),
     });
 }
 
-/**
- * Subscription
- */
 export function getMySubscription(token: string) {
-    return fetchWithAuth("/subscriptions/me", token);
+    return fetchWithAuth("subscriptions/me", token);
+}
+
+export function createCheckoutSession(
+    token: string,
+    plan: "monthly" | "yearly"
+) {
+    return fetchWithAuth("payments/checkout", token, {
+        method: "POST",
+        body: JSON.stringify({ plan }),
+    });
 }

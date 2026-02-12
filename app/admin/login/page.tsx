@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Input, Button, Typography, message } from "antd";
-import { supabase } from "@/lib/supabase";
+import  supabase  from "@/lib/supabase";
 import { checkCurrentUserAdminAccess } from "@/lib/adminAccess";
 
 const { Title } = Typography;
@@ -29,7 +29,8 @@ export default function AdminLoginPage() {
         }
 
         const hasAccess = await checkCurrentUserAdminAccess(authData.user.id);
-
+        console.log('User ID:', authData.user.id);
+        console.log('Has admin access:', hasAccess);
         if (!hasAccess) {
             await supabase.auth.signOut();
             message.error("You do not have admin access");

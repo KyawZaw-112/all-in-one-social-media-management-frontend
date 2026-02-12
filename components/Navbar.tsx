@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import  supabase  from "@/lib/supabase";
 import { Menu, Button } from "antd";
 
 export default function Navbar() {
@@ -61,14 +61,12 @@ export default function Navbar() {
                     { key: "platforms", label: <Link href="/dashboard/platforms">Connect with Facebook</Link> },
                 ]}
             />
-
             <Button
-                danger
                 onClick={async () => {
                     await supabase.auth.signOut();
                     window.location.href = "/";
                 }}
-            >
+                type="default" style={{ border: "1px solid #e5e5e5" }}>
                 Logout
             </Button>
         </header>

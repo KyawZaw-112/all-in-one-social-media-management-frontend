@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import  supabase  from "@/lib/supabase";
 
 import {
     Card,
@@ -30,7 +30,7 @@ export default function LoginPage() {
         setLoading(true);
         setErrorMsg(null);
 
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data,error } = await supabase.auth.signInWithPassword({
             email: values.email,
             password: values.password,
         });
@@ -41,6 +41,18 @@ export default function LoginPage() {
             setErrorMsg(error.message);
             return;
         }
+        const user = data.user
+
+        await fetch("/api/log-login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                user_id: user.id,
+                email: user.email,
+            }),
+        });
 
         window.location.href = "/dashboard";
     };

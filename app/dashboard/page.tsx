@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, Row, Col, Button, Statistic, Table } from "antd";
 import { RocketOutlined, FacebookOutlined, ThunderboltOutlined } from "@ant-design/icons";
-import { supabase } from "@/lib/supabase";
+import  supabase  from "@/lib/supabase";
 import { fetchWithAuth } from "@/lib/api";
 import AuthGuard from "@/components/AuthGuard";
 import SubscriptionGuard from "@/components/SubscriptionGuard";

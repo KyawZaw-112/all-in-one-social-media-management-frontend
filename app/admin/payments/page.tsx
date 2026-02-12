@@ -1,108 +1,201 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { message } from "antd";
-import { supabase } from "@/lib/supabase";
+import {useEffect, useState} from "react";
+import {Table, Tag, Button, Space, Card, Typography, message} from "antd";
+import supabase from "@/lib/supabase";
+import { Modal } from "antd";
+import Image from "next/image";
+const {Title} = Typography;
 
-type Payment = {
-    id: string;
-    user_id: string;
-    plan: string;
-    reference: string;
-    created_at: string;
-    profiles: {
-        email: string;
-    }[];
-};
-
-export default function AdminPaymentsPage() {
-    const [payments, setPayments] = useState<Payment[]>([]);
-    const [loading, setLoading] = useState(false);
-
-    const getSessionToken = async () => {
+export default function PaymentsPage() {
+    const [payments, setPayments] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [processingId, setProcessingId] = useState<string | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const fetchPayments = async () => {
         const {
-            data: { session },
+            data: {session},
         } = await supabase.auth.getSession();
-        return session?.access_token;
+
+        if (!session) return;
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/payments/pending`,
+            {
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`,
+                },
+            }
+        );
+
+        const data = await res.json();
+
+        setPayments(data || []);
+        setLoading(false);
     };
 
-    const loadPayments = useCallback(async () => {
-        try {
-            setLoading(true);
-            const token = await getSessionToken();
-            if (!token) {
-                message.error("Not authenticated");
-                return;
-            }
-            const res = await fetch("/api/admin/payments/pending", {
-                headers: { "Authorization": `Bearer ${token}` },
-            });
-            if (!res.ok) {
-                message.error("Failed to load");
-                return;
-            }
-            const data = await res.json();
-            setPayments(data ?? []);
-        } catch {
-            message.error("Failed to load payments");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    console.log("Payments:", payments);
 
-    const handleApprove = async (paymentId: string) => {
+    const getProofUrl = async (path: string) => {
+        const { data, error } = await supabase.storage
+            .from("payment-proofs")
+            .createSignedUrl(path, 300);
+
+        if (error) {
+            console.error("Signed URL error:", error);
+            return null;
+        }
+
+        return data.signedUrl;
+    };
+
+    const approvePayment = async (id: string) => {
         try {
-            const token = await getSessionToken();
-            if (!token) {
-                message.error("Not authenticated");
-                return;
-            }
-            const res = await fetch("/api/admin/payments/approve", {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/payments/approve/${id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${session?.access_token}`,
+                    },
+                    body: JSON.stringify({}),
+                }
+            );
+
+            if (!res.ok) throw new Error("Failed");
+
+            fetchPayments();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+
+    const rejectPayment = async (id: string) => {
+        const {
+            data: {session},
+        } = await supabase.auth.getSession();
+
+        await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/payments/reject`,
+            {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${session?.access_token}`,
                 },
-                body: JSON.stringify({ paymentId }),
-            });
-            if (!res.ok) {
-                message.error("Failed to approve");
-                return;
+                body: JSON.stringify({paymentId: id}),
             }
-            message.success("Payment approved");
-            loadPayments();
-        } catch {
-            message.error("Failed to approve payment");
-        }
+        );
+
+        fetchPayments();
     };
 
     useEffect(() => {
-        loadPayments();
-    }, [loadPayments]);
+        fetchPayments();
+    }, []);
+
+    const columns = [
+        {
+            title: "No",
+            dataIndex: "no",
+            render: (_: any, __: any, index: number) => index + 1,
+        },
+        {
+            title: "Transaction Id",
+            dataIndex: "transaction_id",
+        },
+        {
+            title: "Payment Method",
+            dataIndex: "method",
+        },
+        {title: "Amount", dataIndex: "amount",},
+        {
+            title: "Proof",
+            render: (_, record) => (
+                <Button
+                    type="primary"
+                    onClick={async () => {
+                        const url = await getProofUrl(record.proof_url);
+                        if (url) setPreview(url);
+                    }}
+                >
+                    View
+                </Button>
+            ),
+        },
+
+        {title: "User ID", dataIndex: "user_id"},
+        {
+            title: "Status",
+            dataIndex: "status",
+            render: (status: string) => {
+                const color =
+                    status === "approved"
+                        ? "green"
+                        : status === "rejected"
+                            ? "red"
+                            : "orange";
+
+                return <Tag color={color}>{status}</Tag>;
+            },
+        },
+        {
+            title: "Actions",
+            render: (_: any, record: any) =>
+                record.status === "pending" && (
+                    <Space>
+                        <Button
+                            type="primary"
+                            loading={processingId === record.id}
+                            onClick={() => approvePayment(record.id)}
+                        >
+                            Approve
+                        </Button>
+                        <Button
+                            danger
+                            onClick={() => rejectPayment(record.id)}
+                        >
+                            Reject
+                        </Button>
+                    </Space>
+                ),
+        },
+    ];
 
     return (
-        <div className="space-y-3">
-            {payments.map((p) => (
-                <div key={p.id} className="border p-3 rounded">
-                    <div>
-                        Email: {p.profiles?.[0]?.email ?? "Unknown"}
-                    </div>
-                    <div>Plan: {p.plan}</div>
-                    <div>Reference: {p.reference}</div>
+        <Card>
+            <Title level={3}>Payment Approvals</Title>
+            <Table
+                rowKey="id"
+                columns={columns}
+                dataSource={payments}
+                loading={loading}
+            />
+            <Modal
+                open={!!preview}
+                footer={null}
+                onCancel={() => setPreview(null)}
+                width={800}
+            >
+                {preview && (
+                    <Image
+                        src={preview}
+                        alt="Payment Proof"
+                        width={1000}
+                        height={400}
+                        style={{ width: "100%", height: "auto", borderRadius: 8 }}
+                        priority
+                    />
+                )}
+            </Modal>
 
-                    <button
-                        className="mt-2 px-3 py-1 bg-green-600 text-white rounded"
-                        onClick={() => handleApprove(p.id)}
-                        disabled={loading}
-                    >
-                        Approve
-                    </button>
-                </div>
-            ))}
 
-            {!payments.length && !loading && (
-                <div className="text-gray-500">No pending payments</div>
-            )}
-        </div>
+        </Card>
     );
 }
