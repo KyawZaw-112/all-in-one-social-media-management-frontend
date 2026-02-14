@@ -27,7 +27,7 @@ export default function AdminUsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [filtered, setFiltered] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
-    const [now, setNow] = useState(Date.now());
+    const [now, setNow] = useState(() => Date.now());
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -73,12 +73,12 @@ export default function AdminUsersPage() {
 
     const extendSubscription = async (id: string) => {
         const {
-            data:{session},
+            data: {session},
         } = await supabase.auth.getSession();
         await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/subscription/extend/${id}`, {
             method: "POST",
-            headers:{
-                Authorization: `Bearer ${session.access_token}`
+            headers: {
+                Authorization: `Bearer ${session?.access_token}`
             }
         });
 
@@ -136,17 +136,20 @@ export default function AdminUsersPage() {
         return () => clearInterval(interval);
     }, []);
     useEffect(() => {
-        fetchUsers();
+        const load = async () => {
+            await fetchUsers();
+        };
+        load();
     }, []);
 
     const forceLogout = async (userId: string) => {
         const {
-            data:{session},
+            data: {session},
         } = await supabase.auth.getSession();
         if (!session) return;
         await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/force-logout/${userId}`, {
             method: "POST",
-            headers:{
+            headers: {
                 Authorization: `Bearer ${session.access_token}`
             }
         });
