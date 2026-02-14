@@ -119,7 +119,7 @@ export default function PaymentsPage() {
         },
         {
             title: "Payment Method",
-            dataIndex: "method",
+            dataIndex: "payment_provider",
         },
         {title: "Amount", dataIndex: "amount",},
         {

@@ -64,7 +64,7 @@ export default function AdminUsersPage() {
         const keyword = value.toLowerCase();
 
         const filteredData = users.filter((u) =>
-            u.email?.toLowerCase().includes(keyword)
+            u.id?.toLowerCase().includes(keyword)
         );
 
         setFiltered(filteredData);
