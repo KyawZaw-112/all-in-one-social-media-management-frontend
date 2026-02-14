@@ -24,7 +24,7 @@ export default function SignupPage() {
         }
 
         message.success("Account created. please wait admin's confirmation.");
-        router.push("/subscribe");
+        router.push("/subscribe/manual");
     };
 
     return (

@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useState} from "react";
-import {Table, Card, Typography, Input, Space, Tag} from "antd";
+import {Table, Card, Typography, Input, Space, Tag, Button} from "antd";
 import type {ColumnsType} from "antd/es/table";
 import supabase from "@/lib/supabase";
 
@@ -10,14 +10,16 @@ const {Search} = Input;
 
 interface User {
     id: string;
-    user_id: string;
     email: string;
     last_sign_in_at: string | null;
-    plan: string;
+    plan: string | null;
     status: string;
-    country: string;
-    expires_at: string;
+    country: string | null;
+    expires_at: string | null;
     created_at: string;
+    device?: string;
+    browser?: string;
+    login_count?: number;
 }
 
 
@@ -26,7 +28,6 @@ export default function AdminUsersPage() {
     const [filtered, setFiltered] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [now, setNow] = useState(Date.now());
-    console.log("Users:", users);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -40,7 +41,7 @@ export default function AdminUsersPage() {
             return;
         }
 
-        const res = await fetch("/api/admin/users", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/users`, {
             headers: {
                 Authorization: `Bearer ${session.access_token}`,
             },
@@ -52,6 +53,7 @@ export default function AdminUsersPage() {
         }
 
         const data = await res.json();
+        console.log(data)
 
         setUsers(data.users || []);
         setFiltered(data.users || []);
@@ -70,8 +72,14 @@ export default function AdminUsersPage() {
 
 
     const extendSubscription = async (id: string) => {
-        await fetch(`/api/admin/subscription/extend/${id}`, {
+        const {
+            data:{session},
+        } = await supabase.auth.getSession();
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/admin/subscription/extend/${id}`, {
             method: "POST",
+            headers:{
+                Authorization: `Bearer ${session.access_token}`
+            }
         });
 
         fetchUsers();
@@ -131,6 +139,22 @@ export default function AdminUsersPage() {
         fetchUsers();
     }, []);
 
+    const forceLogout = async (userId: string) => {
+        const {
+            data:{session},
+        } = await supabase.auth.getSession();
+        if (!session) return;
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/force-logout/${userId}`, {
+            method: "POST",
+            headers:{
+                Authorization: `Bearer ${session.access_token}`
+            }
+        });
+
+        fetchUsers()
+    };
+
+
     const columns: ColumnsType<User> = [
         {
             title: "Email",
@@ -165,12 +189,17 @@ export default function AdminUsersPage() {
         {
             title: "Status",
             render: (_, record) => {
-                const isExpired =
-                    new Date(record.expires_at) < new Date();
+                if (!record.expires_at) {
+                    return <Tag color="red">No Expiry</Tag>;
+                }
+
+                const expiry = new Date(record.expires_at);
+                const isValid = !isNaN(expiry.getTime());
+                const isExpired = isValid && expiry < new Date();
 
                 return (
-                    <Tag color={isExpired ? "red" : "green"}>
-                        {isExpired ? "Expired" : "Active"}
+                    <Tag color={!isValid || isExpired ? "red" : "green"}>
+                        {!isValid || isExpired ? "Expired" : "Active"}
                     </Tag>
                 );
             },
@@ -178,16 +207,26 @@ export default function AdminUsersPage() {
         {
             title: "Expires",
             render: (_, record) => {
-                const isExpired =
-                    new Date(record.expires_at) < new Date();
+                if (!record.expires_at) {
+                    return <span style={{color: "red"}}>-</span>;
+                }
+
+                const expiry = new Date(record.expires_at);
+
+                if (isNaN(expiry.getTime())) {
+                    return <span style={{color: "red"}}>-</span>;
+                }
+
+                const isExpired = expiry < new Date();
 
                 return (
                     <span style={{color: isExpired ? "red" : "inherit"}}>
-          {new Date(record.expires_at).toLocaleDateString()}
-        </span>
+                {expiry.toLocaleDateString()}
+            </span>
                 );
             },
         },
+
         {
             title: "Device",
             dataIndex: "device",
@@ -224,15 +263,13 @@ export default function AdminUsersPage() {
                     >
                         +30 Days
                     </button>
-                    <button
-                        onClick={() =>
-                            fetch(`/api/admin/force-logout/${record.user_id}`, {
-                                method: "POST",
-                            })
-                        }
+                    <Button
+                        danger
+                        style={{marginLeft: 8}}
+                        onClick={() => forceLogout(record.id)}
                     >
                         Force Logout
-                    </button>
+                    </Button>
                 </>
             ),
         },

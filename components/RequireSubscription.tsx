@@ -17,7 +17,7 @@ export default function RequireSubscription({ children }: { children: React.Reac
                 return;
             }
 
-            const res = await fetch("http://localhost:4000/subscriptions/me", {
+            const res = await fetch("http://localhost:4000/subscriptions/my-history", {
                 headers: {
                     Authorization: `Bearer ${data.session.access_token}`,
                 },

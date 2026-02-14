@@ -1,7 +1,10 @@
 "use client";
 
 import { Card, Col, Row, Statistic } from "antd";
-import { UserOutlined, DollarOutlined, TeamOutlined } from "@ant-design/icons";
+import {
+    UserOutlined,
+    TeamOutlined,
+} from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import AnalyticsChart from "@/components/AnalyticsChart";
 import supabase from "@/lib/supabase";
@@ -13,30 +16,49 @@ export default function AdminDashboard() {
         approved: 0,
         subscribers: 0,
         activeSubscribers: 0,
+        monthlyRevenue: 0,
     });
 
     const loadStats = async () => {
         try {
-            // Run queries in parallel for performance
+            const now = new Date();
+            const firstDayOfMonth = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                1
+            ).toISOString();
+
             const [
                 usersRes,
                 paymentsRes,
                 subscriptionsRes,
+                monthlyRevenueRes,
             ] = await Promise.all([
+                // Users count
                 supabase
                     .from("profiles")
                     .select("*", { count: "exact", head: true }),
 
-                supabase.from("payments").select("status"),
+                // All payments
+                supabase.from("payments").select("status, amount, created_at"),
 
+                // Subscriptions
                 supabase
                     .from("subscriptions")
                     .select("status, expires_at"),
+
+                // Monthly revenue (only approved this month)
+                supabase
+                    .from("payments")
+                    .select("amount")
+                    .eq("status", "approved")
+                    .gte("created_at", firstDayOfMonth),
             ]);
 
             if (usersRes.error) throw usersRes.error;
             if (paymentsRes.error) throw paymentsRes.error;
             if (subscriptionsRes.error) throw subscriptionsRes.error;
+            if (monthlyRevenueRes.error) throw monthlyRevenueRes.error;
 
             const usersCount = usersRes.count || 0;
 
@@ -45,8 +67,6 @@ export default function AdminDashboard() {
 
             const approved =
                 paymentsRes.data?.filter((p) => p.status === "approved").length || 0;
-
-            const now = new Date();
 
             const subscribers = subscriptionsRes.data?.length || 0;
 
@@ -58,12 +78,20 @@ export default function AdminDashboard() {
                         new Date(s.expires_at) > now
                 ).length || 0;
 
+            // 💰 Calculate Monthly Revenue
+            const monthlyRevenue =
+                monthlyRevenueRes.data?.reduce(
+                    (sum, p) => sum + Number(p.amount || 0),
+                    0
+                ) || 0;
+
             setStats({
                 users: usersCount,
                 pending,
                 approved,
                 subscribers,
                 activeSubscribers,
+                monthlyRevenue,
             });
         } catch (error) {
             console.error("Dashboard error:", error);
@@ -73,6 +101,10 @@ export default function AdminDashboard() {
     useEffect(() => {
         loadStats();
     }, []);
+
+
+    console.log("monthly",stats.monthlyRevenue)
+
 
     const chartData = [
         { date: "Mon", users: 2 },
@@ -97,9 +129,11 @@ export default function AdminDashboard() {
             <Col xs={24} md={12} lg={6}>
                 <Card>
                     <Statistic
-                        title="Pending Payments"
-                        value={stats.pending}
-                        valueStyle={{ color: "#faad14" }}
+                        title="Monthly Revenue"
+                        value={stats.monthlyRevenue}
+                        precision={2}
+                        prefix="฿"
+                        valueStyle={{ color: "#52c41a" }}
                     />
                 </Card>
             </Col>
@@ -107,10 +141,9 @@ export default function AdminDashboard() {
             <Col xs={24} md={12} lg={6}>
                 <Card>
                     <Statistic
-                        title="Approved Payments"
-                        value={stats.approved}
-                        valueStyle={{ color: "#52c41a" }}
-                        prefix={<DollarOutlined />}
+                        title="Pending Payments"
+                        value={stats.pending}
+                        valueStyle={{ color: "#faad14" }}
                     />
                 </Card>
             </Col>

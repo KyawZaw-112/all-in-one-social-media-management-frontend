@@ -35,6 +35,7 @@ export default function PaymentsPage() {
         );
 
         const data = await res.json();
+        console.log(data)
 
         setPayments(data || []);
         setLoading(false);

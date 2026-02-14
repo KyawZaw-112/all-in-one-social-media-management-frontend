@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {useState} from "react";
 import {
     Card,
     Button,
@@ -10,16 +10,18 @@ import {
     Space,
     message,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import {UploadOutlined} from "@ant-design/icons";
 import supabase from "@/lib/supabase";
+import {Dropdown} from 'antd';
 
-const { Title, Text } = Typography;
+const {Title, Text} = Typography;
 
 export default function ManualPaymentPage() {
     const [reference, setReference] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
-
+    const [amount, setAmount] = useState(100);
+    const [payment_provider, setPaymentProvider] = useState("KBZ");
 
 
     const submitPayment = async () => {
@@ -37,7 +39,7 @@ export default function ManualPaymentPage() {
             setLoading(true);
 
             const {
-                data: { session },
+                data: {session},
             } = await supabase.auth.getSession();
 
             if (!session) {
@@ -56,10 +58,11 @@ export default function ManualPaymentPage() {
                 plan: "monthly",
                 amount: 29,
                 proof_url: filePath,
+                payment_provider: payment_provider,
             });
 
 
-            const { error: uploadError } = await supabase.storage
+            const {error: uploadError} = await supabase.storage
                 .from("payment-proofs")
                 .upload(filePath, file);
 
@@ -68,16 +71,17 @@ export default function ManualPaymentPage() {
                 return;
             }
 
-            const response = await fetch("/api/payments/manual", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/payments/manual`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session.access_token}`
                 },
                 body: JSON.stringify({
                     user_id: userId,
                     reference,
                     plan: "monthly",
-                    amount: 29,
+                    amount: amount,
                     proof_url: filePath,
                 }),
             });
@@ -99,17 +103,66 @@ export default function ManualPaymentPage() {
 
 
     return (
-        <div style={{ maxWidth: 500, margin: "100px auto" }}>
+        <div style={{maxWidth: 500, margin: "50px auto"}}>
             <Card>
-                <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+                <Space orientation="vertical" size={16} style={{width: "100%"}}>
                     <Title level={3}>Manual Payment</Title>
-
                     <Text>
-                        Transfer $29 to:
-                        <br />
-                        Bank: KBZ
-                        <br />
-                        Account: 123-456
+                        <div>
+                            <p>
+                                Transfer Amount
+                            </p>
+                            <b>{amount}</b> kyat
+                        </div>
+                        <div className={""}>
+                            <p>Choose Bank Name</p>
+                            <Dropdown
+                                menu={{
+                                    items: [
+                                        {
+                                            key: 'KBZ Pay',
+                                            label: 'KBZ Pay',
+                                            onClick: () => setPaymentProvider('KBZ'),
+                                        },
+                                        {
+                                            key: 'WAVE',
+                                            label: 'Wave Pay',
+                                            onClick: () => setPaymentProvider('WAVE'),
+                                        }
+                                    ],
+                                }}
+                            >
+                                <Button>
+                                    {payment_provider} ▼
+                                </Button>
+                            </Dropdown>
+                        </div>
+                        <br/>
+                        <div>
+                            <p>Bank Account Details</p>
+                            {payment_provider === "KBZ" && (
+                                <div>
+                                    <p>Account Name: Kyaw Zaw Win</p>
+                                    <p>Account Number: 09 973302141</p>
+                                </div>
+                            )}
+                            {payment_provider === "WAVE" && (
+                                <div>
+                                    <div className={"flex "}>
+                                        <p>Account Name</p>
+                                        <b>Kyaw Zaw Win</b>
+                                    </div>
+                                    <div className={"flex "}>
+                                        <p>Account Number</p>
+                                        <b>
+                                            09973302141
+                                        </b>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        Please transfer the amount to the selected bank account and upload the screenshot along with the
+                        reference number provided after the transfer.
                     </Text>
 
                     <Input
@@ -126,7 +179,7 @@ export default function ManualPaymentPage() {
                         maxCount={1}
                         showUploadList
                     >
-                        <Button icon={<UploadOutlined />}>
+                        <Button icon={<UploadOutlined/>}>
                             Upload Screenshot
                         </Button>
                     </Upload>

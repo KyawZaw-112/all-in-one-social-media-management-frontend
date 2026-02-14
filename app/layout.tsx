@@ -11,7 +11,7 @@ export default function RootLayout({children}:{children: ReactNode}) {
             data: { subscription },
         } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (event === "SIGNED_IN" && session?.user) {
-                await fetch("/api/log-login", {
+                await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/log-login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

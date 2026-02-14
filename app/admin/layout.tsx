@@ -39,6 +39,11 @@ export default function AdminLayout({
                         icon: <UserOutlined />,
                         label: "Subscribed Users",
                     },
+                    {
+                        key: "payment-history",
+                        icon: <UserOutlined />,
+                        label: "Subscriptions",
+                    }
                 ]}
             />
         </Sider>

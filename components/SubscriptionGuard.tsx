@@ -2,10 +2,7 @@
 
 import React from "react";
 import { Card, Button, Typography, Space, Tag } from "antd";
-import {
-    LockOutlined,
-    ClockCircleOutlined,
-} from "@ant-design/icons";
+import { LockOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import { useSubscription } from "@/hooks/useSubscription";
 
 const { Text } = Typography;
@@ -15,69 +12,53 @@ export default function SubscriptionGuard({
                                           }: {
     children: React.ReactNode;
 }) {
-    const { loading, active, subscription } = useSubscription();
+    const { loading, status } = useSubscription();
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[70vh]">
-                <Card size="small" style={{ width: 360 }}>
-                    <Text type="secondary">Checking subscription…</Text>
-                </Card>
-            </div>
-        );
+        return null;
     }
 
-    if (active) {
+    if (status === "active") {
         return <>{children}</>;
     }
 
-    const isPending = subscription?.status === "pending";
+    const isExpired = status === "expired";
 
     return (
-        <div className="flex items-center justify-center min-h-[70vh] px-10 w-full bg-red-500">
-            <Card
-                size="small"
-                variant={"outlined"}
-                style={{ width: 380 }}
-            >
-                <Space orientation="vertical" size={12} style={{ width: "100%" }}>
-                    {/* Header */}
+        <div className="flex items-center justify-center min-h-[70vh] px-6">
+            <Card size="small" style={{ width: 380 }}>
+                <Space direction="vertical" size={12} style={{ width: "100%" }}>
                     <Space>
-                        {isPending ? (
+                        {isExpired ? (
                             <ClockCircleOutlined style={{ color: "#faad14" }} />
                         ) : (
                             <LockOutlined style={{ color: "#ff4d4f" }} />
                         )}
 
                         <Text strong>
-                            {isPending
-                                ? "Payment under review"
+                            {isExpired
+                                ? "Subscription expired"
                                 : "Subscription required"}
                         </Text>
                     </Space>
 
-                    {/* Status */}
-                    <Tag color={isPending ? "gold" : "red"}>
-                        {isPending ? "Pending approval" : "Inactive"}
+                    <Tag color={isExpired ? "gold" : "red"}>
+                        {isExpired ? "Expired" : "Inactive"}
                     </Tag>
 
-                    {/* Message */}
                     <Text type="secondary">
-                        {isPending
-                            ? "Your payment is being reviewed by an admin. Access will be enabled once approved."
+                        {isExpired
+                            ? "Your subscription has expired. Please renew to continue."
                             : "An active subscription is required to access this feature."}
                     </Text>
 
-                    {/* CTA */}
-                    {!isPending && (
-                        <Button
-                            type="primary"
-                            block
-                            href="/subscribe"
-                        >
-                            View pricing
-                        </Button>
-                    )}
+                    <Button type="primary" block href="/subscribe/manual">
+                        View Plans
+                    </Button>
+
+                    <Button block href="/">
+                        Home
+                    </Button>
                 </Space>
             </Card>
         </div>
