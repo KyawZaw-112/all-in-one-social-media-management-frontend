@@ -6,22 +6,18 @@ import supabase from "@/lib/supabase";
 export default function PlatformsPage() {
 
     const connectFacebook = async () => {
-        const session = await supabase.auth.getSession();
-        const token = session.data.session?.access_token;
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
 
-        const res = await fetch(
-            "http://localhost:4000/api/oauth/facebook",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        if (!token) {
+            alert("Not authenticated");
+            return;
+        }
 
-        const data = await res.json();
-        window.location.href = data.url;
+        // Redirect directly (NO fetch)
+        window.location.href =
+            `http://localhost:4000/api/oauth/facebook?token=${token}`;
     };
-
 
     return (
         <div style={{ padding: 40 }}>
