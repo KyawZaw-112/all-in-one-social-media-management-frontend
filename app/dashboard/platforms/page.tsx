@@ -5,7 +5,7 @@ import {Button} from "antd";
 export default function PlatformsPage() {
 
     const connectFacebook = () => {
-        window.location.href = "http://localhost:4000/api/oauth/facebook";
+        window.location.href = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/oauth/facebook`;
     };
 
 
