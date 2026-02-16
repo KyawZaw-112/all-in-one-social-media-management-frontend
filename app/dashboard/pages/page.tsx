@@ -1,90 +1,80 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-    Card,
-    Row,
-    Col,
-    Typography,
-    Spin,
-    Empty,
-    Tag,
-} from "antd";
-import { useRouter } from "next/navigation";
-import { fetchWithAuth } from "@/lib/api";
-import supabase from "@/lib/supabase";
+import { getPlatforms } from "@/lib/api";
+import  supabase  from "@/lib/supabase";
 
-const { Title, Text } = Typography;
-
-interface PageItem {
+interface Platform {
     id: string;
-    name: string;
-    ruleCount: number;
+    page_id: string;
+    page_name: string;
+    platform: string;
 }
 
 export default function PagesListPage() {
-    const router = useRouter();
-    const [pages, setPages] = useState<PageItem[]>([]);
+    const [pages, setPages] = useState<Platform[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadPages = async () => {
+        async function loadPages() {
             try {
-                const { data } = await supabase.auth.getSession();
-                const token = data?.session?.access_token;
-                if (!token) return;
+                setLoading(true);
 
-                const result = await fetchWithAuth(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/stats`,
-                    token
-                );
+                const {
+                    data: { session },
+                } = await supabase.auth.getSession();
 
-                setPages(result || []);
-            } catch (err) {
-                console.error("Failed to load pages:", err);
+                if (!session?.access_token) {
+                    throw new Error("Not authenticated");
+                }
+
+                const data = await getPlatforms(session.access_token);
+
+                setPages(data || []);
+            } catch (err: any) {
+                console.error("Failed to load pages:", err.message);
+                setError(err.message);
             } finally {
                 setLoading(false);
             }
-        };
+        }
 
         loadPages();
     }, []);
 
-    console.log(pages)
+    if (loading) {
+        return <div className="p-6">Loading pages...</div>;
+    }
+
+    if (error) {
+        return (
+            <div className="p-6 text-red-500">
+                Error loading pages: {error}
+            </div>
+        );
+    }
 
     return (
-        <div style={{ padding: 32 }}>
-            <Title level={3}>Connected Pages</Title>
-            <Text type="secondary">
-                Select a page to manage its automation rules.
-            </Text>
+        <div className="p-6">
+            <h1 className="text-2xl font-semibold mb-6">Connected Pages</h1>
 
-            {loading ? (
-                <div style={{ marginTop: 40 }}>
-                    <Spin />
-                </div>
-            ) : pages.length === 0 ? (
-                <div style={{ marginTop: 40 }}>
-                    <Empty description="No connected pages yet" />
-                </div>
+            {pages.length === 0 ? (
+                <div>No connected pages yet</div>
             ) : (
-                <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+                <div className="space-y-4">
                     {pages.map((page) => (
-                        <Col xs={24} md={12} lg={8} key={page.id}>
-                            <Card
-                                hoverable
-                                onClick={() =>
-                                    router.push(`/dashboard/pages/${page.id}/rules`)
-                                }
-                            >
-                                <Title level={5}>{page.name}</Title>
-                                <Tag color="blue">
-                                    {page.ruleCount || 0} Rules
-                                </Tag>
-                            </Card>
-                        </Col>
+                        <div
+                            key={page.id}
+                            className="border rounded-lg p-4 shadow-sm"
+                        >
+                            <div className="font-medium">{page.page_name}</div>
+                            <div className="text-sm text-gray-500">
+                                Platform: {page.platform}
+                            </div>
+                        </div>
                     ))}
-                </Row>
+                </div>
             )}
         </div>
     );
