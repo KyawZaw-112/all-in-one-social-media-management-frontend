@@ -1,8 +1,9 @@
 "use client";
 
 import { Button, message } from "antd";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import supabase from "@/lib/supabase";
+import {useRouter, useSearchParams} from "next/navigation";
 
 export default function PlatformsPage() {
     const [loading, setLoading] = useState(false);
@@ -45,6 +46,16 @@ export default function PlatformsPage() {
             setLoading(false);
         }
     };
+
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (searchParams.get("connected") === "facebook") {
+            message.success("Facebook connected successfully!");
+            router.replace("/platforms"); // remove query param
+        }
+    }, []);
 
     return (
         <div style={{ padding: 40 }}>
