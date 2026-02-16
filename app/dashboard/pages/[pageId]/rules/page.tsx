@@ -2,16 +2,29 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import {Button, Table, Input, Select, Switch, message, Space, Form, Modal} from "antd";
+import {
+    Button,
+    Table,
+    Input,
+    Select,
+    Switch,
+    message,
+    Space,
+    Form,
+    Modal,
+    InputNumber,
+} from "antd";
 import type { ColumnsType } from "antd/es/table";
+
 const { Option } = Select;
 
 interface Rule {
     id: string;
-    keyword: string;
+    keyword: string | null;
     reply_text: string;
-    match_type: string | "contains" | "exact";
+    match_type: "contains" | "exact" | "fallback";
     enabled: boolean;
+    priority: number;
 }
 
 export default function PageRules() {
@@ -27,151 +40,121 @@ export default function PageRules() {
 
     const [keyword, setKeyword] = useState("");
     const [replyText, setReplyText] = useState("");
-    const [matchType, setMatchType] = useState("contains");
+    const [matchType, setMatchType] =
+        useState<"contains" | "exact" | "fallback">("contains");
+    const [priority, setPriority] = useState(1);
 
-    const [pagination, setPagination] = useState({
-        current: 1,
-        pageSize: 10,
-        total: 0,
-    });
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-    // Fetch rules
-    const fetchRules = async (page = 1) => {
+    // Fetch Rules
+    const fetchRules = async () => {
         try {
             setLoading(true);
-
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/rules/${pageId}?page=${page}&limit=${pagination.pageSize}`
-            );
-
+            const res = await fetch(`${backendUrl}/api/rules/${pageId}`);
             const data = await res.json();
-
-            setRules(data.items);
-
-            setPagination(prev => ({
-                ...prev,
-                current: page,
-                total: data.total,
-            }));
+            setRules(data);
         } finally {
             setLoading(false);
         }
     };
 
+    useEffect(() => {
+        if (pageId) fetchRules();
+    }, [pageId]);
+
+    // Add Rule
+    const addRule = async () => {
+        if (!replyText) {
+            message.warning("Reply text required");
+            return;
+        }
+
+        if (matchType !== "fallback" && !keyword) {
+            message.warning("Keyword required");
+            return;
+        }
+
+        if (matchType === "fallback") {
+            const fallbackExists = rules.some(
+                (r) => r.match_type === "fallback"
+            );
+            if (fallbackExists) {
+                message.error("Only one fallback rule allowed per page");
+                return;
+            }
+        }
+
+        await fetch(`${backendUrl}/api/rules`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                page_id: pageId,
+                keyword: matchType === "fallback" ? null : keyword,
+                reply_text: replyText,
+                match_type: matchType,
+                priority: matchType === "fallback" ? 9999 : priority,
+            }),
+        });
+
+        message.success("Rule added");
+
+        setKeyword("");
+        setReplyText("");
+        setPriority(1);
+        setMatchType("contains");
+
+        fetchRules();
+    };
+
+    // Delete Rule
+    const deleteRule = async (id: string) => {
+        await fetch(`${backendUrl}/api/rules/${id}`, {
+            method: "DELETE",
+        });
+
+        fetchRules();
+    };
+
+    // Toggle Enable
+    const toggleRule = async (rule: Rule) => {
+        await fetch(`${backendUrl}/api/rules/${rule.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ enabled: !rule.enabled }),
+        });
+
+        fetchRules();
+    };
+
+    // Edit
     const openEdit = (rule: Rule) => {
         setEditingRule(rule);
         form.setFieldsValue(rule);
         setOpen(true);
     };
 
-
     const updateRule = async () => {
         const values = await form.validateFields();
 
-        await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/rules/${editingRule?.id}`,
-            {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(values),
-            }
-        );
+        await fetch(`${backendUrl}/api/rules/${editingRule?.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(values),
+        });
 
         setOpen(false);
-        fetchRules(pagination.current);
+        fetchRules();
     };
-
-
-
-
-    useEffect(() => {
-        if(pageId) fetchRules();
-    }, [pageId]);
-
-    // Add rule
-    const addRule = async () => {
-        if (!keyword || !replyText) {
-            message.warning("Please fill all fields");
-            return;
-        }
-
-        try {
-            const token = localStorage.getItem("token");
-
-            await fetch(`${backendUrl}/rules`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    page_id: pageId,
-                    keyword,
-                    reply_text: replyText,
-                    match_type: matchType,
-                    trigger_type: "messenger",
-                }),
-            });
-
-            message.success("Rule added");
-            setKeyword("");
-            setReplyText("");
-            fetchRules();
-        } catch {
-            message.error("Failed to add rule");
-        }
-    };
-
-    // Delete rule
-    const deleteRule = async (id: string) => {
-        const oldRules = rules;
-
-        setRules(prev => prev.filter(r => r.id !== id));
-
-        try {
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/rules/${id}`,
-                { method: "DELETE" }
-            );
-        } catch {
-            setRules(oldRules);
-        }
-    };
-
-
-
-    // Toggle enable
-    const toggleRule = async (rule: Rule) => {
-        const updated = { ...rule, enabled: !rule.enabled };
-
-        setRules(prev =>
-            prev.map(r => (r.id === rule.id ? updated : r))
-        );
-
-        try {
-            await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/rules/${rule.id}`,
-                {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ enabled: updated.enabled }),
-                }
-            );
-        } catch {
-            // rollback
-            setRules(prev =>
-                prev.map(r => (r.id === rule.id ? rule : r))
-            );
-        }
-    };
-
 
     const columns: ColumnsType<Rule> = [
         {
             title: "Keyword",
-            dataIndex: "keyword",
+            render: (_, record) =>
+                record.match_type === "fallback"
+                    ? "-"
+                    : record.keyword,
         },
         {
             title: "Reply",
@@ -180,6 +163,10 @@ export default function PageRules() {
         {
             title: "Match Type",
             dataIndex: "match_type",
+        },
+        {
+            title: "Priority",
+            dataIndex: "priority",
         },
         {
             title: "Enabled",
@@ -195,7 +182,10 @@ export default function PageRules() {
             render: (_, record) => (
                 <Space>
                     <Button onClick={() => openEdit(record)}>Edit</Button>
-                    <Button danger onClick={() => deleteRule(record.id)}>
+                    <Button
+                        danger
+                        onClick={() => deleteRule(record.id)}
+                    >
                         Delete
                     </Button>
                 </Space>
@@ -207,27 +197,44 @@ export default function PageRules() {
         <div style={{ padding: 40 }}>
             <h2>Manage Auto Reply Rules</h2>
 
-            <Space style={{ marginBottom: 20 }}>
-                <Input
-                    placeholder="Keyword"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                />
+            <Space style={{ marginBottom: 20 }} wrap>
+                {matchType !== "fallback" && (
+                    <Input
+                        placeholder="Keyword"
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                        style={{ width: 200 }}
+                    />
+                )}
 
                 <Input
                     placeholder="Reply Text"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
+                    style={{ width: 250 }}
                 />
 
                 <Select
                     value={matchType}
-                    onChange={setMatchType}
-                    style={{ width: 120 }}
+                    onChange={(value) => {
+                        setMatchType(value);
+                        if (value === "fallback") {
+                            setKeyword("");
+                        }
+                    }}
+                    style={{ width: 140 }}
                 >
                     <Option value="contains">Contains</Option>
                     <Option value="exact">Exact</Option>
+                    <Option value="fallback">Fallback</Option>
                 </Select>
+
+                <InputNumber
+                    min={1}
+                    value={priority}
+                    onChange={(value) => setPriority(value || 1)}
+                    placeholder="Priority"
+                />
 
                 <Button type="primary" onClick={addRule}>
                     Add Rule
@@ -239,12 +246,6 @@ export default function PageRules() {
                 columns={columns}
                 dataSource={rules}
                 loading={loading}
-                pagination={{
-                    current: pagination.current,
-                    pageSize: pagination.pageSize,
-                    total: pagination.total,
-                    onChange: (page) => fetchRules(page),
-                }}
             />
 
             <Modal
@@ -254,27 +255,38 @@ export default function PageRules() {
                 onCancel={() => setOpen(false)}
             >
                 <Form form={form} layout="vertical">
-                    <Form.Item name="keyword" label="Keyword" rules={[{ required: true }]}>
+                    <Form.Item name="keyword" label="Keyword">
                         <Input />
                     </Form.Item>
 
-                    <Form.Item name="reply_text" label="Reply" rules={[{ required: true }]}>
+                    <Form.Item
+                        name="reply_text"
+                        label="Reply"
+                        rules={[{ required: true }]}
+                    >
                         <Input.TextArea rows={4} />
                     </Form.Item>
 
                     <Form.Item name="match_type" label="Match Type">
                         <Select>
-                            <Select.Option value="contains">Contains</Select.Option>
-                            <Select.Option value="exact">Exact</Select.Option>
+                            <Option value="contains">Contains</Option>
+                            <Option value="exact">Exact</Option>
+                            <Option value="fallback">Fallback</Option>
                         </Select>
                     </Form.Item>
 
-                    <Form.Item name="enabled" valuePropName="checked">
+                    <Form.Item name="priority" label="Priority">
+                        <InputNumber min={1} style={{ width: "100%" }} />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="enabled"
+                        valuePropName="checked"
+                    >
                         <Switch />
                     </Form.Item>
                 </Form>
             </Modal>
-
         </div>
     );
 }

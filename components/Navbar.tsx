@@ -1,39 +1,57 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import  supabase  from "@/lib/supabase";
+import supabase from "@/lib/supabase";
 import { Menu, Button } from "antd";
 
 export default function Navbar() {
     const pathname = usePathname();
-    const [isLogined, setIsLogined] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-    // routes where navbar should be hidden
-    const hiddenRoutes = ["/", "/login", "/register", "/subscribe", "/success"];
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+    // Hide navbar on these routes
+    const hiddenRoutes = new Set([
+        "/",
+        "/login",
+        "/register",
+        "/subscribe",
+        "/success",
+    ]);
 
     useEffect(() => {
+        let mounted = true;
+
+        // Initial session check
         supabase.auth.getSession().then(({ data }) => {
-            setIsLogined(!!data.session);
-            setLoading(false);
+            if (!mounted) return;
+            setIsAuthenticated(!!data.session);
         });
 
-        const { data: listener } =
-            supabase.auth.onAuthStateChange((_event, session) => {
-                setIsLogined(!!session);
-            });
+        // Listen for auth changes
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (!mounted) return;
+            setIsAuthenticated(!!session);
+        });
 
         return () => {
-            listener.subscription.unsubscribe();
+            mounted = false;
+            subscription.unsubscribe();
         };
     }, []);
 
-    // ✅ SAFE conditional rendering (AFTER hooks)
-    if (loading) return null;
-    if (!isLogined) return null;
-    if (hiddenRoutes.includes(pathname)) return null;
+    // Prevent flicker before session loads
+    if (isAuthenticated === null) return null;
+
+    // Hide navbar if not logged in
+    if (!isAuthenticated) return null;
+
+    // Hide navbar on specific routes
+    if (hiddenRoutes.has(pathname)) return null;
 
     return (
         <header
@@ -53,20 +71,40 @@ export default function Navbar() {
 
             <Menu
                 mode="horizontal"
-                selectable={false}
+                selectedKeys={[pathname]}
+                style={{ flex: 1, marginLeft: 40 }}
                 items={[
-                    { key: "dashboard", label: <Link href="/dashboard">Dashboard</Link> },
-                    { key: "post", label: <Link href="/post-now">Post Now</Link> },
-                    { key: "billing", label: <Link href="/subscribe">Billing</Link> },
-                    { key: "platforms", label: <Link href="/dashboard/platforms">Connect with Facebook</Link> },
+                    {
+                        key: "/dashboard",
+                        label: <Link href="/dashboard">Dashboard</Link>,
+                    },
+                    {
+                        key: "/post-now",
+                        label: <Link href="/post-now">Post Now</Link>,
+                    },
+                    {
+                        key: "/subscribe",
+                        label: <Link href="/subscribe">Billing</Link>,
+                    },
+                    {
+                        key: "/dashboard/platforms",
+                        label: (
+                            <Link href="/dashboard/platforms">
+                                Connect Facebook
+                            </Link>
+                        ),
+                    },
                 ]}
             />
+
             <Button
                 onClick={async () => {
                     await supabase.auth.signOut();
-                    window.location.href = "/";
+                    router.push("/");
                 }}
-                type="default" style={{ border: "1px solid #e5e5e5" }}>
+                type="default"
+                style={{ border: "1px solid #e5e5e5" }}
+            >
                 Logout
             </Button>
         </header>
