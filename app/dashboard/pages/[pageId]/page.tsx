@@ -2,21 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import  supabase  from "@/lib/supabase";
+import supabase from "@/lib/supabase";
 import { fetchWithAuth } from "@/lib/api";
 
 interface Rule {
     id: string;
     keyword: string;
     reply_text: string;
+    match_type: string;
     enabled: boolean;
 }
 
 export default function PageRules() {
     const { pageId } = useParams();
+
     const [rules, setRules] = useState<Rule[]>([]);
     const [keyword, setKeyword] = useState("");
     const [replyText, setReplyText] = useState("");
+    const [matchType, setMatchType] = useState("contains");
     const [loading, setLoading] = useState(true);
 
     async function getToken() {
@@ -37,6 +40,8 @@ export default function PageRules() {
     }
 
     async function createRule() {
+        if (!keyword || !replyText) return alert("Fill all fields");
+
         const token = await getToken();
         if (!token) return;
 
@@ -46,12 +51,19 @@ export default function PageRules() {
                 page_id: pageId,
                 keyword,
                 reply_text: replyText,
+                match_type: matchType,
             }),
         });
+
+        if (!newRule?.id) {
+            alert("Failed to create rule");
+            return;
+        }
 
         setRules((prev) => [...prev, newRule]);
         setKeyword("");
         setReplyText("");
+        setMatchType("contains");
     }
 
     async function deleteRule(id: string) {
@@ -74,6 +86,7 @@ export default function PageRules() {
             body: JSON.stringify({
                 keyword: rule.keyword,
                 reply_text: rule.reply_text,
+                match_type: rule.match_type,
                 enabled: !rule.enabled,
             }),
         });
@@ -90,65 +103,90 @@ export default function PageRules() {
     if (loading) return <div className="p-6">Loading rules...</div>;
 
     return (
-        <div className="p-6">
+        <div className="max-w-3xl mx-auto p-6">
             <h1 className="text-2xl font-semibold mb-6">
                 Auto Reply Rules
             </h1>
 
-            {/* Create Rule */}
-            <div className="mb-6 space-y-2">
+            {/* Create Rule Card */}
+            <div className="bg-white shadow rounded-lg p-6 mb-8 space-y-4 border">
+                <h2 className="text-lg font-medium">Create New Rule</h2>
+
                 <input
-                    className="border p-2 w-full"
+                    className="w-full border rounded px-3 py-2"
                     placeholder="Keyword"
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                 />
 
+                <select
+                    className="w-full border rounded px-3 py-2"
+                    value={matchType}
+                    onChange={(e) => setMatchType(e.target.value)}
+                >
+                    <option value="contains">Contains</option>
+                    <option value="exact">Exact Match</option>
+                    <option value="starts_with">Starts With</option>
+                    <option value="fallback">Fallback</option>
+                </select>
+
                 <textarea
-                    className="border p-2 w-full"
-                    placeholder="Reply text"
+                    className="w-full border rounded px-3 py-2"
+                    placeholder="Reply message"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                 />
 
                 <button
                     onClick={createRule}
-                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
                 >
                     Add Rule
                 </button>
             </div>
 
-            {/* Rule List */}
+            {/* Rules List */}
             <div className="space-y-4">
-                {rules?.filter(Boolean).map((rule) => (
+                {rules.map((rule) => (
                     <div
                         key={rule.id}
-                        className="border rounded p-4 flex justify-between items-center"
+                        className="border rounded-lg p-4 flex justify-between items-center shadow-sm"
                     >
                         <div>
                             <div className="font-medium">
-                                Keyword: {rule.keyword}
+                                {rule.keyword}
                             </div>
-                            <div className="text-sm text-gray-600">
-                                Reply: {rule.reply_text}
+
+                            <div className="text-sm text-gray-500">
+                                Match: {rule.match_type}
                             </div>
-                            <div className="text-sm">
-                                Status: {rule.enabled ? "Enabled" : "Disabled"}
+
+                            <div className="text-sm mt-1">
+                                {rule.reply_text}
+                            </div>
+
+                            <div
+                                className={`text-xs mt-2 font-medium ${
+                                    rule.enabled
+                                        ? "text-green-600"
+                                        : "text-gray-400"
+                                }`}
+                            >
+                                {rule.enabled ? "Enabled" : "Disabled"}
                             </div>
                         </div>
 
-                        <div className="space-x-2">
+                        <div className="flex gap-2">
                             <button
                                 onClick={() => toggleRule(rule)}
-                                className="px-3 py-1 bg-yellow-500 text-white rounded"
+                                className="px-3 py-1 bg-yellow-500 text-white rounded text-sm"
                             >
                                 Toggle
                             </button>
 
                             <button
                                 onClick={() => deleteRule(rule.id)}
-                                className="px-3 py-1 bg-red-600 text-white rounded"
+                                className="px-3 py-1 bg-red-600 text-white rounded text-sm"
                             >
                                 Delete
                             </button>
