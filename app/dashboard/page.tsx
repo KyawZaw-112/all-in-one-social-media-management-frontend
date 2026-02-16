@@ -7,47 +7,37 @@ import {
     Col,
     Button,
     Statistic,
-    Table,
-    Tag,
     Space,
     Typography,
     Spin,
-    Empty,
 } from "antd";
 import {
-    RocketOutlined,
-    FacebookOutlined,
     ThunderboltOutlined,
-    PlusOutlined,
+    MessageOutlined,
     SettingOutlined,
+    PlusOutlined,
 } from "@ant-design/icons";
 import supabase from "@/lib/supabase";
 import { fetchWithAuth } from "@/lib/api";
 import AuthGuard from "@/components/AuthGuard";
 import SubscriptionGuard from "@/components/SubscriptionGuard";
+import { useRouter } from "next/navigation";
 
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 
 interface Stats {
-    posts: number;
     replies: number;
     platforms: number;
-}
-
-interface Post {
-    id: string;
-    content: string;
-    platform: string;
-    status: "published" | "scheduled" | "failed";
+    rules: number;
 }
 
 export default function DashboardPage() {
+    const router = useRouter();
     const [stats, setStats] = useState<Stats>({
-        posts: 0,
         replies: 0,
         platforms: 0,
+        rules: 0,
     });
-    const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -57,13 +47,16 @@ export default function DashboardPage() {
                 const token = data?.session?.access_token;
                 if (!token) return;
 
-                const [statsData, postsData] = await Promise.all([
-                    fetchWithAuth("/api/posts/stats", token).catch(() => null),
-                    fetchWithAuth("/api/posts/recent", token).catch(() => []),
-                ]);
+                const statsData = await fetchWithAuth(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/dashboard/stats`,
+                    token
+                ).catch(() => null);
 
-                setStats(statsData || { posts: 0, replies: 0, platforms: 0 });
-                setPosts(postsData || []);
+                setStats(
+                    statsData || { replies: 0, platforms: 0, rules: 0 }
+                );
+            } catch (err) {
+                console.error("Dashboard error:", err);
             } finally {
                 setLoading(false);
             }
@@ -72,114 +65,84 @@ export default function DashboardPage() {
         load();
     }, []);
 
-    const statusTag = (status: string) => {
-        switch (status) {
-            case "published":
-                return <Tag color="green">Published</Tag>;
-            case "scheduled":
-                return <Tag color="blue">Scheduled</Tag>;
-            case "failed":
-                return <Tag color="red">Failed</Tag>;
-            default:
-                return <Tag>Unknown</Tag>;
-        }
-    };
-
     return (
         <SubscriptionGuard>
             <AuthGuard>
                 <div style={{ padding: 32 }}>
-                    <Title level={3} style={{ marginBottom: 24 }}>
-                        Dashboard Overview
-                    </Title>
+                    <Title level={3}>Automation Dashboard</Title>
+                    <Paragraph>
+                        Manage your auto replies and connected platforms.
+                    </Paragraph>
 
                     {loading ? (
                         <Spin />
                     ) : (
                         <>
-                            {/* KPI Section */}
                             <Row gutter={[16, 16]}>
-                                <Col xs={24} md={8}>
-                                    <Card hoverable>
-                                        <Statistic
-                                            title="Posts Published"
-                                            value={stats.posts}
-                                            prefix={<RocketOutlined />}
-                                        />
-                                    </Card>
-                                </Col>
-
                                 <Col xs={24} md={8}>
                                     <Card hoverable>
                                         <Statistic
                                             title="Auto Replies Sent"
                                             value={stats.replies}
-                                            prefix={<FacebookOutlined />}
+                                            prefix={<MessageOutlined />}
                                         />
                                     </Card>
                                 </Col>
 
                                 <Col xs={24} md={8}>
-                                    <Card hoverable>
+                                    <Card
+                                        hoverable
+                                        onClick={() =>
+                                            router.push("/dashboard/pages")
+                                        }
+                                    >
+                                        <Statistic
+                                            title="Rules Created"
+                                            value={stats.rules}
+                                            prefix={<ThunderboltOutlined />}
+                                        />
+                                    </Card>
+                                </Col>
+
+                                <Col xs={24} md={8}>
+                                    <Card
+                                        hoverable
+                                        onClick={() =>
+                                            router.push("/dashboard/platforms")
+                                        }
+                                    >
                                         <Statistic
                                             title="Platforms Connected"
                                             value={stats.platforms}
-                                            prefix={<ThunderboltOutlined />}
+                                            prefix={<SettingOutlined />}
                                         />
                                     </Card>
                                 </Col>
                             </Row>
 
-                            {/* Quick Actions */}
                             <Card style={{ marginTop: 24 }}>
                                 <Space wrap>
                                     <Button
                                         type="primary"
                                         icon={<PlusOutlined />}
-                                        href="/post-now"
+                                        onClick={() =>
+                                            router.push("/dashboard/pages")
+                                        }
                                     >
-                                        Create Post
+                                        Create Rule
                                     </Button>
 
                                     <Button
                                         icon={<SettingOutlined />}
-                                        href="/dashboard/platforms"
+                                        onClick={() =>
+                                            router.push(
+                                                "/dashboard/platforms"
+                                            )
+                                        }
                                     >
                                         Manage Platforms
                                     </Button>
                                 </Space>
-                            </Card>
-
-                            {/* Recent Posts */}
-                            <Card
-                                title="Recent Posts"
-                                style={{ marginTop: 24 }}
-                            >
-                                {posts.length === 0 ? (
-                                    <Empty description="No posts yet" />
-                                ) : (
-                                    <Table
-                                        dataSource={posts}
-                                        rowKey="id"
-                                        pagination={false}
-                                        columns={[
-                                            {
-                                                title: "Content",
-                                                dataIndex: "content",
-                                                ellipsis: true,
-                                            },
-                                            {
-                                                title: "Platform",
-                                                dataIndex: "platform",
-                                            },
-                                            {
-                                                title: "Status",
-                                                render: (_, record) =>
-                                                    statusTag(record.status),
-                                            },
-                                        ]}
-                                    />
-                                )}
                             </Card>
                         </>
                     )}
