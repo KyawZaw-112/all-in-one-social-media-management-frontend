@@ -1,14 +1,18 @@
 "use client";
 
-import { Button, message, Tag, Spin } from "antd";
+import { Button, message, Tag, Spin, Popconfirm } from "antd";
 import { useEffect, useState } from "react";
 import supabase from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
-
+type PlatformConnection={
+    page_id: string;
+    page_name: string;
+    platform: "facebook" | "tik tok" | "viber";
+}
 export default function PlatformsContent() {
     const [loading, setLoading] = useState(false);
     const [checking, setChecking] = useState(true);
-    const [connected, setConnected] = useState(false);
+    const [pages, setPages] = useState<PlatformConnection[]>([]);
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -21,16 +25,21 @@ export default function PlatformsContent() {
         if (searchParams.get("connected") === "facebook") {
             message.success("Facebook connected successfully!");
             router.replace("/dashboard/platforms");
-            checkConnection(); // refresh state
+            checkConnection();
         }
     }, [searchParams]);
 
+    const getSession = async () => {
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
+
+        return session;
+    };
+
     const checkConnection = async () => {
         try {
-            const {
-                data: { session },
-            } = await supabase.auth.getSession();
-
+            const session = await getSession();
             if (!session) return;
 
             const res = await fetch(
@@ -42,10 +51,8 @@ export default function PlatformsContent() {
                 }
             );
 
-            const data = await res.json();
-
-            const fb = data.find((p: any) => p.platform === "facebook");
-            setConnected(fb?.connected ?? false);
+            const data:PlatformConnection[] = await res.json();
+            setPages(data.filter((p) => p.platform === "facebook"));
         } catch (err) {
             console.error(err);
         } finally {
@@ -56,10 +63,7 @@ export default function PlatformsContent() {
     const connectFacebook = async () => {
         try {
             setLoading(true);
-
-            const {
-                data: { session },
-            } = await supabase.auth.getSession();
+            const session = await getSession();
 
             if (!session) {
                 message.error("Please login first");
@@ -87,14 +91,55 @@ export default function PlatformsContent() {
         }
     };
 
+    const disconnectFacebook = async (pageId: string) => {
+        try {
+            const session = await getSession();
+            if (!session) return;
+
+            await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/platforms/${pageId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${session.access_token}`,
+                    },
+                }
+            );
+
+            message.success("Disconnected successfully");
+            setPages((prev) => prev.filter((p) => p.page_id !== pageId));
+        } catch {
+            message.error("Failed to disconnect");
+        }
+    };
+
     if (checking) return <Spin />;
 
     return (
         <div style={{ padding: 40 }}>
             <h2>Facebook</h2>
 
-            {connected ? (
-                <Tag color="green">Connected ✅</Tag>
+            {pages.length > 0 ? (
+                <>
+                    <Tag color="green">Connected ✅</Tag>
+
+                    {pages.map((page) => (
+                        <div key={page.page_id} style={{ marginTop: 16 }}>
+                            <strong>{page.page_name}</strong>
+
+                            <Popconfirm
+                                title="Disconnect this page?"
+                                onConfirm={() => disconnectFacebook(page.page_id)}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button danger style={{ marginLeft: 16 }}>
+                                    Disconnect
+                                </Button>
+                            </Popconfirm>
+                        </div>
+                    ))}
+                </>
             ) : (
                 <Button
                     type="primary"
