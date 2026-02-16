@@ -3,7 +3,7 @@ import {ConfigProvider} from "antd";
 import Navbar from "@/components/Navbar";
 import {ReactNode, useEffect} from "react";
 import supabase from "@/lib/supabase";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 export default function RootLayout({children}:{children: ReactNode}) {
 
     useEffect(() => {
@@ -61,6 +61,7 @@ export default function RootLayout({children}:{children: ReactNode}) {
         >
             <Navbar/>
             {children}
+            <SpeedInsights/>
         </ConfigProvider>
         </body>
         </html>
