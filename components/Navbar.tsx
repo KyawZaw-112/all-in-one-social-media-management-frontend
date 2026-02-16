@@ -79,10 +79,6 @@ export default function Navbar() {
                         label: <Link href="/dashboard">Dashboard</Link>,
                     },
                     {
-                        key: "/post-now",
-                        label: <Link href="/post-now">Post Now</Link>,
-                    },
-                    {
                         key: "/subscribe",
                         label: <Link href="/subscribe">Billing</Link>,
                     },

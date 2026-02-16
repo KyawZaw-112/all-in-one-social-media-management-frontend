@@ -35,7 +35,7 @@ export default function PagesListPage() {
                 if (!token) return;
 
                 const result = await fetchWithAuth(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/platforms`,
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/stats`,
                     token
                 );
 
