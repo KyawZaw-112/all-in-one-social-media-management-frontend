@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { getPlatforms } from "@/lib/api";
 import  supabase  from "@/lib/supabase";
+import {Button} from "antd";
+import {useRouter} from "next/navigation";
 
 interface Platform {
     id: string;
@@ -29,9 +31,19 @@ export default function PagesListPage() {
                     throw new Error("Not authenticated");
                 }
 
-                const data = await getPlatforms(session.access_token);
+                const response = await getPlatforms(session.access_token);
 
-                setPages(data || []);
+                if (Array.isArray(response)) {
+                    setPages(response);
+                } else if (response?.data) {
+                    setPages(response.data);
+                } else {
+                    setPages([]);
+                }
+
+                console.log("SESSION USER:", session.user.id);
+                console.log("PLATFORM RESPONSE:", response);
+
             } catch (err: any) {
                 console.error("Failed to load pages:", err.message);
                 setError(err.message);
@@ -55,6 +67,8 @@ export default function PagesListPage() {
         );
     }
 
+    const router = useRouter();
+
     return (
         <div className="p-6">
             <h1 className="text-2xl font-semibold mb-6">Connected Pages</h1>
@@ -69,9 +83,19 @@ export default function PagesListPage() {
                             className="border rounded-lg p-4 shadow-sm"
                         >
                             <div className="font-medium">{page.page_name}</div>
+                            <Button
+                                type="link"
+                                onClick={() =>
+                                    router.push(`/dashboard/pages/${page.page_id}`)
+                                }
+                                style={{ marginLeft: 16 }}
+                            >
+                                Manage
+                            </Button>
                             <div className="text-sm text-gray-500">
                                 Platform: {page.platform}
                             </div>
+
                         </div>
                     ))}
                 </div>

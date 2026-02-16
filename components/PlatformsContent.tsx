@@ -60,6 +60,8 @@ export default function PlatformsContent() {
         }
     };
 
+
+
     const connectFacebook = async () => {
         try {
             setLoading(true);
