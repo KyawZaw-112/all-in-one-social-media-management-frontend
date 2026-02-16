@@ -32,7 +32,7 @@ export default function PageRules() {
         if (!token) return;
 
         const data = await fetchWithAuth(`rules/${pageId}`, token);
-        setRules(data);
+        setRules(Array.isArray(data) ? data : []);
         setLoading(false);
     }
 
@@ -121,7 +121,7 @@ export default function PageRules() {
 
             {/* Rule List */}
             <div className="space-y-4">
-                {rules.map((rule) => (
+                {rules?.filter(Boolean).map((rule) => (
                     <div
                         key={rule.id}
                         className="border rounded p-4 flex justify-between items-center"
