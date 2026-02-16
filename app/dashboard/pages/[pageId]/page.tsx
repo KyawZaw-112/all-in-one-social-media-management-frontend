@@ -84,6 +84,7 @@ export default function PageRules() {
         const updated = await fetchWithAuth(`rules/${rule.id}`, token, {
             method: "PUT",
             body: JSON.stringify({
+                page_id: String(pageId),
                 keyword: rule.keyword,
                 reply_text: rule.reply_text,
                 match_type: rule.match_type,
