@@ -2,31 +2,33 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import {
+    Card,
+    Input,
+    Button,
+    Select,
+    Typography,
+    Switch,
+    Space,
+    Empty,
+} from "antd";
 import supabase from "@/lib/supabase";
 import { fetchWithAuth } from "@/lib/api";
 
-interface Rule {
-    id: string;
-    keyword: string;
-    reply_text: string;
-    match_type: string;
-    enabled: boolean;
-}
+const { Title, Text } = Typography;
+const { TextArea } = Input;
 
 export default function PageRules() {
     const { pageId } = useParams();
-
-    const [rules, setRules] = useState<Rule[]>([]);
+    const [rules, setRules] = useState<any[]>([]);
     const [keyword, setKeyword] = useState("");
     const [replyText, setReplyText] = useState("");
     const [matchType, setMatchType] = useState("contains");
-    const [loading, setLoading] = useState(true);
 
     async function getToken() {
         const {
             data: { session },
         } = await supabase.auth.getSession();
-
         return session?.access_token;
     }
 
@@ -35,13 +37,10 @@ export default function PageRules() {
         if (!token) return;
 
         const data = await fetchWithAuth(`rules/${pageId}`, token);
-        setRules(Array.isArray(data) ? data : []);
-        setLoading(false);
+        setRules(data || []);
     }
 
     async function createRule() {
-        if (!keyword || !replyText) return alert("Fill all fields");
-
         const token = await getToken();
         if (!token) return;
 
@@ -55,146 +54,88 @@ export default function PageRules() {
             }),
         });
 
-        if (!newRule?.id) {
-            alert("Failed to create rule");
-            return;
-        }
-
         setRules((prev) => [...prev, newRule]);
         setKeyword("");
         setReplyText("");
-        setMatchType("contains");
-    }
-
-    async function deleteRule(id: string) {
-        const token = await getToken();
-        if (!token) return;
-
-        await fetchWithAuth(`rules/${id}`, token, {
-            method: "DELETE",
-        });
-
-        setRules((prev) => prev.filter((r) => r.id !== id));
-    }
-
-    async function toggleRule(rule: Rule) {
-        const token = await getToken();
-        if (!token) return;
-
-        const updated = await fetchWithAuth(`rules/${rule.id}`, token, {
-            method: "PUT",
-            body: JSON.stringify({
-                page_id: String(pageId),
-                keyword: rule.keyword,
-                reply_text: rule.reply_text,
-                match_type: rule.match_type,
-                enabled: !rule.enabled,
-            }),
-        });
-
-        setRules((prev) =>
-            prev.map((r) => (r.id === rule.id ? updated : r))
-        );
     }
 
     useEffect(() => {
-        loadRules();
-    }, []);
-
-    if (loading) return <div className="p-6">Loading rules...</div>;
+        if (pageId) loadRules();
+    }, [pageId]);
 
     return (
-        <div className="max-w-3xl mx-auto p-6">
-            <h1 className="text-2xl font-semibold mb-6">
+        <div style={{ padding: 16, maxWidth: 480, margin: "0 auto" }}>
+            <Title level={3} style={{ marginBottom: 24 }}>
                 Auto Reply Rules
-            </h1>
+            </Title>
 
-            {/* Create Rule Card */}
-            <div className="bg-white shadow rounded-lg p-6 mb-8 space-y-4 border">
-                <h2 className="text-lg font-medium">Create New Rule</h2>
+            {/* Create Rule */}
+            <Card
+                style={{ marginBottom: 24, borderRadius: 16 }}
+                bodyStyle={{ padding: 20 }}
+            >
+                <Space direction="vertical" style={{ width: "100%" }} size="middle">
+                    <Input
+                        placeholder="Keyword"
+                        size="large"
+                        value={keyword}
+                        onChange={(e) => setKeyword(e.target.value)}
+                    />
 
-                <input
-                    className="w-full border rounded px-3 py-2"
-                    placeholder="Keyword"
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                />
+                    <Select
+                        size="large"
+                        value={matchType}
+                        onChange={setMatchType}
+                        options={[
+                            { value: "contains", label: "Contains" },
+                            { value: "exact", label: "Exact Match" },
+                            { value: "starts_with", label: "Starts With" },
+                            { value: "fallback", label: "Fallback" },
+                        ]}
+                    />
 
-                <select
-                    className="w-full border rounded px-3 py-2"
-                    value={matchType}
-                    onChange={(e) => setMatchType(e.target.value)}
-                >
-                    <option value="contains">Contains</option>
-                    <option value="exact">Exact Match</option>
-                    <option value="starts_with">Starts With</option>
-                    <option value="fallback">Fallback</option>
-                </select>
+                    <TextArea
+                        rows={4}
+                        placeholder="Reply message"
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                    />
 
-                <textarea
-                    className="w-full border rounded px-3 py-2"
-                    placeholder="Reply message"
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                />
-
-                <button
-                    onClick={createRule}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
-                >
-                    Add Rule
-                </button>
-            </div>
+                    <Button
+                        type="primary"
+                        size="large"
+                        block
+                        style={{ borderRadius: 12 }}
+                        onClick={createRule}
+                    >
+                        Add Rule
+                    </Button>
+                </Space>
+            </Card>
 
             {/* Rules List */}
-            <div className="space-y-4">
-                {rules.map((rule) => (
-                    <div
+            {rules.length === 0 ? (
+                <Empty description="No rules yet" />
+            ) : (
+                rules.map((rule) => (
+                    <Card
                         key={rule.id}
-                        className="border rounded-lg p-4 flex justify-between items-center shadow-sm"
+                        style={{ marginBottom: 16, borderRadius: 16 }}
+                        bodyStyle={{ padding: 18 }}
                     >
-                        <div>
-                            <div className="font-medium">
-                                {rule.keyword}
-                            </div>
-
-                            <div className="text-sm text-gray-500">
-                                Match: {rule.match_type}
-                            </div>
-
-                            <div className="text-sm mt-1">
-                                {rule.reply_text}
-                            </div>
-
-                            <div
-                                className={`text-xs mt-2 font-medium ${
-                                    rule.enabled
-                                        ? "text-green-600"
-                                        : "text-gray-400"
-                                }`}
-                            >
-                                {rule.enabled ? "Enabled" : "Disabled"}
-                            </div>
+                        <Text strong>{rule.keyword}</Text>
+                        <div style={{ marginTop: 4 }}>
+                            <Text type="secondary">{rule.match_type}</Text>
                         </div>
 
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => toggleRule(rule)}
-                                className="px-3 py-1 bg-yellow-500 text-white rounded text-sm"
-                            >
-                                Toggle
-                            </button>
+                        <div style={{ marginTop: 12 }}>{rule.reply_text}</div>
 
-                            <button
-                                onClick={() => deleteRule(rule.id)}
-                                className="px-3 py-1 bg-red-600 text-white rounded text-sm"
-                            >
-                                Delete
-                            </button>
+                        <div style={{ marginTop: 16 }}>
+                            <Switch checked={rule.enabled} />
                         </div>
-                    </div>
-                ))}
-            </div>
+                    </Card>
+                ))
+            )}
         </div>
     );
 }
