@@ -15,7 +15,10 @@ import {
     Select,
     DatePicker,
     message,
-    Tooltip
+    Tooltip,
+    Row,
+    Col,
+    Statistic
 } from "antd";
 import {
     SearchOutlined,
@@ -207,6 +210,37 @@ export default function MerchantManagement() {
                 </Button>
             </div>
 
+            {/* Stats Summary */}
+            <Row gutter={16} style={{ marginBottom: 24 }}>
+                <Col span={8}>
+                    <Card bordered={false} style={{ background: "#e6f7ff", borderRadius: 12 }}>
+                        <Statistic
+                            title="Total Merchants"
+                            value={merchants.length}
+                            prefix={<ShopOutlined style={{ color: "#1890ff" }} />}
+                        />
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card bordered={false} style={{ background: "#f6ffed", borderRadius: 12 }}>
+                        <Statistic
+                            title="Active Subscriptions"
+                            value={merchants.filter((m: any) => m.subscription_status === 'active').length}
+                            prefix={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
+                        />
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card bordered={false} style={{ background: "#fff1f0", borderRadius: 12 }}>
+                        <Statistic
+                            title="Expired / Inactive"
+                            value={merchants.filter((m: any) => m.subscription_status !== 'active').length}
+                            prefix={<StopOutlined style={{ color: "#f5222d" }} />}
+                        />
+                    </Card>
+                </Col>
+            </Row>
+
             <Card bordered={false} style={{ borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
                 <Table
                     dataSource={filteredData}
@@ -214,6 +248,7 @@ export default function MerchantManagement() {
                     loading={loading}
                     rowKey="id"
                     pagination={{ pageSize: 10 }}
+                    rowClassName="merchant-row"
                 />
             </Card>
 
