@@ -26,7 +26,8 @@ import {
     StopOutlined,
     UserOutlined,
     MailOutlined,
-    CalendarOutlined
+    CalendarOutlined,
+    UserAddOutlined
 } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -39,7 +40,9 @@ export default function MerchantManagement() {
     const [searchText, setSearchText] = useState("");
     const [editingMerchant, setEditingMerchant] = useState<any>(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [createModalVisible, setCreateModalVisible] = useState(false);
     const [form] = Form.useForm();
+    const [createForm] = Form.useForm();
 
     const fetchMerchants = async () => {
         setLoading(true);
@@ -79,6 +82,30 @@ export default function MerchantManagement() {
             fetchMerchants();
         } catch (err) {
             message.error("Update failed");
+        }
+    };
+
+    const handleCreateUser = async (values: any) => {
+        try {
+            const token = localStorage.getItem("authToken");
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+            await axios.post(`${apiUrl}/api/admin/merchants`, {
+                name: values.name,
+                email: values.email,
+                password: values.password,
+                plan: values.plan,
+                role: "user" // default
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            message.success("New user created successfully! 🚀");
+            setCreateModalVisible(false);
+            createForm.resetFields();
+            fetchMerchants();
+        } catch (err: any) {
+            message.error(err.response?.data?.error || "Creation failed");
         }
     };
 
@@ -170,6 +197,14 @@ export default function MerchantManagement() {
                     style={{ width: 300, borderRadius: "8px" }}
                     onChange={e => setSearchText(e.target.value)}
                 />
+                <Button
+                    type="primary"
+                    icon={<UserAddOutlined />}
+                    onClick={() => setCreateModalVisible(true)}
+                    style={{ marginLeft: 16, backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                >
+                    Create User
+                </Button>
             </div>
 
             <Card bordered={false} style={{ borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
@@ -206,6 +241,34 @@ export default function MerchantManagement() {
                     </Form.Item>
                     <Form.Item label="Trial/Expiry Date" name="trial_ends_at" rules={[{ required: true }]}>
                         <DatePicker style={{ width: "100%" }} />
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            <Modal
+                title="Create New User"
+                open={createModalVisible}
+                onCancel={() => setCreateModalVisible(false)}
+                onOk={() => createForm.submit()}
+                okText="Create User"
+                confirmLoading={loading}
+                destroyOnClose
+            >
+                <Form form={createForm} layout="vertical" onFinish={handleCreateUser} style={{ marginTop: 24 }}>
+                    <Form.Item label="Full Name" name="name" rules={[{ required: true, message: 'Please enter name' }]}>
+                        <Input prefix={<UserOutlined />} placeholder="e.g. Mg Mg" />
+                    </Form.Item>
+                    <Form.Item label="Email" name="email" rules={[{ required: true, type: 'email', message: 'Please enter valid email' }]}>
+                        <Input prefix={<MailOutlined />} placeholder="user@example.com" />
+                    </Form.Item>
+                    <Form.Item label="Password" name="password" rules={[{ required: true, min: 6, message: 'Password must be at least 6 chars' }]}>
+                        <Input.Password placeholder="Set a temporary password" />
+                    </Form.Item>
+                    <Form.Item label="Initial Plan" name="plan" initialValue="shop">
+                        <Select>
+                            <Select.Option value="shop">Online Shop (15,000 Ks)</Select.Option>
+                            <Select.Option value="cargo">Cargo & Delivery (20,000 Ks)</Select.Option>
+                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>

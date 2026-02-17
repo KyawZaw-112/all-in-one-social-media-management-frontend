@@ -9,7 +9,8 @@ import {
     CheckCircleFilled,
     DisconnectOutlined,
     ArrowLeftOutlined,
-    SafetyCertificateOutlined
+    SafetyCertificateOutlined,
+    SyncOutlined
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -47,7 +48,17 @@ export default function PlatformsContent() {
             // Re-fetch after short delay to let backend sync
             setTimeout(async () => {
                 const token = localStorage.getItem("authToken");
-                if (token) checkConnection(token);
+                if (token) {
+                    const freshPages = await checkConnection(token);
+                    // 🚀 Auto-sync ALL newly connected pages for convenience
+                    if (freshPages && freshPages.length > 0) {
+                        message.loading({ content: "Synchronizing Webhooks...", key: "autosync" });
+                        for (const p of freshPages) {
+                            await syncPage(p.page_id, true);
+                        }
+                        message.success({ content: "All pages synchronized! 🚀", key: "autosync" });
+                    }
+                }
             }, 1000);
         }
     }, [searchParams]);
@@ -65,9 +76,12 @@ export default function PlatformsContent() {
 
             if (!res.ok) throw new Error("Fetch failed");
             const data: PlatformConnection[] = await res.json();
-            setPages(data.filter((p) => p.platform === "facebook"));
+            const facebookPages = data.filter((p) => p.platform === "facebook");
+            setPages(facebookPages);
+            return facebookPages; // Return for auto-sync logic
         } catch (err) {
             console.error(err);
+            return [];
         } finally {
             setChecking(false);
         }
@@ -105,6 +119,34 @@ export default function PlatformsContent() {
             message.error("Something went wrong");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const syncPage = async (pageId: string, silent = false) => {
+        try {
+            if (!silent) setLoading(true);
+            const token = localStorage.getItem("authToken");
+            if (!token) return;
+
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/platforms/${pageId}/sync`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (res.ok) {
+                if (!silent) message.success("Page synchronized successfully ✨");
+            } else {
+                if (!silent) message.error("Sync failed. Please try again.");
+            }
+        } catch {
+            if (!silent) message.error("Something went wrong during sync");
+        } finally {
+            if (!silent) setLoading(false);
         }
     };
 
@@ -196,22 +238,33 @@ export default function PlatformsContent() {
                                         <Text type="secondary" style={{ fontSize: "12px" }}>ID: {page.page_id}</Text>
                                     </div>
 
-                                    <Popconfirm
-                                        title="Disconnect this page?"
-                                        description="Are you sure you want to stop auto-replies for this page?"
-                                        onConfirm={() => disconnectFacebook(page.page_id)}
-                                        okText="Yes, Disconnect"
-                                        cancelText="No"
-                                        okButtonProps={{ danger: true }}
-                                    >
+                                    <Space>
                                         <Button
                                             type="text"
-                                            danger
-                                            icon={<DisconnectOutlined />}
+                                            icon={<SyncOutlined spin={loading} />}
+                                            onClick={() => syncPage(page.page_id)}
+                                            disabled={loading}
                                         >
-                                            Disconnect
+                                            Sync
                                         </Button>
-                                    </Popconfirm>
+
+                                        <Popconfirm
+                                            title="Disconnect this page?"
+                                            description="Are you sure you want to stop auto-replies for this page?"
+                                            onConfirm={() => disconnectFacebook(page.page_id)}
+                                            okText="Yes, Disconnect"
+                                            cancelText="No"
+                                            okButtonProps={{ danger: true }}
+                                        >
+                                            <Button
+                                                type="text"
+                                                danger
+                                                icon={<DisconnectOutlined />}
+                                            >
+                                                Disconnect
+                                            </Button>
+                                        </Popconfirm>
+                                    </Space>
                                 </div>
                             ))}
 
