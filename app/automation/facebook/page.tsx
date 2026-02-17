@@ -69,7 +69,9 @@ export default function FacebookAutoReply() {
             });
             setFlows(response.data.data || []);
         } catch (error: any) {
-            message.error("Failed to fetch flows");
+            console.error("Fetch Flows Error:", error);
+            const msg = error.response?.data?.error || error.response?.data?.message || "Failed to fetch flows";
+            message.error(msg);
         } finally {
             setLoading(false);
         }
