@@ -1,137 +1,107 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Form, Input, Button, Card, message, Typography } from "antd";
+import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import  supabase  from "@/lib/supabase";
-
-import {
-    Card,
-    Form,
-    Input,
-    Button,
-    Typography,
-    Alert,
-    Space,
-} from "antd";
-import {
-    EyeInvisibleOutlined,
-    EyeTwoTone,
-    MailOutlined,
-    UserOutlined,
-} from "@ant-design/icons";
+import axios from "axios";
 
 const { Title, Text } = Typography;
 
 export default function LoginPage() {
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-    const login = async (values: { email: string; password: string }) => {
+    const onFinish = async (values: any) => {
         setLoading(true);
-        setErrorMsg(null);
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+            const response = await axios.post(`${apiUrl}/api/oauth/login`, values);
 
-        const { data,error } = await supabase.auth.signInWithPassword({
-            email: values.email,
-            password: values.password,
-        });
-
-        setLoading(false);
-
-        if (error) {
-            setErrorMsg(error.message);
-            return;
+            if (response.data.token) {
+                message.success("Login အောင်မြင်ပါသည်။ 👋");
+                localStorage.setItem("authToken", response.data.token);
+                router.push("/dashboard");
+            }
+        } catch (error: any) {
+            message.error(error.response?.data?.error || "Email သို့မဟုတ် Password မှားယွင်းနေပါသည်။");
+        } finally {
+            setLoading(false);
         }
-        const user = data.user
-
-        await fetch("/api/log-login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                user_id: user.id,
-                email: user.email,
-            }),
-        });
-
-        window.location.href = "/dashboard";
     };
 
     return (
-        <div
-            style={{
-                minHeight: "100vh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 16,
-                background: "#fafafa",
-            }}
-        >
-            <Card style={{ width: "100%", maxWidth: 380 }}>
-                <Space orientation="vertical" size={16} style={{ width: "100%" }}>
-                    <div>
-                        <Title level={3} style={{ marginBottom: 4 }}>
-                            Welcome back
-                        </Title>
-                        <Text type="secondary">Sign in to your account</Text>
+        <div style={{
+            minHeight: "100vh",
+            background: "#f0f2f5",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 20px"
+        }}>
+            <div style={{ textAlign: "center", marginBottom: "30px" }}>
+                <Title level={2} style={{ margin: 0 }}>Welcome Back</Title>
+                <Text type="secondary">သင့် Dashboard သို့ ပြန်လည်ဝင်ရောက်ပါ</Text>
+            </div>
+
+            <Card style={{ width: "100%", maxWidth: "400px", borderRadius: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+                <Form layout="vertical" onFinish={onFinish}>
+                    <Form.Item
+                        name="email"
+                        rules={[
+                            { required: true, message: "Email ထည့်ပေးပါ" },
+                            { type: "email", message: "Email ပုံစံ မှန်ကန်မှု မရှိပါ" }
+                        ]}
+                    >
+                        <Input
+                            prefix={<MailOutlined />}
+                            placeholder="Email Address"
+                            size="large"
+                            style={{ borderRadius: "8px" }}
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="password"
+                        rules={[{ required: true, message: "Password ထည့်ပေးပါ" }]}
+                    >
+                        <Input.Password
+                            prefix={<LockOutlined />}
+                            placeholder="Password"
+                            size="large"
+                            style={{ borderRadius: "8px" }}
+                        />
+                    </Form.Item>
+
+                    <div style={{ textAlign: "right", marginBottom: "20px" }}>
+                        <Link href="/forgot-password" style={{ fontSize: "12px" }}>Password မေ့နေပါသလား?</Link>
                     </div>
 
-                    <Form layout="vertical" onFinish={login}>
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[
-                                { required: true, message: "Please enter your email" },
-                                { type: "email", message: "Invalid email address" },
-                            ]}
-                        >
-                            <Input
-                                placeholder="you@example.com"
-                                prefix={<UserOutlined />}
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={[{ required: true, message: "Please enter your password" }]}
-                        >
-                            <Input.Password
-                                placeholder="••••••••"
-                                iconRender={(visible) =>
-                                    visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                                }
-                            />
-                        </Form.Item>
-
-                        {errorMsg && (
-                            <Alert
-                                type="error"
-                                showIcon
-                                message={errorMsg}
-                                description={
-                                    <span>
-                    Trouble logging in?{" "}
-                                        <a href="mailto:developer@example.com">
-                      Contact developer
-                    </a>
-                  </span>
-                                }
-                                style={{ marginBottom: 16 }}
-                            />
-                        )}
-
+                    <Form.Item style={{ marginBottom: "12px" }}>
                         <Button
                             type="primary"
                             htmlType="submit"
-                            loading={loading}
                             block
+                            size="large"
+                            loading={loading}
+                            style={{
+                                borderRadius: "8px",
+                                height: "45px",
+                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                border: "none"
+                            }}
                         >
-                            Login
+                            Login ဝင်မည်
                         </Button>
-                    </Form>
-                </Space>
+                    </Form.Item>
+
+                    <div style={{ textAlign: "center" }}>
+                        <Text type="secondary">အကောင့်မရှိသေးဘူးလား? </Text>
+                        <Link href="/signup">Sign Up လုပ်ရန်</Link>
+                    </div>
+                </Form>
             </Card>
         </div>
     );

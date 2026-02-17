@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
     Card,
-    Tabs,
-    Table,
     Button,
     Modal,
     Form,
@@ -18,6 +17,7 @@ import {
     Tooltip,
     Badge,
     Divider,
+    FloatButton,
 } from "antd";
 import {
     PlusOutlined,
@@ -26,15 +26,13 @@ import {
     ShopOutlined,
     CarOutlined,
     ThunderboltOutlined,
-    CheckCircleOutlined,
-    StopOutlined,
     RobotOutlined,
     MessageOutlined,
+    ArrowLeftOutlined,
 } from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
 
-const { TabPane } = Tabs;
 const { TextArea } = Input;
 
 interface AutomationFlow {
@@ -49,16 +47,15 @@ interface AutomationFlow {
 }
 
 export default function FacebookAutoReply() {
+    const router = useRouter();
     const [flows, setFlows] = useState<AutomationFlow[]>([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [editingFlow, setEditingFlow] = useState<AutomationFlow | null>(null);
-    const [activeTab, setActiveTab] = useState<string>("all");
     const [form] = Form.useForm();
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-    // Fetch flows
     const fetchFlows = async () => {
         setLoading(true);
         try {
@@ -68,7 +65,7 @@ export default function FacebookAutoReply() {
             });
             setFlows(response.data.data || []);
         } catch (error: any) {
-            message.error(error.response?.data?.error || "Failed to fetch flows");
+            message.error("Failed to fetch flows");
         } finally {
             setLoading(false);
         }
@@ -78,73 +75,64 @@ export default function FacebookAutoReply() {
         fetchFlows();
     }, []);
 
-    // Create or update flow
     const handleSubmit = async (values: any) => {
         try {
             const token = localStorage.getItem("authToken");
             if (editingFlow) {
-                await axios.put(
-                    `${apiUrl}/api/automation/flows/${editingFlow.id}`,
-                    values,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                message.success("Flow updated successfully! 🎉");
+                await axios.put(`${apiUrl}/api/automation/flows/${editingFlow.id}`, values, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                message.success("Updated! ✅");
             } else {
                 await axios.post(`${apiUrl}/api/automation/flows`, values, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                message.success("Flow created successfully! 🚀");
+                message.success("Created! 🚀");
             }
             setModalVisible(false);
-            form.resetFields();
             setEditingFlow(null);
             fetchFlows();
         } catch (error: any) {
-            message.error(error.response?.data?.error || "Failed to save flow");
+            message.error("Failed to save flow");
         }
     };
 
-    // Delete flow
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: string, e: any) => {
+        e.stopPropagation();
         Modal.confirm({
-            title: "Delete Flow?",
-            content: "This action cannot be undone.",
-            okText: "Delete",
+            title: "ဖျက်မှာ သေချာပါသလား?",
+            okText: "ဖျက်မည်",
             okType: "danger",
+            cancelText: "မဖျက်တော့ပါ",
             onOk: async () => {
                 try {
                     const token = localStorage.getItem("authToken");
                     await axios.delete(`${apiUrl}/api/automation/flows/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
-                    message.success("Flow deleted successfully");
+                    message.success("Deleted");
                     fetchFlows();
                 } catch (error: any) {
-                    message.error("Failed to delete flow");
+                    message.error("Delete failed");
                 }
             },
         });
     };
 
-    // Toggle active status
-    const toggleActive = async (flow: AutomationFlow) => {
+    const toggleActive = async (flow: AutomationFlow, e: any) => {
+        e.stopPropagation();
         try {
             const token = localStorage.getItem("authToken");
-            await axios.put(
-                `${apiUrl}/api/automation/flows/${flow.id}`,
+            await axios.put(`${apiUrl}/api/automation/flows/${flow.id}`,
                 { is_active: !flow.is_active },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            message.success(
-                flow.is_active ? "Flow disabled" : "Flow enabled! ✅"
-            );
             fetchFlows();
         } catch (error: any) {
-            message.error("Failed to toggle flow status");
+            message.error("Toggle failed");
         }
     };
 
-    // Open modal for create/edit
     const openModal = (flow?: AutomationFlow) => {
         if (flow) {
             setEditingFlow(flow);
@@ -156,361 +144,118 @@ export default function FacebookAutoReply() {
         setModalVisible(true);
     };
 
-    // Filter flows by tab
-    const filteredFlows = flows.filter((flow) => {
-        if (activeTab === "all") return true;
-        if (activeTab === "active") return flow.is_active;
-        if (activeTab === "inactive") return !flow.is_active;
-        return flow.business_type === activeTab;
-    });
-
-    // Get business type icon and color
-    const getBusinessTypeTag = (type: string) => {
-        const configs = {
-            online_shop: {
-                icon: <ShopOutlined />,
-                color: "blue",
-                label: "Online Shop",
-            },
-            cargo: { icon: <CarOutlined />, color: "orange", label: "Cargo" },
-            default: {
-                icon: <ThunderboltOutlined />,
-                color: "default",
-                label: "Default",
-            },
-        };
-        const config = configs[type as keyof typeof configs] || configs.default;
-        return (
-            <Tag icon={config.icon} color={config.color}>
-                {config.label}
-            </Tag>
-        );
-    };
-
-    // Table columns
-    const columns = [
-        {
-            title: "Flow Name",
-            dataIndex: "name",
-            key: "name",
-            render: (text: string, record: AutomationFlow) => (
-                <Space>
-                    <RobotOutlined style={{ color: "#1890ff" }} />
-                    <strong>{text}</strong>
-                    {record.is_active && (
-                        <Badge status="success" text="Active" />
-                    )}
-                </Space>
-            ),
-        },
-        {
-            title: "Trigger",
-            dataIndex: "trigger_keyword",
-            key: "trigger_keyword",
-            render: (text: string) => (
-                <Tag icon={<MessageOutlined />} color="purple">
-                    {text}
-                </Tag>
-            ),
-        },
-        {
-            title: "Business Type",
-            dataIndex: "business_type",
-            key: "business_type",
-            render: (type: string) => getBusinessTypeTag(type),
-        },
-        {
-            title: "Description",
-            dataIndex: "description",
-            key: "description",
-            ellipsis: true,
-        },
-        {
-            title: "Status",
-            dataIndex: "is_active",
-            key: "is_active",
-            render: (isActive: boolean, record: AutomationFlow) => (
-                <Switch
-                    checked={isActive}
-                    onChange={() => toggleActive(record)}
-                    checkedChildren={<CheckCircleOutlined />}
-                    unCheckedChildren={<StopOutlined />}
-                />
-            ),
-        },
-        {
-            title: "Actions",
-            key: "actions",
-            render: (_: any, record: AutomationFlow) => (
-                <Space>
-                    <Tooltip title="Edit">
-                        <Button
-                            type="text"
-                            icon={<EditOutlined />}
-                            onClick={() => openModal(record)}
-                        />
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                        <Button
-                            type="text"
-                            danger
-                            icon={<DeleteOutlined />}
-                            onClick={() => handleDelete(record.id)}
-                        />
-                    </Tooltip>
-                </Space>
-            ),
-        },
-    ];
-
     return (
         <AuthGuard>
-            <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-                {/* Header */}
-                <Card
-                    style={{
-                        marginBottom: 24,
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        border: "none",
-                    }}
-                >
-                    <div style={{ color: "white" }}>
-                        <h1 style={{ color: "white", margin: 0, fontSize: 28 }}>
-                            🤖 Facebook Auto-Reply Automation
-                        </h1>
-                        <p style={{ color: "rgba(255,255,255,0.9)", margin: "8px 0 0 0" }}>
-                            AI-powered conversations for Online Shop & Cargo businesses
-                        </p>
-                    </div>
-                </Card>
-
-                {/* Main Content */}
-                <Card
-                    title={
-                        <Space>
-                            <ThunderboltOutlined />
-                            Automation Flows
-                        </Space>
-                    }
-                    extra={
-                        <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={() => openModal()}
-                            size="large"
-                        >
-                            Create Flow
-                        </Button>
-                    }
-                >
-                    <Tabs activeKey={activeTab} onChange={setActiveTab}>
-                        <TabPane tab="All Flows" key="all" />
-                        <TabPane
-                            tab={
-                                <span>
-                                    <CheckCircleOutlined /> Active
-                                </span>
-                            }
-                            key="active"
-                        />
-                        <TabPane
-                            tab={
-                                <span>
-                                    <StopOutlined /> Inactive
-                                </span>
-                            }
-                            key="inactive"
-                        />
-                        <TabPane
-                            tab={
-                                <span>
-                                    <ShopOutlined /> Online Shop
-                                </span>
-                            }
-                            key="online_shop"
-                        />
-                        <TabPane
-                            tab={
-                                <span>
-                                    <CarOutlined /> Cargo
-                                </span>
-                            }
-                            key="cargo"
-                        />
-                    </Tabs>
-
-                    <Table
-                        columns={columns}
-                        dataSource={filteredFlows}
-                        rowKey="id"
-                        loading={loading}
-                        pagination={{ pageSize: 10 }}
-                        locale={{
-                            emptyText: (
-                                <Empty
-                                    description="No automation flows yet. Create your first flow!"
-                                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                />
-                            ),
-                        }}
+            <div style={{ minHeight: "100vh", background: "#f0f2f5", paddingBottom: "80px" }}>
+                {/* Mobile Header */}
+                <div style={{
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    padding: "20px",
+                    color: "white",
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 100,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "16px"
+                }}>
+                    <Button
+                        icon={<ArrowLeftOutlined />}
+                        type="text"
+                        style={{ color: "white" }}
+                        onClick={() => router.push("/dashboard")}
                     />
-                </Card>
+                    <h2 style={{ margin: 0, color: "white", fontSize: "18px" }}>Auto-Reply Flows</h2>
+                </div>
+
+                <div style={{ padding: "16px" }}>
+                    {loading ? (
+                        <div style={{ textAlign: "center", padding: "40px" }}>Loading...</div>
+                    ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                            {flows.length === 0 ? (
+                                <Empty description="Flow များ မရှိသေးပါ။ တစ်ခုခု စဆောက်ကြည့်ပါ။" />
+                            ) : (
+                                flows.map((flow) => (
+                                    <Card
+                                        key={flow.id}
+                                        onClick={() => openModal(flow)}
+                                        style={{ borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}
+                                        bodyStyle={{ padding: "16px" }}
+                                    >
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                                                    {flow.business_type === "online_shop" ? <ShopOutlined style={{ color: "#1890ff" }} /> : <CarOutlined style={{ color: "#fa8c16" }} />}
+                                                    <span style={{ fontWeight: "bold", fontSize: "16px" }}>{flow.name}</span>
+                                                </div>
+                                                <Space size={4} style={{ marginBottom: "8px" }}>
+                                                    <Tag color="purple">Keyword: {flow.trigger_keyword}</Tag>
+                                                    {flow.is_active ? <Badge status="success" text="Active" /> : <Badge status="default" text="Off" />}
+                                                </Space>
+                                                <div style={{ color: "#666", fontSize: "14px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                                                    {flow.description || "No description set"}
+                                                </div>
+                                            </div>
+                                            <div style={{ display: "flex", flexDirection: "column", gap: "16px", alignItems: "center" }}>
+                                                <Switch
+                                                    checked={flow.is_active}
+                                                    size="small"
+                                                    onClick={(checked, e) => toggleActive(flow, e)}
+                                                />
+                                                <Button
+                                                    danger
+                                                    type="text"
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={(e) => handleDelete(flow.id, e)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </Card>
+                                ))
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Floating Action Button for Mobile */}
+                <FloatButton
+                    icon={<PlusOutlined />}
+                    type="primary"
+                    style={{ right: 24, bottom: 24, width: 56, height: 56 }}
+                    onClick={() => openModal()}
+                />
 
                 {/* Create/Edit Modal */}
                 <Modal
-                    title={
-                        <Space>
-                            <RobotOutlined />
-                            {editingFlow ? "Edit Flow" : "Create New Flow"}
-                        </Space>
-                    }
+                    title={editingFlow ? "ပြင်ဆင်မည်" : "Flow အသစ်ဆောက်မည်"}
                     open={modalVisible}
-                    onCancel={() => {
-                        setModalVisible(false);
-                        form.resetFields();
-                        setEditingFlow(null);
-                    }}
+                    onCancel={() => setModalVisible(false)}
                     footer={null}
-                    width={700}
+                    width="90%"
+                    style={{ maxWidth: "500px" }}
                 >
                     <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                        <Form.Item
-                            label="Flow Name"
-                            name="name"
-                            rules={[
-                                { required: true, message: "Please enter flow name" },
-                            ]}
-                        >
-                            <Input
-                                placeholder="e.g., Product Order Flow"
-                                size="large"
-                            />
+                        <Form.Item label="Flow Name" name="name" rules={[{ required: true }]}>
+                            <Input placeholder="🛍️ ပစ္စည်းမှာယူခြင်း" />
                         </Form.Item>
-
-                        <Form.Item
-                            label="Business Type"
-                            name="business_type"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please select business type",
-                                },
-                            ]}
-                            tooltip="Choose the type of business this flow is for"
-                        >
-                            <Select size="large" placeholder="Select business type">
-                                <Select.Option value="online_shop">
-                                    <ShopOutlined /> Online Shop (Product Orders)
-                                </Select.Option>
-                                <Select.Option value="cargo">
-                                    <CarOutlined /> Cargo/Shipping
-                                </Select.Option>
-                                <Select.Option value="default">
-                                    <ThunderboltOutlined /> Default
-                                </Select.Option>
+                        <Form.Item label="Business Type" name="business_type" rules={[{ required: true }]}>
+                            <Select>
+                                <Select.Option value="online_shop">Online Shop (E-commerce)</Select.Option>
+                                <Select.Option value="cargo">Cargo & Delivery</Select.Option>
                             </Select>
                         </Form.Item>
-
-                        <Form.Item
-                            label="Trigger Keyword"
-                            name="trigger_keyword"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please enter trigger keyword",
-                                },
-                            ]}
-                            tooltip="Customers type this keyword to start the flow"
-                        >
-                            <Input
-                                placeholder="e.g., order, ship, track"
-                                size="large"
-                            />
+                        <Form.Item label="Trigger Keyword" name="trigger_keyword" rules={[{ required: true }]}>
+                            <Input placeholder="order သို့မဟုတ် ship" />
                         </Form.Item>
-
                         <Form.Item label="Description" name="description">
-                            <Input
-                                placeholder="Brief description of this flow"
-                                size="large"
-                            />
+                            <TextArea rows={2} placeholder="ဒီ flow က ဘာအတွက်လဲ..." />
                         </Form.Item>
-
-                        <Form.Item
-                            label="Custom AI Prompt (Optional)"
-                            name="ai_prompt"
-                            tooltip="Leave empty to use default AI prompts for the selected business type"
-                        >
-                            <TextArea
-                                rows={6}
-                                placeholder="Custom instructions for AI (optional). Default prompts are optimized for each business type."
-                            />
-                        </Form.Item>
-
-                        <Form.Item name="is_active" valuePropName="checked">
-                            <Space>
-                                <Switch />
-                                <span>Activate this flow immediately</span>
-                            </Space>
-                        </Form.Item>
-
-                        <Divider />
-
-                        <Form.Item style={{ marginBottom: 0 }}>
-                            <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-                                <Button
-                                    onClick={() => {
-                                        setModalVisible(false);
-                                        form.resetFields();
-                                        setEditingFlow(null);
-                                    }}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type="primary" htmlType="submit" size="large">
-                                    {editingFlow ? "Update Flow" : "Create Flow"}
-                                </Button>
-                            </Space>
-                        </Form.Item>
+                        <Button type="primary" htmlType="submit" block size="large" style={{ marginTop: "16px" }}>
+                            {editingFlow ? "ပြင်ဆင်ချက်သိမ်းမည်" : "စတင်အသုံးပြုမည်"}
+                        </Button>
                     </Form>
                 </Modal>
-
-                {/* Info Cards */}
-                <div
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-                        gap: 16,
-                        marginTop: 24,
-                    }}
-                >
-                    <Card size="small">
-                        <Space direction="vertical" style={{ width: "100%" }}>
-                            <ShopOutlined style={{ fontSize: 24, color: "#1890ff" }} />
-                            <h4 style={{ margin: 0 }}>Online Shop Flows</h4>
-                            <p style={{ margin: 0, color: "#666", fontSize: 12 }}>
-                                AI extracts: product, quantity, address, phone, payment
-                            </p>
-                        </Space>
-                    </Card>
-                    <Card size="small">
-                        <Space direction="vertical" style={{ width: "100%" }}>
-                            <CarOutlined style={{ fontSize: 24, color: "#ff7a45" }} />
-                            <h4 style={{ margin: 0 }}>Cargo Flows</h4>
-                            <p style={{ margin: 0, color: "#666", fontSize: 12 }}>
-                                AI extracts: package type, weight, addresses, urgency
-                            </p>
-                        </Space>
-                    </Card>
-                    <Card size="small">
-                        <Space direction="vertical" style={{ width: "100%" }}>
-                            <RobotOutlined style={{ fontSize: 24, color: "#52c41a" }} />
-                            <h4 style={{ margin: 0 }}>AI-Powered</h4>
-                            <p style={{ margin: 0, color: "#666", fontSize: 12 }}>
-                                Natural conversations with intelligent data extraction
-                            </p>
-                        </Space>
-                    </Card>
-                </div>
             </div>
         </AuthGuard>
     );
