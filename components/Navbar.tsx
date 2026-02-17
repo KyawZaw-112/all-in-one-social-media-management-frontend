@@ -79,16 +79,20 @@ export default function Navbar() {
                         label: <Link href="/dashboard">Dashboard</Link>,
                     },
                     {
-                        key: "/subscribe",
-                        label: <Link href="/subscribe">Billing</Link>,
-                    },
-                    {
                         key: "/dashboard/platforms",
                         label: (
                             <Link href="/dashboard/platforms">
                                 Connect Facebook
                             </Link>
                         ),
+                    },
+                    {
+                        key: "/dashboard/billing",
+                        label: <Link href="/dashboard/billing">Payment History</Link>,
+                    },
+                    {
+                        key: "/subscribe",
+                        label: <Link href="/subscribe">Upgrade Plan</Link>,
                     },
                 ]}
             />
