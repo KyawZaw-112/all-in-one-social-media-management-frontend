@@ -29,7 +29,8 @@ import {
     QuestionCircleOutlined,
     ArrowRightOutlined,
     BellOutlined,
-    FacebookOutlined
+    FacebookOutlined,
+    CreditCardOutlined
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
@@ -240,7 +241,15 @@ export default function UserDashboard() {
                             <Divider />
                             <Space direction="vertical" style={{ width: "100%" }}>
                                 <Button block size="large" style={{ borderRadius: "12px", textAlign: "left" }}>Business Settings</Button>
-                                <Button block size="large" style={{ borderRadius: "12px", textAlign: "left" }}>Payout Information</Button>
+                                <Button
+                                    block
+                                    size="large"
+                                    icon={<CreditCardOutlined />}
+                                    style={{ borderRadius: "12px", textAlign: "left" }}
+                                    onClick={() => router.push("/dashboard/billing")}
+                                >
+                                    Billing History
+                                </Button>
                                 <Button block danger size="large" style={{ borderRadius: "12px", marginTop: "10px", fontWeight: 600 }} onClick={() => { localStorage.clear(); router.push("/login"); }}>Sign Out</Button>
                             </Space>
                         </Card>
