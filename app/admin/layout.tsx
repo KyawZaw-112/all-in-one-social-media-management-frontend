@@ -110,8 +110,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             <Divider type="vertical" />
                             <Space size={12} style={{ cursor: "pointer" }}>
                                 <div style={{ textAlign: "right", lineHeight: "1.2" }}>
-                                    <Text strong block style={{ color: "#333" }}>Zayar Lwin</Text>
-                                    <Text type="secondary" style={{ fontSize: "11px" }}>Owner Account</Text>
+                                    <Text strong style={{ color: "#333", display: "block" }}>Zayar Lwin</Text>
+                                    <Text type="secondary" style={{ fontSize: "11px", display: "block" }}>Owner Account</Text>
                                 </div>
                                 <Avatar size={40} style={{ backgroundColor: "#722ed1", color: "white", fontSize: 18 }}>Z</Avatar>
                             </Space>
