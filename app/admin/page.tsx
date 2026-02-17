@@ -7,7 +7,7 @@ import {
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import AnalyticsChart from "@/components/AnalyticsChart";
-import supabase from "@/lib/supabase";
+import axios from "axios";
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
@@ -19,80 +19,31 @@ export default function AdminDashboard() {
         monthlyRevenue: 0,
     });
 
+    const [chartData, setChartData] = useState([]);
+
     const loadStats = async () => {
         try {
-            const now = new Date();
-            const firstDayOfMonth = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                1
-            ).toISOString();
+            const token = localStorage.getItem("authToken");
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-            const [
-                usersRes,
-                paymentsRes,
-                subscriptionsRes,
-                monthlyRevenueRes,
-            ] = await Promise.all([
-                // Users count
-                supabase
-                    .from("profiles")
-                    .select("*", { count: "exact", head: true }),
-
-                // All payments
-                supabase.from("payments").select("status, amount, created_at"),
-
-                // Subscriptions
-                supabase
-                    .from("subscriptions")
-                    .select("status, expires_at"),
-
-                // Monthly revenue (only approved this month)
-                supabase
-                    .from("payments")
-                    .select("amount")
-                    .eq("status", "approved")
-                    .gte("created_at", firstDayOfMonth),
-            ]);
-
-            if (usersRes.error) throw usersRes.error;
-            if (paymentsRes.error) throw paymentsRes.error;
-            if (subscriptionsRes.error) throw subscriptionsRes.error;
-            if (monthlyRevenueRes.error) throw monthlyRevenueRes.error;
-
-            const usersCount = usersRes.count || 0;
-
-            const pending =
-                paymentsRes.data?.filter((p) => p.status === "pending").length || 0;
-
-            const approved =
-                paymentsRes.data?.filter((p) => p.status === "approved").length || 0;
-
-            const subscribers = subscriptionsRes.data?.length || 0;
-
-            const activeSubscribers =
-                subscriptionsRes.data?.filter(
-                    (s) =>
-                        s.status === "active" &&
-                        s.expires_at &&
-                        new Date(s.expires_at) > now
-                ).length || 0;
-
-            // 💰 Calculate Monthly Revenue
-            const monthlyRevenue =
-                monthlyRevenueRes.data?.reduce(
-                    (sum, p) => sum + Number(p.amount || 0),
-                    0
-                ) || 0;
-
-            setStats({
-                users: usersCount,
-                pending,
-                approved,
-                subscribers,
-                activeSubscribers,
-                monthlyRevenue,
+            const res = await axios.get(`${apiUrl}/api/admin/system-stats`, {
+                headers: { Authorization: `Bearer ${token}` }
             });
+
+            if (res.data.success) {
+                const data = res.data.data;
+                setStats({
+                    users: data.totalUsers,
+                    pending: data.pendingPayments,
+                    approved: data.activeSubs,
+                    subscribers: data.planDistribution.shop + data.planDistribution.cargo,
+                    activeSubscribers: data.activeSubs,
+                    monthlyRevenue: data.monthlyRevenue,
+                });
+                if (data.chartData) {
+                    setChartData(data.chartData);
+                }
+            }
         } catch (error) {
             console.error("Dashboard error:", error);
         }
@@ -102,65 +53,55 @@ export default function AdminDashboard() {
         loadStats();
     }, []);
 
-
-    console.log("monthly",stats.monthlyRevenue)
-
-
-    const chartData = [
-        { date: "Mon", users: 2 },
-        { date: "Tue", users: 5 },
-        { date: "Wed", users: 8 },
-        { date: "Thu", users: 12 },
-        { date: "Fri", users: 15 },
-    ];
-
     return (
         <Row gutter={[16, 16]}>
             <Col xs={24} md={12} lg={6}>
-                <Card>
+                <Card bordered={false} style={{ borderRadius: 16 }}>
                     <Statistic
-                        title="Total Users"
+                        title="Total Merchants"
                         value={stats.users}
-                        prefix={<UserOutlined />}
+                        prefix={<TeamOutlined style={{ color: '#1677ff' }} />}
                     />
                 </Card>
             </Col>
 
             <Col xs={24} md={12} lg={6}>
-                <Card>
+                <Card bordered={false} style={{ borderRadius: 16 }}>
                     <Statistic
                         title="Monthly Revenue"
                         value={stats.monthlyRevenue}
-                        precision={2}
-                        prefix="฿"
+                        precision={0}
+                        suffix="Ks"
+                        prefix={<span style={{ fontSize: 18 }}>💰</span>}
                         valueStyle={{ color: "#52c41a" }}
                     />
                 </Card>
             </Col>
 
             <Col xs={24} md={12} lg={6}>
-                <Card>
+                <Card bordered={false} style={{ borderRadius: 16 }}>
                     <Statistic
-                        title="Pending Payments"
+                        title="Pending Reviews"
                         value={stats.pending}
                         valueStyle={{ color: "#faad14" }}
+                        prefix={<UserOutlined />}
                     />
                 </Card>
             </Col>
 
             <Col xs={24} md={12} lg={6}>
-                <Card>
+                <Card bordered={false} style={{ borderRadius: 16 }}>
                     <Statistic
-                        title="Active Subscribers"
+                        title="Active Subscriptions"
                         value={stats.activeSubscribers}
-                        valueStyle={{ color: "#1677ff" }}
+                        valueStyle={{ color: "#722ed1" }}
                         prefix={<TeamOutlined />}
                     />
                 </Card>
             </Col>
 
             <Col span={24}>
-                <Card style={{ marginTop: 24 }}>
+                <Card style={{ marginTop: 24, borderRadius: 16 }} title="Growth Overview">
                     <AnalyticsChart data={chartData} />
                 </Card>
             </Col>
