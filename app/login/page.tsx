@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Form, Input, Button, Card, message, Typography } from "antd";
-import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import axios from "axios";
 
@@ -25,7 +25,6 @@ export default function LoginPage() {
 
                 message.success("Login အောင်မြင်ပါသည်။ 👋");
 
-                // Admin ဆိုရင် Admin Panel ကို သွား၊ ရိုးရိုး User ဆိုရင် Dashboard ကို သွား
                 const isAdmin = values.email === "admin@autoreply.biz";
 
                 setTimeout(() => {
@@ -34,7 +33,7 @@ export default function LoginPage() {
                     } else {
                         router.push("/dashboard");
                     }
-                }, 500); // ခဏလေး စောင့်ပြီးမှ redirect လုပ်မယ် (localStorage သေချာသွားအောင်)
+                }, 500);
             }
         } catch (error: any) {
             message.error(error.response?.data?.error || "Email သို့မဟုတ် Password မှားယွင်းနေပါသည်။");
@@ -46,19 +45,68 @@ export default function LoginPage() {
     return (
         <div style={{
             minHeight: "100vh",
-            background: "#f0f2f5",
+            background: "#0a0a0f",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            padding: "0 20px"
+            padding: "0 20px",
+            position: "relative",
+            overflow: "hidden",
         }}>
-            <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                <Title level={2} style={{ margin: 0 }}>Welcome Back</Title>
-                <Text type="secondary">သင့် Dashboard သို့ ပြန်လည်ဝင်ရောက်ပါ</Text>
+            {/* Background Glow */}
+            <div style={{
+                position: "absolute",
+                width: 500,
+                height: 500,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(129,140,248,0.08) 0%, transparent 70%)",
+                top: "10%",
+                left: "20%",
+                filter: "blur(60px)",
+                pointerEvents: "none",
+            }} />
+            <div style={{
+                position: "absolute",
+                width: 400,
+                height: 400,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(167,139,250,0.06) 0%, transparent 70%)",
+                bottom: "10%",
+                right: "20%",
+                filter: "blur(60px)",
+                pointerEvents: "none",
+            }} />
+
+            <div style={{ textAlign: "center", marginBottom: 30, position: "relative", zIndex: 1 }}>
+                <div style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 18,
+                    background: "linear-gradient(135deg, #818cf8, #a78bfa)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 20px",
+                    fontSize: 28,
+                }}>
+                    🤖
+                </div>
+                <Title level={2} style={{ margin: 0, color: "#f1f5f9" }}>Welcome Back</Title>
+                <Text style={{ color: "#94a3b8" }}>သင့် Dashboard သို့ ပြန်လည်ဝင်ရောက်ပါ</Text>
             </div>
 
-            <Card style={{ width: "100%", maxWidth: "400px", borderRadius: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
+            <Card style={{
+                width: "100%",
+                maxWidth: 420,
+                borderRadius: 24,
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                background: "rgba(255,255,255,0.03)",
+                backdropFilter: "blur(20px)",
+                position: "relative",
+                zIndex: 1,
+            }}>
                 <Form layout="vertical" onFinish={onFinish}>
                     <Form.Item
                         name="email"
@@ -68,10 +116,16 @@ export default function LoginPage() {
                         ]}
                     >
                         <Input
-                            prefix={<MailOutlined />}
+                            prefix={<MailOutlined style={{ color: "#64748b" }} />}
                             placeholder="Email Address"
                             size="large"
-                            style={{ borderRadius: "8px" }}
+                            style={{
+                                borderRadius: 14,
+                                height: 52,
+                                background: "rgba(255,255,255,0.04)",
+                                border: "1px solid rgba(255,255,255,0.08)",
+                                color: "#f1f5f9",
+                            }}
                         />
                     </Form.Item>
 
@@ -80,18 +134,26 @@ export default function LoginPage() {
                         rules={[{ required: true, message: "Password ထည့်ပေးပါ" }]}
                     >
                         <Input.Password
-                            prefix={<LockOutlined />}
+                            prefix={<LockOutlined style={{ color: "#64748b" }} />}
                             placeholder="Password"
                             size="large"
-                            style={{ borderRadius: "8px" }}
+                            style={{
+                                borderRadius: 14,
+                                height: 52,
+                                background: "rgba(255,255,255,0.04)",
+                                border: "1px solid rgba(255,255,255,0.08)",
+                                color: "#f1f5f9",
+                            }}
                         />
                     </Form.Item>
 
-                    <div style={{ textAlign: "right", marginBottom: "20px" }}>
-                        <Link href="/forgot-password" style={{ fontSize: "12px" }}>Password မေ့နေပါသလား?</Link>
+                    <div style={{ textAlign: "right", marginBottom: 20 }}>
+                        <Link href="/forgot-password" style={{ fontSize: 13, color: "#818cf8" }}>
+                            Password မေ့နေပါသလား?
+                        </Link>
                     </div>
 
-                    <Form.Item style={{ marginBottom: "12px" }}>
+                    <Form.Item style={{ marginBottom: 16 }}>
                         <Button
                             type="primary"
                             htmlType="submit"
@@ -99,10 +161,13 @@ export default function LoginPage() {
                             size="large"
                             loading={loading}
                             style={{
-                                borderRadius: "8px",
-                                height: "45px",
-                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                border: "none"
+                                borderRadius: 14,
+                                height: 52,
+                                background: "linear-gradient(135deg, #818cf8, #a78bfa)",
+                                border: "none",
+                                fontWeight: 600,
+                                fontSize: 16,
+                                boxShadow: "0 8px 24px rgba(129,140,248,0.3)"
                             }}
                         >
                             Login ဝင်မည်
@@ -110,8 +175,8 @@ export default function LoginPage() {
                     </Form.Item>
 
                     <div style={{ textAlign: "center" }}>
-                        <Text type="secondary">အကောင့်မရှိသေးဘူးလား? </Text>
-                        <Link href="/signup">Sign Up လုပ်ရန်</Link>
+                        <Text style={{ color: "#94a3b8" }}>အကောင့်မရှိသေးဘူးလား? </Text>
+                        <Link href="/signup" style={{ color: "#818cf8", fontWeight: 600 }}>Sign Up လုပ်ရန်</Link>
                     </div>
                 </Form>
             </Card>

@@ -1,10 +1,12 @@
 'use client';
-import {ConfigProvider} from "antd";
+import "./globals.css";
+import { ConfigProvider } from "antd";
 import Navbar from "@/components/Navbar";
-import {ReactNode, useEffect} from "react";
+import { ReactNode, useEffect } from "react";
 import supabase from "@/lib/supabase";
-import { SpeedInsights } from "@vercel/speed-insights/next"
-export default function RootLayout({children}:{children: ReactNode}) {
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const {
@@ -26,44 +28,62 @@ export default function RootLayout({children}:{children: ReactNode}) {
 
         return () => subscription.unsubscribe();
     }, []);
+
     return (
         <html lang="en">
-        <head>
-            <title>PostNow - Schedule and Post to Social Media Effortlessly</title>
-            <meta
-                name="description"
-                content="PostNow is a social media scheduling tool that helps you plan, schedule, and post content across multiple platforms with ease."
-            />
-            <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            <link rel="icon" href="/favicon.ico"/>
-        </head>
-        <body>
-        <ConfigProvider
-            theme={{
-                token: {
-                    colorPrimary: "#111111",      // clean black primary
-                    borderRadius: 8,
-                    colorBgContainer: "#ffffff",
-                    colorText: "#111111",
-                    colorTextSecondary: "#666666",
-                    fontSize: 14,
-                },
-                components: {
-                    Card: {
-                        boxShadow: "none",
-                        borderRadius: 12,
-                    },
-                    Button: {
-                        borderRadius: 8,
-                    },
-                },
-            }}
-        >
-            <Navbar/>
-            {children}
-            <SpeedInsights/>
-        </ConfigProvider>
-        </body>
+            <head>
+                <title>AutoReply — Facebook Auto-Reply Platform for Myanmar Businesses</title>
+                <meta
+                    name="description"
+                    content="Myanmar's #1 Facebook Auto-Reply Platform. Automate your Online Shop and Cargo business replies. No AI cost, mobile-first, Myanmar + English support."
+                />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta name="theme-color" content="#0a0a0f" />
+                <link rel="icon" href="/favicon.ico" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+                    rel="stylesheet"
+                />
+            </head>
+            <body>
+                <ConfigProvider
+                    theme={{
+                        token: {
+                            colorPrimary: "#6366f1",
+                            borderRadius: 12,
+                            colorBgContainer: "#ffffff",
+                            colorText: "#0f172a",
+                            colorTextSecondary: "#64748b",
+                            fontSize: 14,
+                            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                        },
+                        components: {
+                            Card: {
+                                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                                borderRadius: 20,
+                            },
+                            Button: {
+                                borderRadius: 12,
+                            },
+                            Input: {
+                                borderRadius: 12,
+                            },
+                            Table: {
+                                borderRadius: 16,
+                            },
+                            Modal: {
+                                borderRadius: 20,
+                            },
+                        },
+                    }}
+                >
+                    <Navbar />
+                    {children}
+                    <SpeedInsights />
+                </ConfigProvider>
+            </body>
         </html>
     );
 }

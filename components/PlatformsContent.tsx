@@ -1,8 +1,7 @@
 "use client";
 
-import { Button, message, Tag, Spin, Popconfirm, Card, Typography, Space, Avatar } from "antd";
+import { Button, message, Tag, Spin, Popconfirm, Card, Typography, Space, Avatar, Alert } from "antd";
 import { useEffect, useState } from "react";
-import supabase from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     FacebookOutlined,
@@ -10,7 +9,9 @@ import {
     DisconnectOutlined,
     ArrowLeftOutlined,
     SafetyCertificateOutlined,
-    SyncOutlined
+    SyncOutlined,
+    WarningOutlined,
+    InfoCircleOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -45,12 +46,10 @@ export default function PlatformsContent() {
         if (searchParams.get("connected") === "facebook") {
             message.success("Facebook connected successfully! 🚀");
             router.replace("/dashboard/platforms");
-            // Re-fetch after short delay to let backend sync
             setTimeout(async () => {
                 const token = localStorage.getItem("authToken");
                 if (token) {
                     const freshPages = await checkConnection(token);
-                    // 🚀 Auto-sync ALL newly connected pages for convenience
                     if (freshPages && freshPages.length > 0) {
                         message.loading({ content: "Synchronizing Webhooks...", key: "autosync" });
                         for (const p of freshPages) {
@@ -78,7 +77,7 @@ export default function PlatformsContent() {
             const data: PlatformConnection[] = await res.json();
             const facebookPages = data.filter((p) => p.platform === "facebook");
             setPages(facebookPages);
-            return facebookPages; // Return for auto-sync logic
+            return facebookPages;
         } catch (err) {
             console.error(err);
             return [];
@@ -110,6 +109,17 @@ export default function PlatformsContent() {
             );
 
             const data = await res.json();
+
+            if (!res.ok) {
+                // Handle 1-page limit error
+                if (data.code === "PAGE_LIMIT_REACHED") {
+                    message.warning(data.error);
+                } else {
+                    message.error(data.error || "Could not connect");
+                }
+                return;
+            }
+
             if (data.url) {
                 window.location.href = data.url;
             } else {
@@ -166,7 +176,7 @@ export default function PlatformsContent() {
             );
 
             if (res.ok) {
-                message.success("Disconnected successfully");
+                message.success("Disconnected and auto-reply data cleaned up ✅");
                 setPages((prev) => prev.filter((p) => p.page_id !== pageId));
             }
         } catch {
@@ -181,6 +191,8 @@ export default function PlatformsContent() {
             </div>
         );
     }
+
+    const hasPage = pages.length > 0;
 
     return (
         <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
@@ -202,9 +214,19 @@ export default function PlatformsContent() {
             </div>
 
             <div style={{ maxWidth: "600px", margin: "40px auto", padding: "0 20px" }}>
+                {/* 1-Page Limit Notice */}
+                <Alert
+                    message="အကောင့်တစ်ခုလျှင် Facebook Page တစ်ခုသာ ချိတ်ဆက်ခွင့်ရှိပါသည်"
+                    description="Page အသစ်ချိတ်ဆက်လိုပါက လက်ရှိချိတ်ဆက်ထားသည့် page ကို disconnect လုပ်ပေးပါ။ Disconnect လုပ်လိုက်ပါက auto-reply data များအားလုံးကိုလည်း ရှင်းလင်းမည်ဖြစ်ပါသည်။"
+                    type="info"
+                    showIcon
+                    icon={<InfoCircleOutlined />}
+                    style={{ borderRadius: 16, marginBottom: 24, border: "1px solid #91d5ff" }}
+                />
+
                 <Card
                     style={{ borderRadius: "24px", boxShadow: "0 4px 20px rgba(0,0,0,0.03)", border: "none" }}
-                    bodyStyle={{ padding: "32px" }}
+                    styles={{ body: { padding: "32px" } }}
                 >
                     <div style={{ textAlign: "center", marginBottom: "32px" }}>
                         <Avatar
@@ -216,7 +238,7 @@ export default function PlatformsContent() {
                         <Text type="secondary">သင့် Page မှ message များကို AI ဖြင့် အလိုအလျောက် ပြန်ကြားပေးရန် ချိတ်ဆက်ပါ</Text>
                     </div>
 
-                    {pages.length > 0 ? (
+                    {hasPage ? (
                         <Space direction="vertical" style={{ width: "100%" }} size={16}>
                             {pages.map((page) => (
                                 <div
@@ -250,7 +272,17 @@ export default function PlatformsContent() {
 
                                         <Popconfirm
                                             title="Disconnect this page?"
-                                            description="Are you sure you want to stop auto-replies for this page?"
+                                            description={
+                                                <div>
+                                                    <p>ဒီ page ကို disconnect လုပ်လိုက်ပါက:</p>
+                                                    <ul style={{ paddingLeft: 16, margin: "8px 0" }}>
+                                                        <li>Auto-reply flows အားလုံး ဖျက်ပစ်မည်</li>
+                                                        <li>Templates အားလုံး ဖျက်ပစ်မည်</li>
+                                                        <li>Rules အားလုံး ဖျက်ပစ်မည်</li>
+                                                    </ul>
+                                                    <p><strong>ဆက်လုပ်မှာ သေချာပါသလား?</strong></p>
+                                                </div>
+                                            }
                                             onConfirm={() => disconnectFacebook(page.page_id)}
                                             okText="Yes, Disconnect"
                                             cancelText="No"
@@ -268,15 +300,15 @@ export default function PlatformsContent() {
                                 </div>
                             ))}
 
-                            <Button
-                                block
-                                type="dashed"
-                                onClick={connectFacebook}
-                                loading={loading}
-                                style={{ borderRadius: "12px", height: "45px" }}
-                            >
-                                + Connect Another Page
-                            </Button>
+                            {/* Show disabled button when page limit reached */}
+                            <Alert
+                                message="Page limit reached"
+                                description="အကောင့်တစ်ခုလျှင် page တစ်ခုသာ ချိတ်ဆက်ခွင့်ရှိပါသည်။ Page အသစ်ချိတ်ဆက်ရန် အထက်က page ကို disconnect လုပ်ပါ။"
+                                type="warning"
+                                showIcon
+                                icon={<WarningOutlined />}
+                                style={{ borderRadius: 12 }}
+                            />
                         </Space>
                     ) : (
                         <div style={{ textAlign: "center" }}>
