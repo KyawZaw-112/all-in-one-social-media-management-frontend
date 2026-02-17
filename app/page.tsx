@@ -114,7 +114,7 @@ export default function LandingPage() {
                             <ShopOutlined style={{ fontSize: 60, color: "#1890ff" }} />
                             <h2 style={{ margin: "16px 0" }}>🛍️ Online Shop</h2>
                             <div style={{ fontSize: 40, fontWeight: "bold", color: "#1890ff", margin: "20px 0" }}>
-                                15,000 Ks
+                                2,000 Baht
                             </div>
                             <p style={{ color: "#666", marginBottom: 30 }}>per month</p>
 
@@ -149,7 +149,7 @@ export default function LandingPage() {
                             <CarOutlined style={{ fontSize: 60, color: "#fa8c16" }} />
                             <h2 style={{ margin: "16px 0" }}>📦 Cargo & Delivery</h2>
                             <div style={{ fontSize: 40, fontWeight: "bold", color: "#fa8c16", margin: "20px 0" }}>
-                                20,000 Ks
+                                2,000 Baht
                             </div>
                             <p style={{ color: "#666", marginBottom: 30 }}>per month</p>
 

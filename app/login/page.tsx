@@ -20,9 +20,21 @@ export default function LoginPage() {
             const response = await axios.post(`${apiUrl}/api/oauth/login`, values);
 
             if (response.data.token) {
-                message.success("Login အောင်မြင်ပါသည်။ 👋");
                 localStorage.setItem("authToken", response.data.token);
-                router.push("/dashboard");
+                localStorage.setItem("user", JSON.stringify(response.data.user));
+
+                message.success("Login အောင်မြင်ပါသည်။ 👋");
+
+                // Admin ဆိုရင် Admin Panel ကို သွား၊ ရိုးရိုး User ဆိုရင် Dashboard ကို သွား
+                const isAdmin = values.email === "admin@autoreply.biz";
+
+                setTimeout(() => {
+                    if (isAdmin) {
+                        router.push("/admin/dashboard");
+                    } else {
+                        router.push("/dashboard");
+                    }
+                }, 500); // ခဏလေး စောင့်ပြီးမှ redirect လုပ်မယ် (localStorage သေချာသွားအောင်)
             }
         } catch (error: any) {
             message.error(error.response?.data?.error || "Email သို့မဟုတ် Password မှားယွင်းနေပါသည်။");

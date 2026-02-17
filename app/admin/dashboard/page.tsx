@@ -71,7 +71,7 @@ export default function AdminDashboard() {
                             title={<Text type="secondary">Estimated Revenue (Kyats)</Text>}
                             value={stats?.estimatedMonthlyRevenue}
                             precision={0}
-                            valueStyle={{ color: "#722ed1", fontWeight: 800 }}
+                            styles={{ content: { color: "#722ed1", fontWeight: 800 } }}
                             prefix={<WalletOutlined style={{ marginRight: 8 }} />}
                             suffix={<Text style={{ fontSize: 14 }}>/mo</Text>}
                         />
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
                         <Statistic
                             title="Total Merchants"
                             value={stats?.totalUsers}
-                            valueStyle={{ fontWeight: 800 }}
+                            styles={{ content: { fontWeight: 800 } }}
                             prefix={<TeamOutlined style={{ marginRight: 8, color: "#1890ff" }} />}
                         />
                         <div style={{ marginTop: 16 }}>
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
                         <Statistic
                             title="Active Subscriptions"
                             value={stats?.activeSubs}
-                            valueStyle={{ color: "#52c41a", fontWeight: 800 }}
+                            styles={{ content: { color: "#52c41a", fontWeight: 800 } }}
                             prefix={<Badge status="processing" color="#52c41a" style={{ marginRight: 12 }} />}
                         />
                         <div style={{ marginTop: 12, fontSize: "12px", color: "#666" }}>
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
                         <Statistic
                             title="System Health"
                             value={stats?.systemHealth?.fbPages || 0}
-                            valueStyle={{ fontWeight: 800 }}
+                            styles={{ content: { fontWeight: 800 } }}
                             prefix={<GlobalOutlined style={{ color: "#fa8c16", marginRight: 8 }} />}
                             suffix="Connected"
                         />
@@ -134,14 +134,14 @@ export default function AdminDashboard() {
                                             <Space><ShopOutlined /> <Text>Online Shop</Text></Space>
                                             <Text strong>{stats?.planDistribution?.shop}</Text>
                                         </div>
-                                        <Progress percent={(stats?.planDistribution?.shop / stats?.totalUsers) * 100} strokeColor="#1890ff" strokeWidth={12} />
+                                        <Progress percent={(stats?.planDistribution?.shop / stats?.totalUsers) * 100} strokeColor="#1890ff" size={12 as any} />
                                     </div>
                                     <div>
                                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                                             <Space><CarOutlined /> <Text>Cargo & Delivery</Text></Space>
                                             <Text strong>{stats?.planDistribution?.cargo}</Text>
                                         </div>
-                                        <Progress percent={(stats?.planDistribution?.cargo / stats?.totalUsers) * 100} strokeColor="#fa8c16" strokeWidth={12} />
+                                        <Progress percent={(stats?.planDistribution?.cargo / stats?.totalUsers) * 100} strokeColor="#fa8c16" size={12 as any} />
                                     </div>
                                 </div>
                             </Col>
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
                                     value={72.4}
                                     suffix="%"
                                     prefix={<ArrowUpOutlined />}
-                                    valueStyle={{ color: "#3f8600" }}
+                                    styles={{ content: { color: "#3f8600" } }}
                                 />
                                 <Text type="secondary">Trial to Paid conversion is healthy</Text>
                             </Col>
