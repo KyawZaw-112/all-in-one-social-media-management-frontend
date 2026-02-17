@@ -83,6 +83,50 @@ export function deleteAdminUser(token: string, id: string) {
     });
 }
 
+/* ================================
+   GET ALL CONVERSATIONS
+================================ */
+export async function getConversations() {
+    const res = await fetch(`${BASE_URL}/api/conversations`, {
+        credentials: "include",
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch conversations");
+
+    return res.json();
+}
+
+/* ================================
+   GET SINGLE CONVERSATION DETAIL
+================================ */
+export async function getConversationDetail(id: string) {
+    const res = await fetch(
+        `${BASE_URL}/api/conversations/${id}`,
+        {
+            credentials: "include",
+        }
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch conversation");
+
+    return res.json();
+}
+
+/* ================================
+   CLOSE CONVERSATION
+================================ */
+export async function closeConversation(id: string) {
+    const res = await fetch(
+        `${BASE_URL}/api/conversations/${id}/close`,
+        {
+            method: "POST",
+            credentials: "include",
+        }
+    );
+    if(!res.ok) throw new Error("Failed to close conversation");
+    return res.json();
+}
+
 /* ===========================
    OTHER EXAMPLES
 =========================== */
