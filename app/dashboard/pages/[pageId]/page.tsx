@@ -14,7 +14,7 @@ import {
 } from "antd";
 import supabase from "@/lib/supabase";
 import { fetchWithAuth } from "@/lib/api";
-
+import { message } from 'antd';
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
@@ -57,7 +57,22 @@ export default function PageRules() {
         setRules((prev) => [...prev, newRule]);
         setKeyword("");
         setReplyText("");
+        message.success("Rule created successfully");
     }
+
+    const deleteRule = async (id: string) => {
+        const token = await getToken();
+        if (!token) return;
+
+        await fetchWithAuth(`rules/${id}`, token, {
+            method: "DELETE",
+        });
+
+        setRules((prev) => prev.filter((r) => r.id !== id));
+        message.success(
+            "Rule deleted successfully"
+        )
+    };
 
     useEffect(() => {
         if (pageId) loadRules();
@@ -133,6 +148,12 @@ export default function PageRules() {
                         <div style={{ marginTop: 16 }}>
                             <Switch checked={rule.enabled} />
                         </div>
+                        <div style={{ marginTop: 16 }}
+                        onClick={()=>deleteRule(rule.id)}
+                        >
+                            <Button danger>Delete</Button>
+                        </div>
+
                     </Card>
                 ))
             )}
