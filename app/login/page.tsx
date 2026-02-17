@@ -16,7 +16,7 @@ export default function LoginPage() {
     const onFinish = async (values: any) => {
         setLoading(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+            const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
             const response = await axios.post(`${apiUrl}/api/oauth/login`, values);
 
             if (response.data.token) {
