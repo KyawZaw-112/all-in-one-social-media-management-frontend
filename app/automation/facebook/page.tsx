@@ -8,7 +8,6 @@ import {
     Modal,
     Form,
     Input,
-    Select,
     Switch,
     Tag,
     Space,
@@ -65,7 +64,7 @@ export default function FacebookAutoReply() {
         setLoading(true);
         try {
             const token = localStorage.getItem("authToken");
-            const response = await axios.get(`${API_URL}/api/automation/flows`, {
+            const response = await axios.get(`${API_URL}/api/merchants/flows`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setFlows(response.data.data || []);
@@ -95,12 +94,12 @@ export default function FacebookAutoReply() {
             const token = localStorage.getItem("authToken");
             // Redirect to Backend OAuth URL
             if (editingFlow) {
-                await axios.put(`${API_URL}/api/automation/flows/${editingFlow.id}`, values, {
+                await axios.put(`${API_URL}/api/merchants/flows/${editingFlow.id}`, values, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 message.success(t.automation.updated);
             } else {
-                await axios.post(`${API_URL}/api/automation/flows`, values, {
+                await axios.post(`${API_URL}/api/merchants/flows`, values, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 message.success(t.automation.created);
@@ -126,7 +125,7 @@ export default function FacebookAutoReply() {
             onOk: async () => {
                 try {
                     const token = localStorage.getItem("authToken");
-                    await axios.delete(`${API_URL}/api/automation/flows/${id}`, {
+                    await axios.delete(`${API_URL}/api/merchants/flows/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
                     message.success(t.automation.deleted);
@@ -142,7 +141,7 @@ export default function FacebookAutoReply() {
         e.stopPropagation();
         try {
             const token = localStorage.getItem("authToken");
-            await axios.put(`${API_URL}/api/automation/flows/${flow.id}`,
+            await axios.patch(`${API_URL}/api/merchants/flows/${flow.id}/toggle`,
                 { is_active: !flow.is_active },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -307,12 +306,7 @@ export default function FacebookAutoReply() {
                         <Form.Item label={<Text strong>{t.automation.flowName}</Text>} name="name" rules={[{ required: true, message: t.automation.nameRequired }]}>
                             <Input placeholder={t.automation.placeholderName} style={{ height: "45px", borderRadius: "10px" }} />
                         </Form.Item>
-                        <Form.Item label={<Text strong>{t.automation.businessType}</Text>} name="business_type" rules={[{ required: true, message: t.automation.businessTypeRequired }]}>
-                            <Select style={{ height: "45px" }} dropdownStyle={{ borderRadius: "12px" }}>
-                                <Select.Option value="online_shop">{t.automation.onlineShop}</Select.Option>
-                                <Select.Option value="cargo">{t.automation.cargo}</Select.Option>
-                            </Select>
-                        </Form.Item>
+                        {/* business_type is auto-filled from merchant profile */}
                         <Form.Item label={<Text strong>{t.automation.triggerKeyword}</Text>} name="trigger_keyword" rules={[{ required: true, message: t.automation.keywordRequired }]}>
                             <Input placeholder={t.automation.placeholderKeyword} style={{ height: "45px", borderRadius: "10px" }} />
                         </Form.Item>
