@@ -48,11 +48,16 @@ export default function PlatformsContent() {
         if (searchParams.get("connected") === "facebook") {
             message.success(t.common.success + " 🚀");
             router.replace("/dashboard/platforms");
-            setTimeout(async () => {
+
+            // Retry checking connection 3 times to allow backend to sync
+            let attempts = 0;
+            const checkLoop = setInterval(async () => {
+                attempts++;
                 const token = localStorage.getItem("authToken");
                 if (token) {
                     const freshPages = await checkConnection(token);
                     if (freshPages && freshPages.length > 0) {
+                        clearInterval(checkLoop); // Stop if found
                         message.loading({ content: "Synchronizing Webhooks...", key: "autosync" });
                         for (const p of freshPages) {
                             await syncPage(p.page_id, true);
@@ -60,7 +65,8 @@ export default function PlatformsContent() {
                         message.success({ content: "All pages synchronized! 🚀", key: "autosync" });
                     }
                 }
-            }, 1000);
+                if (attempts >= 5) clearInterval(checkLoop); // Stop after 5 attempts
+            }, 2000); // Check every 2 seconds
         }
     }, [searchParams]);
 
@@ -69,6 +75,7 @@ export default function PlatformsContent() {
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/platforms`,
                 {
+                    cache: "no-store",
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
