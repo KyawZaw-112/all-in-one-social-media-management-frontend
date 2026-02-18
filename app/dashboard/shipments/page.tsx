@@ -20,7 +20,7 @@ export default function ShipmentsPage() {
         setLoading(true);
         try {
             const token = localStorage.getItem("authToken");
-            const res = await axios.get(`${API_URL}/api/automation/shipments`, {
+            const res = await axios.get(`${API_URL}/api/merchants/shipments`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setData(res.data.data || []);

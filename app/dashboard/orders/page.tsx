@@ -20,7 +20,7 @@ export default function OrdersPage() {
         setLoading(true);
         try {
             const token = localStorage.getItem("authToken");
-            const res = await axios.get(`${API_URL}/api/automation/orders`, {
+            const res = await axios.get(`${API_URL}/api/merchants/orders`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setData(res.data.data || []);
