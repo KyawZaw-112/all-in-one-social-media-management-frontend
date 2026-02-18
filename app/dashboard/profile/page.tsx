@@ -14,9 +14,18 @@ import {
     Input,
     message
 } from "antd";
-import { UserOutlined, ShopOutlined, LockOutlined, SaveOutlined } from "@ant-design/icons";
+import {
+    UserOutlined,
+    MailOutlined,
+    PhoneOutlined,
+    SafetyCertificateOutlined,
+    LockOutlined,
+    ShopOutlined,
+    SaveOutlined
+} from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
+import { API_URL } from "@/lib/apiConfig";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import dayjs from "dayjs";
 import supabase from "@/lib/supabase";
@@ -39,9 +48,8 @@ export default function ProfilePage() {
 
                 // 2. Get Merchant Profile via endpoint
                 const token = localStorage.getItem("authToken");
-                const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
 
-                const res = await axios.get(`${apiUrl}/api/automation/me`, {
+                const res = await axios.get(`${API_URL}/api/merchants/me`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStats(res.data.data);

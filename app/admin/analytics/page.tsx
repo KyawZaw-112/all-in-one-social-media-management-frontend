@@ -50,7 +50,9 @@ import {
     Cell,
     Legend,
 } from "recharts";
+import Link from "next/link";
 import axios from "axios";
+import { API_URL } from "@/lib/apiConfig";
 
 const { Title, Text } = Typography;
 
@@ -92,8 +94,7 @@ export default function AnalyticsPage() {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem("authToken");
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-                const res = await axios.get(`${apiUrl}/api/admin/system-stats`, {
+                const res = await axios.get(`${API_URL}/api/admin/system-stats`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setStats(res.data.data);

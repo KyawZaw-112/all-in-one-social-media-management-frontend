@@ -28,6 +28,7 @@ import {
     CalendarOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
+import { API_URL } from "@/lib/apiConfig";
 import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
@@ -41,8 +42,7 @@ export default function SubscriptionsPage() {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem("authToken");
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-                const res = await axios.get(`${apiUrl}/api/admin/merchants`, {
+                const res = await axios.get(`${API_URL}/api/admin/merchants`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setMerchants(res.data.data || []);

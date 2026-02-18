@@ -6,6 +6,7 @@ import { Form, Input, Button, Card, message, Typography } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import axios from "axios";
+import { API_URL } from "@/lib/apiConfig";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -19,8 +20,7 @@ export default function LoginPage() {
     const onFinish = async (values: any) => {
         setLoading(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-            const response = await axios.post(`${apiUrl}/api/oauth/login`, values);
+            const response = await axios.post(`${API_URL}/api/oauth/login`, values);
 
             if (response.data.token) {
                 localStorage.setItem("authToken", response.data.token);

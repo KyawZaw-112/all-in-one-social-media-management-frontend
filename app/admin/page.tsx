@@ -8,6 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import AnalyticsChart from "@/components/AnalyticsChart";
 import axios from "axios";
+import { API_URL } from "@/lib/apiConfig";
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
@@ -24,9 +25,8 @@ export default function AdminDashboard() {
     const loadStats = async () => {
         try {
             const token = localStorage.getItem("authToken");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-            const res = await axios.get(`${apiUrl}/api/admin/system-stats`, {
+            const res = await axios.get(`${API_URL}/api/admin/system-stats`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

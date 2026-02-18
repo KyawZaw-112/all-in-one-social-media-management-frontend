@@ -5,6 +5,7 @@ import { Form, Input, Button, Card, message, Typography, Result } from "antd";
 import { MailOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import axios from "axios";
+import { API_URL } from "@/lib/apiConfig";
 
 const { Title, Text } = Typography;
 
@@ -15,8 +16,7 @@ export default function ForgotPasswordPage() {
     const onFinish = async (values: any) => {
         setLoading(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-            await axios.post(`${apiUrl}/api/oauth/forgot-password`, { email: values.email });
+            await axios.post(`${API_URL}/api/oauth/forgot-password`, { email: values.email });
             setSent(true);
         } catch (error: any) {
             message.error(error.response?.data?.error || "တစ်ခုခု မှားယွင်းနေပါသည်။ ထပ်ကြိုးစားကြည့်ပါ။");

@@ -5,6 +5,7 @@ import { Table, Card, Typography, Tag, Space, Alert } from "antd";
 import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import axios from "axios";
+import { API_URL } from "@/lib/apiConfig";
 
 const { Title, Text } = Typography;
 
@@ -16,9 +17,8 @@ export default function PaymentHistory() {
         const fetchHistory = async () => {
             try {
                 const token = localStorage.getItem("authToken");
-                const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-                const res = await axios.get(`${apiUrl}/api/payments/my-history`, {
+                const res = await axios.get(`${API_URL}/api/payments/my-history`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

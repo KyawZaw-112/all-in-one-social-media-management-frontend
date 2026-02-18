@@ -1,8 +1,6 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import { API_URL } from "./apiConfig";
 
-if (!BASE_URL) {
-    throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
-}
+const BASE_URL = API_URL;
 
 export async function fetchWithAuth<T = any>(
     path: string,
@@ -34,7 +32,7 @@ export async function fetchWithAuth<T = any>(
         try {
             const error = await res.json();
             message = error.error || error.message || message;
-        } catch {}
+        } catch { }
 
         throw new Error(message);
     }
@@ -123,7 +121,7 @@ export async function closeConversation(id: string) {
             credentials: "include",
         }
     );
-    if(!res.ok) throw new Error("Failed to close conversation");
+    if (!res.ok) throw new Error("Failed to close conversation");
     return res.json();
 }
 

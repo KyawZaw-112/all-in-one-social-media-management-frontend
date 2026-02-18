@@ -33,6 +33,7 @@ import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { API_URL } from "@/lib/apiConfig";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -47,8 +48,7 @@ export default function UserDashboard() {
             if (!token) return;
 
             try {
-                const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-                const res = await axios.get(`${apiUrl}/api/automation/stats`, {
+                const res = await axios.get(`${API_URL}/api/merchants/me`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStats(res.data.data);

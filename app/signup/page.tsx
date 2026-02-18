@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import axios from "axios";
+import { API_URL } from "@/lib/apiConfig";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -30,15 +31,11 @@ function SignupForm() {
     const onFinish = async (values: any) => {
         setLoading(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
-            const signupData = {
+            const response = await axios.post(`${API_URL}/api/oauth/register`, {
                 ...values,
                 subscription_plan: plan,
                 trial_ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-            };
-
-            const response = await axios.post(`${apiUrl}/api/oauth/register`, signupData);
+            });
 
             if (response.data.success) {
                 message.success(t.common.success + " 🚀");

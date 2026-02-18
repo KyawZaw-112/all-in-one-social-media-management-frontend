@@ -35,6 +35,7 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
+import { API_URL } from "@/lib/apiConfig";
 
 const { Title, Text } = Typography;
 
@@ -52,8 +53,7 @@ export default function MerchantManagement() {
         setLoading(true);
         try {
             const token = localStorage.getItem("authToken");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-            const res = await axios.get(`${apiUrl}/api/admin/merchants`, {
+            const res = await axios.get(`${API_URL}/api/admin/merchants`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMerchants(res.data.data);
@@ -76,9 +76,8 @@ export default function MerchantManagement() {
     const handleUpdateSubscription = async (values: any) => {
         try {
             const token = localStorage.getItem("authToken");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-            await axios.put(`${apiUrl}/api/admin/merchants/${editingMerchant.id}/subscription`, {
+            await axios.put(`${API_URL}/api/admin/merchants/${editingMerchant.id}/subscription`, {
                 status: values.subscription_status,
                 plan: values.subscription_plan,
                 trial_ends_at: values.trial_ends_at.toISOString()
@@ -97,9 +96,8 @@ export default function MerchantManagement() {
     const handleCreateUser = async (values: any) => {
         try {
             const token = localStorage.getItem("authToken");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-            await axios.post(`${apiUrl}/api/admin/merchants`, {
+            await axios.post(`${API_URL}/api/admin/merchants`, {
                 name: values.name,
                 email: values.email,
                 password: values.password,
@@ -124,12 +122,11 @@ export default function MerchantManagement() {
     const handleApprove = async (merchant: any) => {
         try {
             const token = localStorage.getItem("authToken");
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
             // Set trial to 30 days from now
             const oneMonthLater = dayjs().add(30, 'day').toISOString();
 
-            await axios.put(`${apiUrl}/api/admin/merchants/${merchant.id}/subscription`, {
+            await axios.put(`${API_URL}/api/admin/merchants/${merchant.id}/subscription`, {
                 status: 'active',
                 plan: merchant.subscription_plan || 'shop',
                 trial_ends_at: oneMonthLater

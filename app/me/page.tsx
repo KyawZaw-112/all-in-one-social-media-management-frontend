@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import  supabase  from "@/lib/supabase";
+import { API_URL } from "@/lib/apiConfig";
+import supabase from "@/lib/supabase";
 
 export default function MePage() {
     const [user, setUser] = useState<any>(null);
@@ -16,7 +17,7 @@ export default function MePage() {
                 return;
             }
 
-            const res = await fetch("http://localhost:4000/api/me", {
+            const res = await fetch(`${API_URL}/api/me`, {
                 headers: {
                     Authorization: `Bearer ${data.session.access_token}`,
                 },

@@ -37,6 +37,7 @@ import {
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { API_URL } from "@/lib/apiConfig";
 
 const { TextArea } = Input;
 
@@ -60,13 +61,11 @@ export default function FacebookAutoReply() {
     const [editingFlow, setEditingFlow] = useState<AutomationFlow | null>(null);
     const [form] = Form.useForm();
 
-    const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-
     const fetchFlows = async () => {
         setLoading(true);
         try {
             const token = localStorage.getItem("authToken");
-            const response = await axios.get(`${apiUrl}/api/automation/flows`, {
+            const response = await axios.get(`${API_URL}/api/automation/flows`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setFlows(response.data.data || []);
@@ -94,13 +93,14 @@ export default function FacebookAutoReply() {
     const handleSubmit = async (values: any) => {
         try {
             const token = localStorage.getItem("authToken");
+            // Redirect to Backend OAuth URL
             if (editingFlow) {
-                await axios.put(`${apiUrl}/api/automation/flows/${editingFlow.id}`, values, {
+                await axios.put(`${API_URL}/api/automation/flows/${editingFlow.id}`, values, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 message.success(t.automation.updated);
             } else {
-                await axios.post(`${apiUrl}/api/automation/flows`, values, {
+                await axios.post(`${API_URL}/api/automation/flows`, values, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 message.success(t.automation.created);
@@ -126,7 +126,7 @@ export default function FacebookAutoReply() {
             onOk: async () => {
                 try {
                     const token = localStorage.getItem("authToken");
-                    await axios.delete(`${apiUrl}/api/automation/flows/${id}`, {
+                    await axios.delete(`${API_URL}/api/automation/flows/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
                     message.success(t.automation.deleted);
@@ -142,7 +142,7 @@ export default function FacebookAutoReply() {
         e.stopPropagation();
         try {
             const token = localStorage.getItem("authToken");
-            await axios.put(`${apiUrl}/api/automation/flows/${flow.id}`,
+            await axios.put(`${API_URL}/api/automation/flows/${flow.id}`,
                 { is_active: !flow.is_active },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
