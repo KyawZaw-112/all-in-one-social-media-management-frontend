@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Layout, Menu, Button, Avatar, Space, Typography, ConfigProvider, theme, App } from "antd";
+import { Layout, Menu, Button, Avatar, Space, Typography, ConfigProvider, theme, App, Spin } from "antd";
 import {
     DashboardOutlined,
     UserOutlined,
@@ -22,8 +22,33 @@ const { Text, Title } = Typography;
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [collapsed, setCollapsed] = useState(false);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
     const pathname = usePathname();
+
+    useEffect(() => {
+        const checkAdmin = () => {
+            const userStr = localStorage.getItem("user");
+            if (!userStr) {
+                router.push("/login");
+                return;
+            }
+
+            try {
+                const user = JSON.parse(userStr);
+                if (user.role !== "admin") {
+                    router.push("/dashboard");
+                    return;
+                }
+                setLoading(false);
+            } catch (err) {
+                console.error("Auth check error:", err);
+                router.push("/login");
+            }
+        };
+
+        checkAdmin();
+    }, [router]);
 
     const menuItems = [
         { key: "/admin/dashboard", icon: <DashboardOutlined />, label: "Stats Overview" },
@@ -32,6 +57,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { key: "/admin/analytics", icon: <LineChartOutlined />, label: "System Health" },
         { key: "/admin/settings", icon: <SettingOutlined />, label: "Global Settings" },
     ];
+
+    if (loading) {
+        return (
+            <div style={{
+                height: "100vh",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "#f5f7fa",
+                gap: "16px"
+            }}>
+                <Spin size="large" />
+                <Text type="secondary">Verifying Admin Access...</Text>
+            </div>
+        );
+    }
 
     return (
         <ConfigProvider
