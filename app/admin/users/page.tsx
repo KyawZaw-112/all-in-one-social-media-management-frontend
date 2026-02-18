@@ -27,6 +27,7 @@ import {
     CarOutlined,
     CheckCircleOutlined,
     StopOutlined,
+    ClockCircleOutlined,
     UserOutlined,
     MailOutlined,
     CalendarOutlined,
@@ -120,15 +121,38 @@ export default function MerchantManagement() {
         }
     };
 
+    const handleApprove = async (merchant: any) => {
+        try {
+            const token = localStorage.getItem("authToken");
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+            // Set trial to 30 days from now
+            const oneMonthLater = dayjs().add(30, 'day').toISOString();
+
+            await axios.put(`${apiUrl}/api/admin/merchants/${merchant.id}/subscription`, {
+                status: 'active',
+                plan: merchant.subscription_plan || 'shop',
+                trial_ends_at: oneMonthLater
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            message.success(`Approved ${merchant.business_name || 'user'}! 30-day trial started. ✅`);
+            fetchMerchants();
+        } catch (err) {
+            message.error("Approval failed");
+        }
+    };
+
     const columns = [
         {
             title: "Merchant / Email",
             key: "merchant",
             render: (record: any) => (
                 <Space>
-                    <Avatar style={{ backgroundColor: '#722ed1' }}>{record.business_name?.[0]}</Avatar>
+                    <Avatar style={{ backgroundColor: '#722ed1' }}>{record.business_name?.[0] || 'U'}</Avatar>
                     <div>
-                        <div style={{ fontWeight: "bold" }}>{record.business_name}</div>
+                        <div style={{ fontWeight: "bold" }}>{record.business_name || 'No Name'}</div>
                         <div style={{ fontSize: "12px", color: "#999" }}><MailOutlined /> {record.user?.email}</div>
                     </div>
                 </Space>
@@ -140,7 +164,7 @@ export default function MerchantManagement() {
             key: "plan",
             render: (plan: string) => (
                 <Tag color={plan === 'cargo' ? 'orange' : 'blue'} icon={plan === 'cargo' ? <CarOutlined /> : <ShopOutlined />}>
-                    {plan?.toUpperCase()}
+                    {(plan || 'SHOP').toUpperCase()}
                 </Tag>
             )
         },
@@ -148,44 +172,65 @@ export default function MerchantManagement() {
             title: "Status",
             dataIndex: "subscription_status",
             key: "status",
-            render: (status: string) => (
-                <Tag color={status === 'active' ? 'success' : 'error'} icon={status === 'active' ? <CheckCircleOutlined /> : <StopOutlined />}>
-                    {status?.toUpperCase()}
-                </Tag>
-            )
+            render: (status: string, record: any) => {
+                if (!record.trial_ends_at) {
+                    return <Tag color="warning" icon={<ClockCircleOutlined />}>PENDING APPROVAL</Tag>;
+                }
+                return (
+                    <Tag color={status === 'active' ? 'success' : 'error'} icon={status === 'active' ? <CheckCircleOutlined /> : <StopOutlined />}>
+                        {status?.toUpperCase()}
+                    </Tag>
+                );
+            }
         },
         {
-            title: "Trial Ends",
+            title: "Trial / Expiry",
             dataIndex: "trial_ends_at",
             key: "trial",
-            render: (date: string) => (
-                <Space>
-                    <CalendarOutlined style={{ color: '#999' }} />
-                    <Text>{dayjs(date).format('DD MMM YYYY')}</Text>
-                    {dayjs().isAfter(dayjs(date)) && <Tag color="red">Expired</Tag>}
-                </Space>
-            )
+            render: (date: string) => {
+                if (!date) return <Text type="secondary">Not Started</Text>;
+                return (
+                    <Space>
+                        <CalendarOutlined style={{ color: '#999' }} />
+                        <Text>{dayjs(date).format('DD MMM YYYY')}</Text>
+                        {dayjs().isAfter(dayjs(date)) && <Tag color="red">Expired</Tag>}
+                    </Space>
+                );
+            }
         },
         {
             title: "Actions",
             key: "actions",
             render: (record: any) => (
-                <Button
-                    icon={<EditOutlined />}
-                    type="primary"
-                    ghost
-                    onClick={() => {
-                        setEditingMerchant(record);
-                        form.setFieldsValue({
-                            subscription_status: record.subscription_status,
-                            subscription_plan: record.subscription_plan,
-                            trial_ends_at: dayjs(record.trial_ends_at)
-                        });
-                        setModalVisible(true);
-                    }}
-                >
-                    Edit
-                </Button>
+                <Space>
+                    {!record.trial_ends_at && (
+                        <Button
+                            type="primary"
+                            size="small"
+                            style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                            onClick={() => handleApprove(record)}
+                        >
+                            Approve (1m)
+                        </Button>
+                    )}
+                    <Button
+                        icon={<EditOutlined />}
+                        type="primary"
+                        ghost
+                        size="small"
+                        onClick={() => {
+                            setEditingMerchant(record);
+                            form.setFieldsValue({
+                                subscription_status: record.subscription_status,
+                                subscription_plan: record.subscription_plan,
+                                trial_ends_at: record.trial_ends_at ? dayjs(record.trial_ends_at) : dayjs().add(30, 'day')
+                            });
+                            setModalVisible(true);
+                        }}
+                    >
+                        Edit
+                    </Button>
+                </Space>
             )
         }
     ];

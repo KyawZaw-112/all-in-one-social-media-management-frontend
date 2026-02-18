@@ -153,10 +153,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 <Divider type="vertical" />
                                 <Space size={12} style={{ cursor: "pointer" }}>
                                     <div style={{ textAlign: "right", lineHeight: "1.2" }}>
-                                        <Text strong style={{ color: "#333", display: "block" }}>Zayar Lwin</Text>
+                                        <Text strong style={{ color: "#333", display: "block" }}>
+                                            {localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")!).email.split('@')[0] : "Admin"}
+                                        </Text>
                                         <Text type="secondary" style={{ fontSize: "11px", display: "block" }}>Owner Account</Text>
                                     </div>
-                                    <Avatar size={40} style={{ backgroundColor: "#722ed1", color: "white", fontSize: 18 }}>Z</Avatar>
+                                    <Avatar size={40} style={{ backgroundColor: "#722ed1", color: "white", fontSize: 18 }}>
+                                        {localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")!).email[0].toUpperCase() : "A"}
+                                    </Avatar>
                                 </Space>
                             </Space>
                         </Header>
