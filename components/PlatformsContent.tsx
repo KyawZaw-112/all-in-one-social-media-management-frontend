@@ -67,6 +67,10 @@ export default function PlatformsContent() {
                 }
                 if (attempts >= 5) clearInterval(checkLoop); // Stop after 5 attempts
             }, 2000); // Check every 2 seconds
+        } else if (searchParams.get("error")) {
+            const errorMsg = searchParams.get("message") || "Connection failed";
+            message.error(decodeURIComponent(errorMsg));
+            router.replace("/dashboard/platforms");
         }
     }, [searchParams]);
 
