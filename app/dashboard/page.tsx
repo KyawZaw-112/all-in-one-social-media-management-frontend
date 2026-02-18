@@ -123,7 +123,7 @@ export default function UserDashboard() {
 
                     {/* Stats Grid */}
                     <Row gutter={[24, 24]} style={{ marginBottom: "48px" }}>
-                        <Col xs={24} sm={6}>
+                        <Col xs={24} sm={8}>
                             <Card bordered={false} style={{ background: "#f8fafc", borderRadius: "16px" }}>
                                 <Statistic
                                     title={<Text type="secondary">{t.dashboard.activeFlows}</Text>}
@@ -132,7 +132,7 @@ export default function UserDashboard() {
                                 />
                             </Card>
                         </Col>
-                        <Col xs={24} sm={6}>
+                        <Col xs={24} sm={8}>
                             <Card bordered={false} style={{ background: "#f8fafc", borderRadius: "16px" }}>
                                 <Statistic
                                     title={<Text type="secondary">{t.dashboard.totalReplies}</Text>}
@@ -141,26 +141,29 @@ export default function UserDashboard() {
                                 />
                             </Card>
                         </Col>
-                        <Col xs={24} sm={6}>
-                            <Card bordered={false} style={{ background: "#f8fafc", borderRadius: "16px", cursor: "pointer" }} onClick={() => router.push("/dashboard/orders")}>
-                                <Statistic
-                                    title={<Text type="secondary">Orders</Text>}
-                                    value={stats?.orders_count || 0}
-                                    valueStyle={{ fontSize: "36px", fontWeight: 300, color: "#6366f1" }}
-                                    prefix={<ShoppingCartOutlined style={{ fontSize: "20px", marginRight: "8px" }} />}
-                                />
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={6}>
-                            <Card bordered={false} style={{ background: "#f8fafc", borderRadius: "16px", cursor: "pointer" }} onClick={() => router.push("/dashboard/shipments")}>
-                                <Statistic
-                                    title={<Text type="secondary">Shipments</Text>}
-                                    value={stats?.shipments_count || 0}
-                                    valueStyle={{ fontSize: "36px", fontWeight: 300, color: "#f59e0b" }}
-                                    prefix={<SendOutlined style={{ fontSize: "20px", marginRight: "8px" }} />}
-                                />
-                            </Card>
-                        </Col>
+                        {stats?.business_type === 'cargo' ? (
+                            <Col xs={24} sm={8}>
+                                <Card bordered={false} style={{ background: "#fffbeb", borderRadius: "16px", cursor: "pointer", border: "1px solid #fef3c7" }} onClick={() => router.push("/dashboard/shipments")}>
+                                    <Statistic
+                                        title={<Text type="secondary" style={{ color: "#92400e" }}>Shipment Requests</Text>}
+                                        value={stats?.shipments_count || 0}
+                                        valueStyle={{ fontSize: "36px", fontWeight: 300, color: "#f59e0b" }}
+                                        prefix={<SendOutlined style={{ fontSize: "20px", marginRight: "8px" }} />}
+                                    />
+                                </Card>
+                            </Col>
+                        ) : (
+                            <Col xs={24} sm={8}>
+                                <Card bordered={false} style={{ background: "#eef2ff", borderRadius: "16px", cursor: "pointer", border: "1px solid #e0e7ff" }} onClick={() => router.push("/dashboard/orders")}>
+                                    <Statistic
+                                        title={<Text type="secondary" style={{ color: "#3730a3" }}>Orders</Text>}
+                                        value={stats?.orders_count || 0}
+                                        valueStyle={{ fontSize: "36px", fontWeight: 300, color: "#6366f1" }}
+                                        prefix={<ShoppingCartOutlined style={{ fontSize: "20px", marginRight: "8px" }} />}
+                                    />
+                                </Card>
+                            </Col>
+                        )}
                     </Row>
 
                     {/* Main Content Split */}
@@ -205,7 +208,7 @@ export default function UserDashboard() {
 
                             <Row gutter={[16, 16]}>
                                 <Col span={12}>
-                                    <Card hoverable bordered style={{ borderRadius: "12px", borderColor: "#e2e8f0" }} onClick={() => router.push("/automation/facebook")}>
+                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #6366f1" }} onClick={() => router.push("/automation/facebook")}>
                                         <Space direction="vertical">
                                             <RobotOutlined style={{ fontSize: "24px", color: "#6366f1" }} />
                                             <Text strong>{t.dashboard.createNewFlow}</Text>
@@ -214,7 +217,7 @@ export default function UserDashboard() {
                                     </Card>
                                 </Col>
                                 <Col span={12}>
-                                    <Card hoverable bordered style={{ borderRadius: "12px", borderColor: "#e2e8f0" }} onClick={() => router.push("/dashboard/platforms")}>
+                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #1877f2" }} onClick={() => router.push("/dashboard/platforms")}>
                                         <Space direction="vertical">
                                             <FacebookOutlined style={{ fontSize: "24px", color: "#1877f2" }} />
                                             <Text strong>{t.dashboard.connectPage}</Text>
@@ -282,9 +285,9 @@ export default function UserDashboard() {
                         </Col>
 
                         <Col xs={24} md={8}>
-                            <Card bordered={false} style={{ borderRadius: "24px", background: "#f8fafc" }}>
+                            <Card bordered={false} style={{ borderRadius: "24px", background: "#f8fafc", border: "1px solid #e2e8f0" }}>
                                 <div style={{ textAlign: "center", padding: "24px 0" }}>
-                                    <Avatar size={80} style={{ backgroundColor: "#1e293b", marginBottom: "16px" }} icon={<UserOutlined />} />
+                                    <Avatar size={80} style={{ backgroundColor: "#1e293b", marginBottom: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} icon={<UserOutlined />} />
                                     <Title level={4} style={{ marginBottom: "4px" }}>
                                         {stats?.business_name || t.dashboard.merchantAccount}
                                     </Title>
@@ -297,12 +300,15 @@ export default function UserDashboard() {
                                     </Tag>
 
                                     <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                                        <Button block size="large" onClick={() => router.push("/dashboard/orders")}>
-                                            <ShoppingCartOutlined /> Orders ({stats?.orders_count || 0})
-                                        </Button>
-                                        <Button block size="large" onClick={() => router.push("/dashboard/shipments")}>
-                                            <SendOutlined /> Shipments ({stats?.shipments_count || 0})
-                                        </Button>
+                                        {stats?.business_type === 'cargo' ? (
+                                            <Button block size="large" type="primary" style={{ background: "#f59e0b", borderColor: "#f59e0b" }} onClick={() => router.push("/dashboard/shipments")}>
+                                                <SendOutlined /> View Shipments ({stats?.shipments_count || 0})
+                                            </Button>
+                                        ) : (
+                                            <Button block size="large" type="primary" onClick={() => router.push("/dashboard/orders")}>
+                                                <ShoppingCartOutlined /> View Orders ({stats?.orders_count || 0})
+                                            </Button>
+                                        )}
                                         <Button block size="large" onClick={() => router.push("/dashboard/platforms")} icon={<FacebookOutlined />}>
                                             {t.dashboard.connectPage}
                                         </Button>
