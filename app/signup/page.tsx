@@ -161,8 +161,11 @@ function SignupForm() {
 
                 <Form form={form} layout="vertical" onFinish={onFinish} initialValues={{ business_type: plan }}>
                     <div style={{ marginBottom: 24 }}>
-                        <Text style={{ color: "#94a3b8", display: "block", marginBottom: 12, fontSize: 13 }}>{t.auth.selectBusinessType}</Text>
                         <Form.Item name="business_type" noStyle>
+                            <Input type="hidden" />
+                        </Form.Item>
+                        <div style={{ marginBottom: 24 }}>
+                            <Text style={{ color: "#94a3b8", display: "block", marginBottom: 12, fontSize: 13 }}>{t.auth.selectBusinessType}</Text>
                             <Row gutter={12}>
                                 <Col span={12}>
                                     <div
@@ -207,7 +210,7 @@ function SignupForm() {
                                     </div>
                                 </Col>
                             </Row>
-                        </Form.Item>
+                        </div>
                     </div>
 
                     <Form.Item
