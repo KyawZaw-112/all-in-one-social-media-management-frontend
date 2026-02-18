@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Form, Input, Button, Card, message, Typography, Spin } from "antd";
+import { Form, Input, Button, Card, message, Typography, Spin, Row, Col } from "antd";
 import {
     UserOutlined,
     LockOutlined,
@@ -33,7 +33,8 @@ function SignupForm() {
         try {
             const response = await axios.post(`${API_URL}/api/oauth/register`, {
                 ...values,
-                subscription_plan: plan,
+                subscription_plan: values.business_type || plan,
+                business_type: values.business_type || plan,
                 trial_ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
             });
 
@@ -152,7 +153,53 @@ function SignupForm() {
                     <Link href="/#pricing" style={{ fontSize: 12, color: "#818cf8" }}>{t.auth.changePlan}</Link>
                 </div>
 
-                <Form layout="vertical" onFinish={onFinish}>
+                <Form layout="vertical" onFinish={onFinish} initialValues={{ business_type: plan }}>
+                    <div style={{ marginBottom: 24 }}>
+                        <Text style={{ color: "#94a3b8", display: "block", marginBottom: 12, fontSize: 13 }}>{t.auth.selectBusinessType}</Text>
+                        <Form.Item name="business_type" noStyle>
+                            <Row gutter={12}>
+                                <Col span={12}>
+                                    <Form.Item name="business_type" noStyle>
+                                        <div
+                                            onClick={() => router.replace(`/signup?plan=shop`)}
+                                            style={{
+                                                padding: "16px 12px",
+                                                borderRadius: 16,
+                                                background: !isCargo ? "rgba(129,140,248,0.1)" : "rgba(255,255,255,0.02)",
+                                                border: `1px solid ${!isCargo ? "rgba(129,140,248,0.4)" : "rgba(255,255,255,0.06)"}`,
+                                                textAlign: "center",
+                                                cursor: "pointer",
+                                                transition: "all 0.3s ease"
+                                            }}
+                                        >
+                                            <div style={{ fontSize: 24, marginBottom: 8 }}>🛍️</div>
+                                            <div style={{ color: "#f1f5f9", fontWeight: 600, fontSize: 13 }}>{t.automation.onlineShop}</div>
+                                            <div style={{ color: "#64748b", fontSize: 10, marginTop: 4 }}>{t.auth.onlineShopDesc}</div>
+                                        </div>
+                                    </Form.Item>
+                                </Col>
+                                <Col span={12}>
+                                    <div
+                                        onClick={() => router.replace(`/signup?plan=cargo`)}
+                                        style={{
+                                            padding: "16px 12px",
+                                            borderRadius: 16,
+                                            background: isCargo ? "rgba(251,146,60,0.1)" : "rgba(255,255,255,0.02)",
+                                            border: `1px solid ${isCargo ? "rgba(251,146,60,0.4)" : "rgba(255,255,255,0.06)"}`,
+                                            textAlign: "center",
+                                            cursor: "pointer",
+                                            transition: "all 0.3s ease"
+                                        }}
+                                    >
+                                        <div style={{ fontSize: 24, marginBottom: 8 }}>📦</div>
+                                        <div style={{ color: "#f1f5f9", fontWeight: 600, fontSize: 13 }}>{t.automation.cargo}</div>
+                                        <div style={{ color: "#64748b", fontSize: 10, marginTop: 4 }}>{t.auth.cargoDesc}</div>
+                                    </div>
+                                </Col>
+                            </Row>
+                        </Form.Item>
+                    </div>
+
                     <Form.Item
                         name="name"
                         rules={[{ required: true, message: t.auth.nameRequired }]}

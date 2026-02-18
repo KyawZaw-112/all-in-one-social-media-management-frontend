@@ -127,6 +127,9 @@ export type TranslationKeys = {
         resetButton: string;
         resetSuccess: string;
         resetSuccessDesc: string;
+        selectBusinessType: string;
+        onlineShopDesc: string;
+        cargoDesc: string;
     };
     dashboard: {
         overview: string;
@@ -338,6 +341,9 @@ export const translations: Record<Language, TranslationKeys> = {
             resetButton: "Change Password",
             resetSuccess: "Password Changed!",
             resetSuccessDesc: "You can now login with your new password",
+            selectBusinessType: "Select Business Type",
+            onlineShopDesc: "E-commerce & Online Selling",
+            cargoDesc: "Logistics & Shipping Business",
         },
         dashboard: {
             overview: "Overview",
@@ -547,6 +553,9 @@ export const translations: Record<Language, TranslationKeys> = {
             resetButton: "Password ပြောင်းလဲမည်",
             resetSuccess: "Password ပြောင်းပြီးပါပြီ!",
             resetSuccessDesc: "Password အသစ်ဖြင့် login ပြန်ဝင်နိုင်ပါပြီ",
+            selectBusinessType: "လုပ်ငန်းအမျိုးအစား ရွေးချယ်ပါ",
+            onlineShopDesc: "အွန်လိုင်းစျေးဆိုင်နှင့် အရောင်းအဝယ်",
+            cargoDesc: "သယ်ယူပို့ဆောင်ရေးနှင့် ကုန်စည်ပို့ဆောင်ရေး",
         },
         dashboard: {
             overview: "အကျဉ်းချုပ်",
@@ -756,6 +765,9 @@ export const translations: Record<Language, TranslationKeys> = {
             resetButton: "เปลี่ยนรหัสผ่าน",
             resetSuccess: "เปลี่ยนรหัสผ่านแล้ว!",
             resetSuccessDesc: "คุณสามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้แล้ว",
+            selectBusinessType: "เลือกประเภทธุรกิจ",
+            onlineShopDesc: "อีคอมเมิร์ซและการขายออนไลน์",
+            cargoDesc: "ธุรกิจโลจิสติกส์และการขนส่ง",
         },
         dashboard: {
             overview: "ภาพรวม",

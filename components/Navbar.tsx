@@ -11,7 +11,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -88,6 +88,14 @@ export default function Navbar() {
                                 {t.platforms.connectFacebook}
                             </Link>
                         ),
+                    },
+                    {
+                        key: "/dashboard/orders",
+                        label: <Link href="/dashboard/orders">{language === 'my' ? "အမှာစာများ" : "Orders"}</Link>,
+                    },
+                    {
+                        key: "/dashboard/shipments",
+                        label: <Link href="/dashboard/shipments">{language === 'my' ? "Cargo" : "Cargo"}</Link>,
                     },
                     {
                         key: "/dashboard/billing",
