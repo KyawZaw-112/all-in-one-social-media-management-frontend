@@ -79,7 +79,7 @@ export default function AutoReplyPage() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const accessToken = localStorage.getItem('accessToken') || token;
+            const accessToken = localStorage.getItem('authToken') || token;
 
             const [templatesRes, rulesRes, statsRes] = await Promise.all([
                 axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/dashboard/auto-reply/templates`, {
@@ -106,7 +106,7 @@ export default function AutoReplyPage() {
 
     const handleCreateTemplate = async (values: TemplateFormValues) => {
         try {
-            const accessToken = localStorage.getItem('accessToken') || token;
+            const accessToken = localStorage.getItem('authToken') || token;
             const keywords = values.trigger_keywords
                 ? values.trigger_keywords.split(',').map((k: string) => k.trim())
                 : [];
@@ -155,7 +155,7 @@ export default function AutoReplyPage() {
             okButtonProps: { danger: true },
             onOk: async () => {
                 try {
-                    const accessToken = localStorage.getItem('accessToken') || token;
+                    const accessToken = localStorage.getItem('authToken') || token;
                     await axios.delete(`/api/auto-reply/templates/${id}`, {
                         headers: { Authorization: `Bearer ${accessToken}` },
                     });
@@ -170,7 +170,7 @@ export default function AutoReplyPage() {
 
     const handleCreateRule = async (values: RuleFormValues) => {
         try {
-            const accessToken = localStorage.getItem('accessToken') || token;
+            const accessToken = localStorage.getItem('authToken') || token;
 
             if (editingRule) {
                 await axios.put(
@@ -330,7 +330,7 @@ export default function AutoReplyPage() {
                         icon={<DeleteOutlined />}
                         onClick={async () => {
                             try {
-                                const accessToken = localStorage.getItem('accessToken') || token;
+                                const accessToken = localStorage.getItem('authToken') || token;
                                 await axios.delete(`/api/auto-reply/rules/${record.id}`, {
                                     headers: { Authorization: `Bearer ${accessToken}` },
                                 });
