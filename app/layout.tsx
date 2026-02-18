@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { ReactNode, useEffect } from "react";
 import supabase from "@/lib/supabase";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
 
@@ -79,8 +80,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                         },
                     }}
                 >
-                    <Navbar />
-                    {children}
+                    <LanguageProvider>
+                        <Navbar />
+                        {children}
+                    </LanguageProvider>
                     <SpeedInsights />
                 </ConfigProvider>
             </body>

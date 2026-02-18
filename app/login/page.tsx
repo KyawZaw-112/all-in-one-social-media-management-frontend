@@ -6,11 +6,14 @@ import { Form, Input, Button, Card, message, Typography } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import axios from "axios";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const { Title, Text } = Typography;
 
 export default function LoginPage() {
     const router = useRouter();
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
 
     const onFinish = async (values: any) => {
@@ -23,7 +26,7 @@ export default function LoginPage() {
                 localStorage.setItem("authToken", response.data.token);
                 localStorage.setItem("user", JSON.stringify(response.data.user));
 
-                message.success("Login အောင်မြင်ပါသည်။ 👋");
+                message.success(t.common.success + " 👋");
 
                 const isAdmin = values.email === "admin@autoreply.biz";
 
@@ -36,7 +39,7 @@ export default function LoginPage() {
                 }, 500);
             }
         } catch (error: any) {
-            message.error(error.response?.data?.error || "Email သို့မဟုတ် Password မှားယွင်းနေပါသည်။");
+            message.error(error.response?.data?.error || t.common.error);
         } finally {
             setLoading(false);
         }
@@ -54,6 +57,11 @@ export default function LoginPage() {
             position: "relative",
             overflow: "hidden",
         }}>
+            {/* Language Switcher */}
+            <div style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
+                <LanguageSwitcher />
+            </div>
+
             {/* Background Glow */}
             <div style={{
                 position: "absolute",
@@ -92,8 +100,8 @@ export default function LoginPage() {
                 }}>
                     🤖
                 </div>
-                <Title level={2} style={{ margin: 0, color: "#f1f5f9" }}>Welcome Back</Title>
-                <Text style={{ color: "#94a3b8" }}>သင့် Dashboard သို့ ပြန်လည်ဝင်ရောက်ပါ</Text>
+                <Title level={2} style={{ margin: 0, color: "#f1f5f9" }}>{t.auth.welcomeBack}</Title>
+                <Text style={{ color: "#94a3b8" }}>{t.auth.loginSubtitle}</Text>
             </div>
 
             <Card style={{
@@ -111,13 +119,13 @@ export default function LoginPage() {
                     <Form.Item
                         name="email"
                         rules={[
-                            { required: true, message: "Email ထည့်ပေးပါ" },
-                            { type: "email", message: "Email ပုံစံ မှန်ကန်မှု မရှိပါ" }
+                            { required: true, message: t.auth.emailRequired },
+                            { type: "email", message: t.auth.emailInvalid }
                         ]}
                     >
                         <Input
                             prefix={<MailOutlined style={{ color: "#64748b" }} />}
-                            placeholder="Email Address"
+                            placeholder={t.auth.emailPlaceholder}
                             size="large"
                             style={{
                                 borderRadius: 14,
@@ -131,11 +139,11 @@ export default function LoginPage() {
 
                     <Form.Item
                         name="password"
-                        rules={[{ required: true, message: "Password ထည့်ပေးပါ" }]}
+                        rules={[{ required: true, message: t.auth.passwordRequired }]}
                     >
                         <Input.Password
                             prefix={<LockOutlined style={{ color: "#64748b" }} />}
-                            placeholder="Password"
+                            placeholder={t.auth.passwordPlaceholder}
                             size="large"
                             style={{
                                 borderRadius: 14,
@@ -149,7 +157,7 @@ export default function LoginPage() {
 
                     <div style={{ textAlign: "right", marginBottom: 20 }}>
                         <Link href="/forgot-password" style={{ fontSize: 13, color: "#818cf8" }}>
-                            Password မေ့နေပါသလား?
+                            {t.auth.forgotPassword}
                         </Link>
                     </div>
 
@@ -170,13 +178,13 @@ export default function LoginPage() {
                                 boxShadow: "0 8px 24px rgba(129,140,248,0.3)"
                             }}
                         >
-                            Login ဝင်မည်
+                            {t.auth.loginButton}
                         </Button>
                     </Form.Item>
 
                     <div style={{ textAlign: "center" }}>
-                        <Text style={{ color: "#94a3b8" }}>အကောင့်မရှိသေးဘူးလား? </Text>
-                        <Link href="/signup" style={{ color: "#818cf8", fontWeight: 600 }}>Sign Up လုပ်ရန်</Link>
+                        <Text style={{ color: "#94a3b8" }}>{t.auth.noAccount} </Text>
+                        <Link href="/signup" style={{ color: "#818cf8", fontWeight: 600 }}>{t.auth.signUpLink}</Link>
                     </div>
                 </Form>
             </Card>

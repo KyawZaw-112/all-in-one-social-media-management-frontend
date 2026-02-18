@@ -5,10 +5,13 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import supabase from "@/lib/supabase";
 import { Menu, Button } from "antd";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
+    const { t } = useLanguage();
 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -66,7 +69,7 @@ export default function Navbar() {
             }}
         >
             <Link href="/dashboard" style={{ fontWeight: 600 }}>
-                🚀 PostNow
+                🚀 AutoReply
             </Link>
 
             <Menu
@@ -76,37 +79,40 @@ export default function Navbar() {
                 items={[
                     {
                         key: "/dashboard",
-                        label: <Link href="/dashboard">Dashboard</Link>,
+                        label: <Link href="/dashboard">{t.dashboard.dashboard}</Link>,
                     },
                     {
                         key: "/dashboard/platforms",
                         label: (
                             <Link href="/dashboard/platforms">
-                                Connect Facebook
+                                {t.platforms.connectFacebook}
                             </Link>
                         ),
                     },
                     {
                         key: "/dashboard/billing",
-                        label: <Link href="/dashboard/billing">Payment History</Link>,
+                        label: <Link href="/dashboard/billing">{t.dashboard.billingHistory}</Link>,
                     },
                     {
                         key: "/subscribe",
-                        label: <Link href="/subscribe">Upgrade Plan</Link>,
+                        label: <Link href="/subscribe">{t.auth.changePlan}</Link>,
                     },
                 ]}
             />
 
-            <Button
-                onClick={async () => {
-                    await supabase.auth.signOut();
-                    router.push("/");
-                }}
-                type="default"
-                style={{ border: "1px solid #e5e5e5" }}
-            >
-                Logout
-            </Button>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <LanguageSwitcher />
+                <Button
+                    onClick={async () => {
+                        await supabase.auth.signOut();
+                        router.push("/");
+                    }}
+                    type="default"
+                    style={{ border: "1px solid #e5e5e5" }}
+                >
+                    {t.nav.signOut}
+                </Button>
+            </div>
         </header>
     );
 }

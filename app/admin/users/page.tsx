@@ -56,8 +56,13 @@ export default function MerchantManagement() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMerchants(res.data.data);
-        } catch (err) {
-            message.error("Failed to load merchants");
+        } catch (err: any) {
+            console.error("Failed to load merchants:", err);
+            if (!err.response) {
+                message.error("Network Error (Check API URL)");
+            } else {
+                message.error("Failed to load: " + (err.response?.data?.error || err.message));
+            }
         } finally {
             setLoading(false);
         }
@@ -108,7 +113,10 @@ export default function MerchantManagement() {
             createForm.resetFields();
             fetchMerchants();
         } catch (err: any) {
-            message.error(err.response?.data?.error || "Creation failed");
+            console.error("Create user failed:", err);
+            const errorMsg = err.response?.data?.error || err.message || "Creation failed";
+            const details = err.response?.data?.details || "";
+            message.error(errorMsg + (details ? `: ${details}` : ""));
         }
     };
 

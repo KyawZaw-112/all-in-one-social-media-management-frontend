@@ -36,6 +36,7 @@ import {
 } from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const { TextArea } = Input;
 
@@ -52,13 +53,14 @@ interface AutomationFlow {
 
 export default function FacebookAutoReply() {
     const router = useRouter();
+    const { t } = useLanguage();
     const [flows, setFlows] = useState<AutomationFlow[]>([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [editingFlow, setEditingFlow] = useState<AutomationFlow | null>(null);
     const [form] = Form.useForm();
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
     const fetchFlows = async () => {
         setLoading(true);
@@ -70,7 +72,15 @@ export default function FacebookAutoReply() {
             setFlows(response.data.data || []);
         } catch (error: any) {
             console.error("Fetch Flows Error:", error);
-            const msg = error.response?.data?.error || error.response?.data?.message || "Failed to fetch flows";
+            if (!error.response) {
+                message.error("Network Error: Unable to reach server.");
+                return;
+            }
+            if (error.response.status === 402) {
+                message.error(error.response.data.message || "Subscription expired");
+                return;
+            }
+            const msg = error.response?.data?.error || error.response?.data?.message || t.common.error;
             message.error(msg);
         } finally {
             setLoading(false);
@@ -88,29 +98,29 @@ export default function FacebookAutoReply() {
                 await axios.put(`${apiUrl}/api/automation/flows/${editingFlow.id}`, values, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                message.success("Updated Successfully! ✅");
+                message.success(t.automation.updated);
             } else {
                 await axios.post(`${apiUrl}/api/automation/flows`, values, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                message.success("Flow Created! 🚀");
+                message.success(t.automation.created);
             }
             setModalVisible(false);
             setEditingFlow(null);
             fetchFlows();
         } catch (error: any) {
-            message.error("Failed to save flow");
+            message.error(t.common.error);
         }
     };
 
     const handleDelete = async (id: string, e: any) => {
         e.stopPropagation();
         Modal.confirm({
-            title: "ဖျက်မှာ သေချာပါသလား?",
-            content: "ဤ Flow ကို ဖျက်လိုက်ပါက Auto-reply အလုပ်လုပ်တော့မည် မဟုတ်ပါ။",
-            okText: "ဖျက်မည်",
+            title: t.automation.deleteTitle,
+            content: t.automation.deleteDesc,
+            okText: t.automation.deleteConfirm,
             okType: "danger",
-            cancelText: "မဖျက်တော့ပါ",
+            cancelText: t.automation.deleteCancel,
             okButtonProps: { style: { borderRadius: "8px" } },
             cancelButtonProps: { style: { borderRadius: "8px" } },
             onOk: async () => {
@@ -119,10 +129,10 @@ export default function FacebookAutoReply() {
                     await axios.delete(`${apiUrl}/api/automation/flows/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
-                    message.success("Deleted");
+                    message.success(t.automation.deleted);
                     fetchFlows();
                 } catch (error: any) {
-                    message.error("Delete failed");
+                    message.error(t.common.error);
                 }
             },
         });
@@ -138,7 +148,7 @@ export default function FacebookAutoReply() {
             );
             fetchFlows();
         } catch (error: any) {
-            message.error("Toggle failed");
+            message.error(t.automation.toggleFailed);
         }
     };
 
@@ -176,7 +186,7 @@ export default function FacebookAutoReply() {
                             style={{ background: "#f1f5f9" }}
                             onClick={() => router.push("/dashboard")}
                         />
-                        <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#0f172a" }}>Auto-Reply Flows</h2>
+                        <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700, color: "#0f172a" }}>{t.automation.title}</h2>
                     </div>
                 </div>
 
@@ -184,7 +194,7 @@ export default function FacebookAutoReply() {
                     {loading ? (
                         <div style={{ textAlign: "center", padding: "100px 0" }}>
                             <Spin size="large" />
-                            <div style={{ marginTop: "16px", color: "#64748b" }}>Loading flows...</div>
+                            <div style={{ marginTop: "16px", color: "#64748b" }}>{t.automation.loading}</div>
                         </div>
                     ) : (
                         <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "800px", margin: "0 auto" }}>
@@ -194,13 +204,13 @@ export default function FacebookAutoReply() {
                                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                                         description={
                                             <Space direction="vertical">
-                                                <span style={{ fontSize: "16px", fontWeight: 600, color: "#475569" }}>No Flows Created Yet</span>
-                                                <span style={{ color: "#94a3b8" }}>တစ်ခုခု စတင်ဆောက်လုပ်ပြီး Auto-reply စတင်လိုက်ပါ။</span>
+                                                <span style={{ fontSize: "16px", fontWeight: 600, color: "#475569" }}>{t.automation.emptyTitle}</span>
+                                                <span style={{ color: "#94a3b8" }}>{t.automation.emptyDesc}</span>
                                             </Space>
                                         }
                                     >
                                         <Button type="primary" size="large" icon={<PlusOutlined />} onClick={() => openModal()} style={{ borderRadius: "12px", marginTop: "20px" }}>
-                                            Create First Flow
+                                            {t.automation.createFirst}
                                         </Button>
                                     </Empty>
                                 </Card>
@@ -234,8 +244,8 @@ export default function FacebookAutoReply() {
                                                     </div>
                                                     <span style={{ fontWeight: 700, fontSize: "17px", color: "#1e293b" }}>{flow.name}</span>
                                                     {flow.is_active ?
-                                                        <Tag bordered={false} color="success" style={{ borderRadius: "6px", margin: 0 }}>Active</Tag> :
-                                                        <Tag bordered={false} color="default" style={{ borderRadius: "6px", margin: 0 }}>Paused</Tag>
+                                                        <Tag bordered={false} color="success" style={{ borderRadius: "6px", margin: 0 }}>{t.automation.active}</Tag> :
+                                                        <Tag bordered={false} color="default" style={{ borderRadius: "6px", margin: 0 }}>{t.automation.paused}</Tag>
                                                     }
                                                 </div>
                                                 <Space size={8} style={{ marginBottom: "12px" }}>
@@ -244,7 +254,7 @@ export default function FacebookAutoReply() {
                                                     </Tag>
                                                 </Space>
                                                 <div style={{ color: "#64748b", fontSize: "14px", lineHeight: "1.5" }}>
-                                                    {flow.description || "No description provided."}
+                                                    {flow.description || t.automation.noDescription}
                                                 </div>
                                             </div>
                                             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -284,7 +294,7 @@ export default function FacebookAutoReply() {
 
                 {/* Premium Modal */}
                 <Modal
-                    title={<div style={{ padding: "10px 0", fontSize: "20px", fontWeight: 700 }}>{editingFlow ? "Edit Flow" : "Create New Flow"}</div>}
+                    title={<div style={{ padding: "10px 0", fontSize: "20px", fontWeight: 700 }}>{editingFlow ? t.automation.editFlow : t.automation.createFlow}</div>}
                     open={modalVisible}
                     onCancel={() => setModalVisible(false)}
                     footer={null}
@@ -294,24 +304,24 @@ export default function FacebookAutoReply() {
                     style={{ borderRadius: "24px", overflow: "hidden" }}
                 >
                     <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false}>
-                        <Form.Item label={<Text strong>Flow Name</Text>} name="name" rules={[{ required: true, message: 'Please enter a name' }]}>
-                            <Input placeholder="🛍️ ပစ္စည်းမှာယူခြင်း" style={{ height: "45px", borderRadius: "10px" }} />
+                        <Form.Item label={<Text strong>{t.automation.flowName}</Text>} name="name" rules={[{ required: true, message: t.automation.nameRequired }]}>
+                            <Input placeholder={t.automation.placeholderName} style={{ height: "45px", borderRadius: "10px" }} />
                         </Form.Item>
-                        <Form.Item label={<Text strong>Business Type</Text>} name="business_type" rules={[{ required: true }]}>
+                        <Form.Item label={<Text strong>{t.automation.businessType}</Text>} name="business_type" rules={[{ required: true, message: t.automation.businessTypeRequired }]}>
                             <Select style={{ height: "45px" }} dropdownStyle={{ borderRadius: "12px" }}>
-                                <Select.Option value="online_shop">Online Shop (E-commerce)</Select.Option>
-                                <Select.Option value="cargo">Cargo & Delivery</Select.Option>
+                                <Select.Option value="online_shop">{t.automation.onlineShop}</Select.Option>
+                                <Select.Option value="cargo">{t.automation.cargo}</Select.Option>
                             </Select>
                         </Form.Item>
-                        <Form.Item label={<Text strong>Trigger Keyword</Text>} name="trigger_keyword" rules={[{ required: true }]}>
-                            <Input placeholder="ဥပမာ- order သို့မဟုတ် ship" style={{ height: "45px", borderRadius: "10px" }} />
+                        <Form.Item label={<Text strong>{t.automation.triggerKeyword}</Text>} name="trigger_keyword" rules={[{ required: true, message: t.automation.keywordRequired }]}>
+                            <Input placeholder={t.automation.placeholderKeyword} style={{ height: "45px", borderRadius: "10px" }} />
                         </Form.Item>
-                        <Form.Item label={<Text strong>Description</Text>} name="description">
-                            <TextArea rows={3} placeholder="ဒီ flow က ဘာအတွက်လဲ..." style={{ borderRadius: "10px" }} />
+                        <Form.Item label={<Text strong>{t.automation.description}</Text>} name="description">
+                            <TextArea rows={3} placeholder={t.automation.placeholderDesc} style={{ borderRadius: "10px" }} />
                         </Form.Item>
                         <div style={{ marginTop: "24px" }}>
                             <Button type="primary" htmlType="submit" block size="large" style={{ height: "50px", borderRadius: "12px", fontWeight: 700, background: "#0f172a", border: "none" }}>
-                                {editingFlow ? "Save Changes" : "Create Flow"}
+                                {editingFlow ? t.automation.saveChanges : t.automation.createFlow}
                             </Button>
                         </div>
                     </Form>

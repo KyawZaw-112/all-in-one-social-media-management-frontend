@@ -18,8 +18,11 @@ import {
     ApiOutlined,
     StarFilled,
 } from "@ant-design/icons";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function LandingPage() {
+    const { t } = useLanguage();
     const [selectedPlan, setSelectedPlan] = useState<"shop" | "cargo" | null>(null);
     const [scrolled, setScrolled] = useState(false);
 
@@ -64,9 +67,12 @@ export default function LandingPage() {
                     <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>AutoReply</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div className="hidden sm:block">
+                        <LanguageSwitcher />
+                    </div>
                     <Link href="/login">
                         <Button type="text" style={{ color: "#94a3b8", fontWeight: 500, height: 40, borderRadius: 10 }}>
-                            Login
+                            {t.nav.login}
                         </Button>
                     </Link>
                     <Link href="/signup">
@@ -78,7 +84,7 @@ export default function LandingPage() {
                             fontWeight: 600,
                             boxShadow: "0 4px 15px rgba(129,140,248,0.3)"
                         }}>
-                            Get Started
+                            {t.nav.getStarted}
                         </Button>
                     </Link>
                 </div>
@@ -142,7 +148,7 @@ export default function LandingPage() {
                         fontWeight: 700,
                         color: "white"
                     }}>NEW</span>
-                    Myanmar's #1 Auto-Reply Platform
+                    {t.landing.badge}
                 </div>
 
                 {/* Headline */}
@@ -157,7 +163,7 @@ export default function LandingPage() {
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                 }}>
-                    Automate Your Facebook Replies
+                    {t.landing.headline}
                 </h1>
 
                 <p style={{
@@ -167,8 +173,7 @@ export default function LandingPage() {
                     margin: "0 0 16px",
                     lineHeight: 1.7,
                 }}>
-                    AI မလို၊ ငွေချွေတာမယ့် Auto-Reply Platform။
-                    Online Shop နဲ့ Cargo လုပ်ငန်းတွေအတွက် အထူးဖန်တီးထားပါတယ်။
+                    {t.landing.subtitle}
                 </p>
                 <p style={{
                     fontSize: 15,
@@ -177,7 +182,7 @@ export default function LandingPage() {
                     margin: "0 0 40px",
                     lineHeight: 1.6,
                 }}>
-                    Save time. Boost sales. Never miss a customer message again.
+                    {t.landing.subtitleLine2}
                 </p>
 
                 {/* CTA Buttons */}
@@ -197,7 +202,7 @@ export default function LandingPage() {
                             alignItems: "center",
                             gap: 8,
                         }}>
-                            Start Free Trial <ArrowRightOutlined />
+                            {t.landing.ctaStart} <ArrowRightOutlined />
                         </Button>
                     </Link>
                     <a href="#features">
@@ -211,7 +216,7 @@ export default function LandingPage() {
                             border: "1px solid rgba(255,255,255,0.1)",
                             color: "#e2e8f0",
                         }}>
-                            Learn More
+                            {t.landing.ctaLearn}
                         </Button>
                     </a>
                 </div>
@@ -228,13 +233,13 @@ export default function LandingPage() {
                     fontSize: 13,
                 }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <CheckCircleOutlined style={{ color: "#22c55e" }} /> No Credit Card Required
+                        <CheckCircleOutlined style={{ color: "#22c55e" }} /> {t.landing.trustNoCc}
                     </span>
                     <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <CheckCircleOutlined style={{ color: "#22c55e" }} /> 7-Day Free Trial
+                        <CheckCircleOutlined style={{ color: "#22c55e" }} /> {t.landing.trustTrial}
                     </span>
                     <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <CheckCircleOutlined style={{ color: "#22c55e" }} /> Cancel Anytime
+                        <CheckCircleOutlined style={{ color: "#22c55e" }} /> {t.landing.trustCancel}
                     </span>
                 </div>
             </section>
@@ -253,7 +258,7 @@ export default function LandingPage() {
                         letterSpacing: "0.1em",
                         color: "#818cf8",
                         marginBottom: 12,
-                    }}>Features</p>
+                    }}>{t.landing.featuresLabel}</p>
                     <h2 style={{
                         fontSize: "clamp(28px, 4vw, 42px)",
                         fontWeight: 700,
@@ -261,7 +266,7 @@ export default function LandingPage() {
                         margin: 0,
                         color: "#f1f5f9",
                     }}>
-                        Everything you need to automate
+                        {t.landing.featuresTitle}
                     </h2>
                 </div>
 
@@ -273,48 +278,48 @@ export default function LandingPage() {
                     {[
                         {
                             icon: <ThunderboltOutlined />,
-                            title: "No AI Cost",
-                            desc: "OpenAI API မလို၊ လုံးဝ Free",
+                            title: t.landing.featureNoAi,
+                            desc: t.landing.featureNoAiDesc,
                             gradient: "linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.03))",
                             border: "rgba(34,197,94,0.2)",
                             iconColor: "#22c55e",
                         },
                         {
                             icon: <MessageOutlined />,
-                            title: "Smart Auto-Reply",
-                            desc: "Keyword-based reply ဖြင့် ဖောက်သည်များကို လျှင်မြန်စွာ ပြန်ကြားပါ",
+                            title: t.landing.featureSmartReply,
+                            desc: t.landing.featureSmartReplyDesc,
                             gradient: "linear-gradient(135deg, rgba(129,140,248,0.12), rgba(129,140,248,0.03))",
                             border: "rgba(129,140,248,0.2)",
                             iconColor: "#818cf8",
                         },
                         {
                             icon: <MobileOutlined />,
-                            title: "Mobile First",
-                            desc: "ဖုန်းနဲ့ သုံးဖို့ အဆင်ပြေဆုံး",
+                            title: t.landing.featureMobile,
+                            desc: t.landing.featureMobileDesc,
                             gradient: "linear-gradient(135deg, rgba(56,189,248,0.12), rgba(56,189,248,0.03))",
                             border: "rgba(56,189,248,0.2)",
                             iconColor: "#38bdf8",
                         },
                         {
                             icon: <GlobalOutlined />,
-                            title: "Myanmar + English",
-                            desc: "နှစ်ဘာသာလုံး Support",
+                            title: t.landing.featureLang,
+                            desc: t.landing.featureLangDesc,
                             gradient: "linear-gradient(135deg, rgba(168,85,247,0.12), rgba(168,85,247,0.03))",
                             border: "rgba(168,85,247,0.2)",
                             iconColor: "#a855f7",
                         },
                         {
                             icon: <DashboardOutlined />,
-                            title: "Real-time Dashboard",
-                            desc: "Message ပမာဏ၊ Reply Rate အားလုံးကို Dashboard မှာ ကြည့်ပါ",
+                            title: t.landing.featureDashboard,
+                            desc: t.landing.featureDashboardDesc,
                             gradient: "linear-gradient(135deg, rgba(251,146,60,0.12), rgba(251,146,60,0.03))",
                             border: "rgba(251,146,60,0.2)",
                             iconColor: "#fb923c",
                         },
                         {
                             icon: <SafetyOutlined />,
-                            title: "Secure & Fast",
-                            desc: "လုံခြုံ၊ မြန်ဆန်၊ 99.9% uptime",
+                            title: t.landing.featureSecure,
+                            desc: t.landing.featureSecureDesc,
                             gradient: "linear-gradient(135deg, rgba(244,63,94,0.12), rgba(244,63,94,0.03))",
                             border: "rgba(244,63,94,0.2)",
                             iconColor: "#f43f5e",
@@ -379,7 +384,7 @@ export default function LandingPage() {
                         letterSpacing: "0.1em",
                         color: "#818cf8",
                         marginBottom: 12,
-                    }}>Pricing</p>
+                    }}>{t.landing.pricingLabel}</p>
                     <h2 style={{
                         fontSize: "clamp(28px, 4vw, 42px)",
                         fontWeight: 700,
@@ -387,10 +392,10 @@ export default function LandingPage() {
                         margin: "0 0 12px",
                         color: "#f1f5f9",
                     }}>
-                        Choose your business type
+                        {t.landing.pricingTitle}
                     </h2>
                     <p style={{ color: "#64748b", fontSize: 16 }}>
-                        7 ရက် အခမဲ့ စမ်းသုံးပါ။ Credit card မလိုပါ။
+                        {t.landing.pricingSubtitle}
                     </p>
                 </div>
 
@@ -431,26 +436,26 @@ export default function LandingPage() {
                         </div>
 
                         <h3 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 6px", color: "#f1f5f9" }}>
-                            🛍️ Online Shop
+                            🛍️ {t.landing.planShopTitle}
                         </h3>
                         <p style={{ fontSize: 14, color: "#64748b", margin: "0 0 24px" }}>
-                            E-commerce & Online Selling
+                            {t.landing.planShopSubtitle}
                         </p>
 
                         <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
                             <span style={{ fontSize: 42, fontWeight: 800, color: "#f1f5f9" }}>2,000</span>
-                            <span style={{ fontSize: 16, color: "#94a3b8" }}>Baht / month</span>
+                            <span style={{ fontSize: 16, color: "#94a3b8" }}>{t.landing.planPrice}</span>
                         </div>
 
                         <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 28 }}>
                             {[
-                                "Unlimited conversations",
-                                "Auto order collection",
-                                "Product catalog management",
-                                "Online Warehouse feature",
-                                "Payment options (COD/Bank)",
-                                "Myanmar + English support",
-                                "Mobile dashboard",
+                                t.landing.shopFeature1,
+                                t.landing.shopFeature2,
+                                t.landing.shopFeature3,
+                                t.landing.shopFeature4,
+                                t.landing.shopFeature5,
+                                t.landing.shopFeature6,
+                                t.landing.shopFeature7,
                             ].map((item, i) => (
                                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#cbd5e1" }}>
                                     <CheckCircleOutlined style={{ color: "#22c55e", fontSize: 16 }} />
@@ -470,7 +475,7 @@ export default function LandingPage() {
                                 fontSize: 15,
                                 boxShadow: "0 6px 20px rgba(129,140,248,0.3)"
                             }}>
-                                Start Free Trial
+                                {t.landing.planCta}
                             </Button>
                         </Link>
                     </div>
@@ -508,7 +513,7 @@ export default function LandingPage() {
                             alignItems: "center",
                             gap: 4,
                         }}>
-                            <StarFilled /> POPULAR
+                            <StarFilled /> {t.landing.popular}
                         </div>
 
                         <div style={{
@@ -525,26 +530,26 @@ export default function LandingPage() {
                         </div>
 
                         <h3 style={{ fontSize: 22, fontWeight: 700, margin: "0 0 6px", color: "#f1f5f9" }}>
-                            📦 Cargo & Delivery
+                            📦 {t.landing.planCargoTitle}
                         </h3>
                         <p style={{ fontSize: 14, color: "#64748b", margin: "0 0 24px" }}>
-                            Logistics & Shipping Business
+                            {t.landing.planCargoSubtitle}
                         </p>
 
                         <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
                             <span style={{ fontSize: 42, fontWeight: 800, color: "#f1f5f9" }}>2,000</span>
-                            <span style={{ fontSize: 16, color: "#94a3b8" }}>Baht / month</span>
+                            <span style={{ fontSize: 16, color: "#94a3b8" }}>{t.landing.planPrice}</span>
                         </div>
 
                         <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 28 }}>
                             {[
-                                "Unlimited shipment tracking",
-                                "Auto booking system",
-                                "Tracking number generation",
-                                "Cargo process flow",
-                                "Rate calculator",
-                                "Myanmar + English support",
-                                "Priority support 24/7",
+                                t.landing.cargoFeature1,
+                                t.landing.cargoFeature2,
+                                t.landing.cargoFeature3,
+                                t.landing.cargoFeature4,
+                                t.landing.cargoFeature5,
+                                t.landing.cargoFeature6,
+                                t.landing.cargoFeature7,
                             ].map((item, i) => (
                                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#cbd5e1" }}>
                                     <CheckCircleOutlined style={{ color: "#22c55e", fontSize: 16 }} />
@@ -564,7 +569,7 @@ export default function LandingPage() {
                                 fontSize: 15,
                                 boxShadow: "0 6px 20px rgba(251,146,60,0.3)"
                             }}>
-                                Start Free Trial
+                                {t.landing.planCta}
                             </Button>
                         </Link>
                     </div>
@@ -585,7 +590,7 @@ export default function LandingPage() {
                         letterSpacing: "0.1em",
                         color: "#818cf8",
                         marginBottom: 12,
-                    }}>How It Works</p>
+                    }}>{t.landing.howLabel}</p>
                     <h2 style={{
                         fontSize: "clamp(28px, 4vw, 42px)",
                         fontWeight: 700,
@@ -593,7 +598,7 @@ export default function LandingPage() {
                         margin: 0,
                         color: "#f1f5f9",
                     }}>
-                        Get started in minutes
+                        {t.landing.howTitle}
                     </h2>
                 </div>
 
@@ -601,26 +606,26 @@ export default function LandingPage() {
                     {[
                         {
                             step: "01",
-                            title: "Create Account",
-                            desc: "အကောင့်ဖွင့်ပြီး plan ရွေးပါ (7 ရက် free trial)",
+                            title: t.landing.step1Title,
+                            desc: t.landing.step1Desc,
                             color: "#818cf8",
                         },
                         {
                             step: "02",
-                            title: "Connect Facebook Page",
-                            desc: "သင့် Facebook Page ချိတ်ဆက်ပါ — 1 click!",
+                            title: t.landing.step2Title,
+                            desc: t.landing.step2Desc,
                             color: "#22c55e",
                         },
                         {
                             step: "03",
-                            title: "Setup Auto-Reply Flows",
-                            desc: "Trigger keywords သတ်မှတ်ပြီး reply templates ဖန်တီးပါ",
+                            title: t.landing.step3Title,
+                            desc: t.landing.step3Desc,
                             color: "#a78bfa",
                         },
                         {
                             step: "04",
-                            title: "Start Receiving Orders!",
-                            desc: "ပြီးပါပြီ! Order/Booking တွေ အလိုအလျောက် လက်ခံပါမယ်! 🎉",
+                            title: t.landing.step4Title,
+                            desc: t.landing.step4Desc,
                             color: "#fb923c",
                         },
                     ].map((item, i) => (
@@ -695,7 +700,7 @@ export default function LandingPage() {
                         margin: "0 0 16px",
                         color: "#f1f5f9",
                     }}>
-                        Ready to automate your business?
+                        {t.landing.ctaTitle}
                     </h2>
                     <p style={{
                         fontSize: 16,
@@ -704,7 +709,7 @@ export default function LandingPage() {
                         margin: "0 auto 32px",
                         lineHeight: 1.7,
                     }}>
-                        7 ရက် အခမဲ့ စမ်းသုံးပါ။ အလုပ်များမှုက လျော့မယ်၊ အရောင်းက တက်မယ်။
+                        {t.landing.ctaDesc}
                     </p>
                     <Link href="/signup">
                         <Button size="large" style={{
@@ -721,7 +726,7 @@ export default function LandingPage() {
                             alignItems: "center",
                             gap: 8,
                         }}>
-                            Start Free Trial Now <RocketOutlined />
+                            {t.landing.ctaButton} <RocketOutlined />
                         </Button>
                     </Link>
                 </div>
@@ -758,9 +763,9 @@ export default function LandingPage() {
                     </div>
 
                     <div style={{ display: "flex", gap: 24, fontSize: 13 }}>
-                        <Link href="/privacy-policy" style={{ color: "#64748b", textDecoration: "none" }}>Privacy</Link>
-                        <Link href="/terms" style={{ color: "#64748b", textDecoration: "none" }}>Terms</Link>
-                        <a href="mailto:support@example.com" style={{ color: "#64748b", textDecoration: "none" }}>Support</a>
+                        <Link href="/privacy-policy" style={{ color: "#64748b", textDecoration: "none" }}>{t.landing.privacy}</Link>
+                        <Link href="/terms" style={{ color: "#64748b", textDecoration: "none" }}>{t.landing.terms}</Link>
+                        <a href="mailto:support@example.com" style={{ color: "#64748b", textDecoration: "none" }}>{t.landing.support}</a>
                     </div>
                 </div>
 
@@ -772,7 +777,7 @@ export default function LandingPage() {
                     fontSize: 12,
                     color: "#475569",
                 }}>
-                    © 2026 AutoReply Platform. Made with 💖 in Myanmar.
+                    {t.landing.footerCopy}
                 </div>
             </footer>
         </div>

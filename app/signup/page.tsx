@@ -13,12 +13,15 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import axios from "axios";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const { Title, Text } = Typography;
 
 function SignupForm() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
 
     const plan = searchParams.get("plan") || "shop";
@@ -27,7 +30,7 @@ function SignupForm() {
     const onFinish = async (values: any) => {
         setLoading(true);
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+            const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
             const signupData = {
                 ...values,
@@ -38,12 +41,12 @@ function SignupForm() {
             const response = await axios.post(`${apiUrl}/api/oauth/register`, signupData);
 
             if (response.data.success) {
-                message.success("အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။ 🚀");
+                message.success(t.common.success + " 🚀");
                 localStorage.setItem("authToken", response.data.token);
                 router.push("/dashboard");
             }
         } catch (error: any) {
-            message.error(error.response?.data?.error || "အကောင့်ဖွင့်ခြင်း မအောင်မြင်ပါ။ ပြန်ကြိုးစားကြည့်ပါ။");
+            message.error(error.response?.data?.error || t.common.error);
         } finally {
             setLoading(false);
         }
@@ -60,6 +63,11 @@ function SignupForm() {
             position: "relative",
             overflow: "hidden",
         }}>
+            {/* Language Switcher */}
+            <div style={{ position: "absolute", top: 20, right: 20, zIndex: 10 }}>
+                <LanguageSwitcher />
+            </div>
+
             {/* Background Glow */}
             <div style={{
                 position: "absolute",
@@ -91,9 +99,9 @@ function SignupForm() {
                 }}>
                     {isCargo ? "📦" : "🛍️"}
                 </div>
-                <Title level={2} style={{ margin: 0, color: "#f1f5f9" }}>Create Account</Title>
+                <Title level={2} style={{ margin: 0, color: "#f1f5f9" }}>{t.auth.createAccount}</Title>
                 <Text style={{ color: "#94a3b8" }}>
-                    {isCargo ? "Cargo & Delivery" : "Online Shop"} Auto-Reply စတင်ရန်
+                    {t.auth.signupSubtitle}
                 </Text>
             </div>
 
@@ -138,23 +146,23 @@ function SignupForm() {
                     </div>
                     <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: 700, color: "#f1f5f9", fontSize: 15 }}>
-                            {isCargo ? "Cargo & Delivery Plan" : "Online Shop Plan"}
+                            {isCargo ? t.auth.cargoDeliveryPlan : t.auth.onlineShopPlan}
                         </div>
                         <div style={{ fontSize: 12, color: "#94a3b8", display: "flex", alignItems: "center", gap: 4 }}>
-                            7 Days Free Trial <CheckCircleFilled style={{ color: "#22c55e" }} />
+                            {t.auth.trialIncluded} <CheckCircleFilled style={{ color: "#22c55e" }} />
                         </div>
                     </div>
-                    <Link href="/#pricing" style={{ fontSize: 12, color: "#818cf8" }}>Change</Link>
+                    <Link href="/#pricing" style={{ fontSize: 12, color: "#818cf8" }}>{t.auth.changePlan}</Link>
                 </div>
 
                 <Form layout="vertical" onFinish={onFinish}>
                     <Form.Item
                         name="name"
-                        rules={[{ required: true, message: "သင့်အမည် ထည့်ပေးပါ" }]}
+                        rules={[{ required: true, message: t.auth.nameRequired }]}
                     >
                         <Input
                             prefix={<UserOutlined style={{ color: "#64748b" }} />}
-                            placeholder="သင့်အမည် (Full Name)"
+                            placeholder={t.auth.namePlaceholder}
                             size="large"
                             style={{
                                 borderRadius: 14,
@@ -169,13 +177,13 @@ function SignupForm() {
                     <Form.Item
                         name="email"
                         rules={[
-                            { required: true, message: "Email ထည့်ပေးပါ" },
-                            { type: "email", message: "Email ပုံစံ မှန်ကန်မှု မရှိပါ" }
+                            { required: true, message: t.auth.emailRequired },
+                            { type: "email", message: t.auth.emailInvalid }
                         ]}
                     >
                         <Input
                             prefix={<MailOutlined style={{ color: "#64748b" }} />}
-                            placeholder="Email Address"
+                            placeholder={t.auth.emailPlaceholder}
                             size="large"
                             style={{
                                 borderRadius: 14,
@@ -190,13 +198,13 @@ function SignupForm() {
                     <Form.Item
                         name="password"
                         rules={[
-                            { required: true, message: "Password ထည့်ပေးပါ" },
-                            { min: 6, message: "အနည်းဆုံး ၆ လုံး ရှိရပါမည်" }
+                            { required: true, message: t.auth.passwordRequired },
+                            { min: 6, message: t.auth.passwordMin }
                         ]}
                     >
                         <Input.Password
                             prefix={<LockOutlined style={{ color: "#64748b" }} />}
-                            placeholder="Password"
+                            placeholder={t.auth.passwordPlaceholder}
                             size="large"
                             style={{
                                 borderRadius: 14,
@@ -229,19 +237,19 @@ function SignupForm() {
                                     : "0 8px 24px rgba(129,140,248,0.3)"
                             }}
                         >
-                            Sign Up — Free Trial စမည်
+                            {t.auth.signupButton}
                         </Button>
                     </Form.Item>
 
                     <div style={{ textAlign: "center" }}>
-                        <Text style={{ color: "#94a3b8" }}>ရှိပြီးသား အကောင့်ရှိလား? </Text>
-                        <Link href="/login" style={{ color: "#818cf8", fontWeight: 600 }}>Login ဝင်ရန်</Link>
+                        <Text style={{ color: "#94a3b8" }}>{t.auth.hasAccount} </Text>
+                        <Link href="/login" style={{ color: "#818cf8", fontWeight: 600 }}>{t.auth.loginLink}</Link>
                     </div>
                 </Form>
             </Card>
 
             <div style={{ marginTop: 40, color: "#475569", fontSize: 12, textAlign: "center", position: "relative", zIndex: 1 }}>
-                By signing up, you agree to our Terms and Privacy Policy.
+                {t.auth.signupTerms}
             </div>
         </div>
     );
