@@ -75,10 +75,15 @@ export default function OrdersPage() {
 
     const handleDownloadPDF = () => {
         try {
-            const doc = new jsPDF();
             const isCargo = businessType === 'cargo';
-            const title = isCargo ? "Shipment Report (Last 7 Days)" : "Order Report (Last 7 Days)";
-            const filename = isCargo ? `shipments_${dayjs().format("YYYYMMDD")}.pdf` : `orders_${dayjs().format("YYYYMMDD")}.pdf`;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const title = isCargo ? "Detailed Shipment Report (Last 7 Days)" : "Detailed Order Report (Last 7 Days)";
+            const filename = isCargo ? `shipments_detailed_${dayjs().format("YYYYMMDD")}.pdf` : `orders_detailed_${dayjs().format("YYYYMMDD")}.pdf`;
 
             // Filter data for last 7 days
             const sevenDaysAgo = dayjs().subtract(7, 'day');
@@ -91,43 +96,59 @@ export default function OrdersPage() {
 
             // PDF Styling
             doc.setFontSize(18);
-            doc.text(title, 14, 22);
+            doc.text(title, 14, 20);
             doc.setFontSize(11);
             doc.setTextColor(100);
-            doc.text(`Generated on: ${dayjs().format("DD/MM/YYYY HH:mm")}`, 14, 30);
+            doc.text(`Generated on: ${dayjs().format("DD/MM/YYYY HH:mm")}`, 14, 28);
 
             // Table Columns & Rows
             let columns, rows;
 
             if (isCargo) {
-                columns = ["ID", "Date", "Sender", "Item", "Weight", "Status"];
+                columns = ["ID", "Date", "Sender", "Phone", "Item", "Weight", "Country", "Shipping", "Address", "Status"];
                 rows = filteredData.map((item: any) => [
                     item.id.slice(-6).toUpperCase(),
                     dayjs(item.created_at).format("DD/MM/YYYY"),
                     item.full_name || "-",
+                    item.phone || "-",
                     item.item_name || "-",
                     item.weight || "-",
+                    item.country || "-",
+                    item.shipping || "-",
+                    item.address || "-",
                     item.status?.toUpperCase()
                 ]);
             } else {
-                columns = ["ID", "Date", "Customer", "Item", "Qty", "Status"];
+                columns = ["ID", "Date", "Customer", "Phone", "Item", "Qty", "Payment", "Address", "Note/KPay", "Status"];
                 rows = filteredData.map((item: any) => [
                     item.id.slice(-6).toUpperCase(),
                     dayjs(item.created_at).format("DD/MM/YYYY"),
                     item.full_name || "-",
+                    item.phone || "-",
                     item.item_name || "-",
                     item.quantity || "1",
+                    item.payment_method || item.payment || "-",
+                    item.address || "-",
+                    item.notes || "-",
                     item.status?.toUpperCase()
                 ]);
             }
 
             autoTable(doc, {
-                startY: 40,
+                startY: 35,
                 head: [columns],
                 body: rows,
                 theme: 'striped',
-                headStyles: { fillColor: isCargo ? [245, 158, 11] : [99, 102, 241] },
-                styles: { fontSize: 9 },
+                headStyles: { fillColor: isCargo ? [245, 158, 11] : [99, 102, 241], fontSize: 8 },
+                styles: { fontSize: 8, cellPadding: 2 },
+                columnStyles: {
+                    0: { cellWidth: 15 }, // ID
+                    1: { cellWidth: 20 }, // Date
+                    2: { cellWidth: 25 }, // Name
+                    3: { cellWidth: 25 }, // Phone
+                    4: { cellWidth: 35 }, // Item
+                    8: { cellWidth: 40 }, // Address
+                },
             });
 
             doc.save(filename);
