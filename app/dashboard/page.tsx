@@ -118,7 +118,12 @@ export default function UserDashboard() {
                             <Text type="secondary" style={{ fontSize: "14px", letterSpacing: "1px", textTransform: "uppercase" }}>{t.dashboard.overview}</Text>
                             <Title level={2} style={{ margin: "4px 0 0 0", fontWeight: 300 }}>{t.dashboard.dashboard}</Title>
                         </div>
-                        <Button icon={<SettingOutlined />} type="text" size="large" />
+                        <Button
+                            icon={<SettingOutlined />}
+                            type="text"
+                            size="large"
+                            onClick={() => router.push("/dashboard/profile")}
+                        />
                     </div>
 
                     {/* Stats Grid */}

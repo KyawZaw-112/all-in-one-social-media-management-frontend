@@ -140,7 +140,8 @@ export default function SubscribePage() {
                                         showHeader={false}
                                     />
                                     {/* CTA */}
-                                    <Button
+                                    {/* Stripe hidden as requested */}
+                                    {/* <Button
                                         type="primary"
                                         size="large"
                                         block
@@ -148,10 +149,19 @@ export default function SubscribePage() {
                                         onClick={subscribe}
                                     >
                                         {loading ? "Redirecting…" : "Subscribe now"}
+                                    </Button> */}
+
+                                    <Button
+                                        type="primary"
+                                        block
+                                        size="large"
+                                        href="/subscribe/manual"
+                                    >
+                                        Manual Payment (KBZ / Wave / KPlus)
                                     </Button>
 
-                                    <Text type="secondary" style={{ textAlign: "center", fontSize: 12 }}>
-                                        Secure payment · Instant access after checkout
+                                    <Text type="secondary" style={{ textAlign: "center", fontSize: 12, display: "block", marginTop: 8 }}>
+                                        Instant access after admin approval
                                     </Text>
                                 </Space>
                             </Card>

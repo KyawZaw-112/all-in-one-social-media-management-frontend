@@ -8,8 +8,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 const { Text } = Typography;
 
 export default function SubscriptionGuard({
-                                              children,
-                                          }: {
+    children,
+}: {
     children: React.ReactNode;
 }) {
     const { loading, status } = useSubscription();
@@ -52,8 +52,12 @@ export default function SubscriptionGuard({
                             : "An active subscription is required to access this feature."}
                     </Text>
 
-                    <Button type="primary" block href="/subscribe/manual">
-                        View Plans
+                    <Button type="primary" block href="/subscribe">
+                        Subscribe / Renew
+                    </Button>
+
+                    <Button block href="/subscribe/manual">
+                        Manual Payment (Myanmar / Thailand)
                     </Button>
 
                     <Button block href="/">
