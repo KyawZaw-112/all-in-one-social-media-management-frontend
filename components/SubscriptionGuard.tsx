@@ -52,12 +52,12 @@ export default function SubscriptionGuard({
                             : "An active subscription is required to access this feature."}
                     </Text>
 
-                    <Button type="primary" block href="/subscribe">
-                        Subscribe / Renew
+                    <Button type="primary" block href="/subscribe/manual">
+                        Subscribe / Renew (Manual)
                     </Button>
 
-                    <Button block href="/subscribe/manual">
-                        Manual Payment (Myanmar / Thailand)
+                    <Button block href="/subscribe">
+                        View Plan Details
                     </Button>
 
                     <Button block href="/">
