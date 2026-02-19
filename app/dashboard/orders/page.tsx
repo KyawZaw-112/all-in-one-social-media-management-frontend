@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, Card, Typography, Tag, Space, Button, message } from "antd";
-import { ShoppingCartOutlined, ReloadOutlined, SendOutlined } from "@ant-design/icons";
+import { Table, Card, Typography, Tag, Space, Button, message, Modal, Descriptions } from "antd";
+import { ShoppingCartOutlined, ReloadOutlined, SendOutlined, EyeOutlined } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
 import { API_URL } from "@/lib/apiConfig";
@@ -15,6 +15,8 @@ export default function OrdersPage() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [businessType, setBusinessType] = useState<string | null>(null);
+    const [detailVisible, setDetailVisible] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState<any>(null);
     const { t, language } = useLanguage();
 
     const fetchData = async () => {
@@ -267,10 +269,24 @@ export default function OrdersPage() {
                         dataSource={data}
                         rowKey="id"
                         loading={loading}
-                        pagination={{ pageSize: 10 }}
-                        scroll={{ x: 1000 }}
+                        pagination={{ pageSize: 12 }}
+                        scroll={{ x: 800 }}
                     />
                 </Card>
+
+                <Modal
+                    title={language === 'my' ? "အသေးစိတ် အချက်အလက်" : "Order Details"}
+                    open={detailVisible}
+                    onCancel={() => setDetailVisible(false)}
+                    footer={[
+                        <Button key="close" onClick={() => setDetailVisible(false)}>
+                            {language === 'my' ? "ပိတ်မည်" : "Close"}
+                        </Button>
+                    ]}
+                    width={600}
+                >
+                    {renderDetailContent()}
+                </Modal>
             </div>
         </AuthGuard>
     );
