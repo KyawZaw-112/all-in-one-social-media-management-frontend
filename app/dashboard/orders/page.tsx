@@ -155,12 +155,18 @@ export default function OrdersPage() {
             width: 120,
             render: (status: string) => {
                 let color = "processing";
-                if (status === "approved" || status === "confirmed") color = "success";
+                let label = status?.toUpperCase();
+
+                if (status === "approved" || status === "confirmed") {
+                    color = "success";
+                    label = language === 'my' ? "အတည်ပြုပြီး" : "APPROVED";
+                }
                 if (status === "completed") color = "gold";
                 if (status === "cancelled") color = "error";
+
                 return (
                     <Tag color={color}>
-                        {status?.toUpperCase()}
+                        {label}
                     </Tag>
                 );
             }
@@ -226,12 +232,18 @@ export default function OrdersPage() {
             width: 120,
             render: (status: string) => {
                 let color = "processing";
-                if (status === "approved" || status === "confirmed") color = "success";
+                let label = status?.toUpperCase();
+
+                if (status === "approved" || status === "confirmed") {
+                    color = "success";
+                    label = language === 'my' ? "အတည်ပြုပြီး" : "APPROVED";
+                }
                 if (status === "completed") color = "gold";
                 if (status === "cancelled") color = "error";
+
                 return (
                     <Tag color={color}>
-                        {status?.toUpperCase()}
+                        {label}
                     </Tag>
                 );
             }
