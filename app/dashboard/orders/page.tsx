@@ -140,6 +140,8 @@ export default function OrdersPage() {
         {
             title: language === 'my' ? "လုပ်ဆောင်ချက်" : "Action",
             key: "action",
+            fixed: 'right' as const,
+            width: 120,
             render: (_: any, record: any) => (
                 record.status === 'pending' && (
                     <Button type="primary" size="small" onClick={() => handleUpdateStatus(record.id, 'approved')}>
@@ -223,6 +225,8 @@ export default function OrdersPage() {
         {
             title: language === 'my' ? "လုပ်ဆောင်ချက်" : "Action",
             key: "action",
+            fixed: 'right' as const,
+            width: 120,
             render: (_: any, record: any) => (
                 record.status === 'pending' && (
                     <Button type="primary" size="small" onClick={() => handleUpdateStatus(record.id, 'approved')}>
