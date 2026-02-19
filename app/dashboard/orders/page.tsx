@@ -47,6 +47,21 @@ export default function OrdersPage() {
         fetchData();
     }, []);
 
+    const handleUpdateStatus = async (id: string, newStatus: string) => {
+        try {
+            const token = localStorage.getItem("authToken");
+            const endpoint = businessType === 'cargo' ? `/api/merchants/shipments/${id}/status` : `/api/merchants/orders/${id}/status`;
+            await axios.patch(`${API_URL}${endpoint}`, { status: newStatus }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            message.success(`Status updated to ${newStatus}`);
+            fetchData();
+        } catch (error) {
+            console.error("Update status error:", error);
+            message.error("Failed to update status");
+        }
+    };
+
     const shopColumns = [
         {
             title: language === 'my' ? "ရက်စွဲ" : "Date",
@@ -54,6 +69,12 @@ export default function OrdersPage() {
             key: "created_at",
             render: (date: string) => dayjs(date).format("DD/MM/YYYY HH:mm"),
             sorter: (a: any, b: any) => dayjs(a.created_at).unix() - dayjs(b.created_at).unix(),
+        },
+        {
+            title: language === 'my' ? "ရင်းမြစ်" : "Source",
+            dataIndex: "order_source",
+            key: "order_source",
+            render: (s: string) => <Tag color="blue">{s}</Tag>
         },
         {
             title: language === 'my' ? "ဝယ်သူအမည်" : "Customer",
@@ -72,26 +93,59 @@ export default function OrdersPage() {
             key: "item_name",
         },
         {
+            title: language === 'my' ? "ဒီဇိုင်း/ဆိုဒ်" : "Variant",
+            dataIndex: "item_variant",
+            key: "item_variant",
+        },
+        {
             title: language === 'my' ? "အရေအတွက်" : "Qty",
             dataIndex: "quantity",
             key: "quantity",
         },
         {
+            title: language === 'my' ? "ပို့ဆောင်မှု" : "Delivery",
+            dataIndex: "delivery",
+            key: "delivery",
+        },
+        {
+            title: language === 'my' ? "လိပ်စာ" : "Address",
+            dataIndex: "address",
+            key: "address",
+            ellipsis: true,
+        },
+        {
             title: language === 'my' ? "ငွေပေးချေမှု" : "Payment",
             dataIndex: "payment_method",
             key: "payment_method",
-            render: (method: string) => (
-                <Tag color={method === "COD" ? "blue" : "green"}>{method}</Tag>
+            render: (method: string, record: any) => (
+                <Tag color={method === "COD" ? "blue" : "green"}>{method || record.payment}</Tag>
             )
         },
         {
             title: language === 'my' ? "အခြေအနေ" : "Status",
             dataIndex: "status",
             key: "status",
-            render: (status: string) => (
-                <Tag color={status === "completed" ? "success" : "processing"}>
-                    {status?.toUpperCase()}
-                </Tag>
+            render: (status: string) => {
+                let color = "processing";
+                if (status === "approved" || status === "confirmed") color = "success";
+                if (status === "completed") color = "gold";
+                if (status === "cancelled") color = "error";
+                return (
+                    <Tag color={color}>
+                        {status?.toUpperCase()}
+                    </Tag>
+                );
+            }
+        },
+        {
+            title: language === 'my' ? "လုပ်ဆောင်ချက်" : "Action",
+            key: "action",
+            render: (_: any, record: any) => (
+                record.status === 'pending' && (
+                    <Button type="primary" size="small" onClick={() => handleUpdateStatus(record.id, 'approved')}>
+                        {language === 'my' ? "အတည်ပြုမည်" : "Confirm"}
+                    </Button>
+                )
             )
         }
     ];
@@ -109,15 +163,25 @@ export default function OrdersPage() {
             key: "full_name",
         },
         {
+            title: language === 'my' ? "ဖုန်း" : "Phone",
+            dataIndex: "phone",
+            key: "phone",
+        },
+        {
             title: language === 'my' ? "နိုင်ငံ" : "Country",
             dataIndex: "country",
             key: "country",
             render: (c: string) => <Tag color="blue">{c}</Tag>
         },
         {
-            title: language === 'my' ? "အမျိုးအစား" : "Type",
+            title: language === 'my' ? "အမျိုးအစား" : "Shipping",
             dataIndex: "shipping",
             key: "shipping",
+        },
+        {
+            title: language === 'my' ? "ပစ္စည်းအမျိုးအစား" : "Type",
+            dataIndex: "item_type",
+            key: "item_type",
         },
         {
             title: language === 'my' ? "ပစ္စည်း" : "Item",
@@ -130,13 +194,41 @@ export default function OrdersPage() {
             key: "weight",
         },
         {
+            title: language === 'my' ? "တန်ဖိုး" : "Value",
+            dataIndex: "item_value",
+            key: "item_value",
+        },
+        {
+            title: language === 'my' ? "လိပ်စာ" : "Address",
+            dataIndex: "address",
+            key: "address",
+            ellipsis: true,
+        },
+        {
             title: language === 'my' ? "အခြေအနေ" : "Status",
             dataIndex: "status",
             key: "status",
-            render: (status: string) => (
-                <Tag color={status === "completed" ? "success" : "processing"}>
-                    {status?.toUpperCase()}
-                </Tag>
+            render: (status: string) => {
+                let color = "processing";
+                if (status === "approved" || status === "confirmed") color = "success";
+                if (status === "completed") color = "gold";
+                if (status === "cancelled") color = "error";
+                return (
+                    <Tag color={color}>
+                        {status?.toUpperCase()}
+                    </Tag>
+                );
+            }
+        },
+        {
+            title: language === 'my' ? "လုပ်ဆောင်ချက်" : "Action",
+            key: "action",
+            render: (_: any, record: any) => (
+                record.status === 'pending' && (
+                    <Button type="primary" size="small" onClick={() => handleUpdateStatus(record.id, 'approved')}>
+                        {language === 'my' ? "အတည်ပြုမည်" : "Confirm"}
+                    </Button>
+                )
             )
         }
     ];
