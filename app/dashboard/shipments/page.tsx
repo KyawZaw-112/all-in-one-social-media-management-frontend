@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, Card, Typography, Tag, Space, Button, message } from "antd";
-import { ReconciliationOutlined, ReloadOutlined } from "@ant-design/icons";
+import { Table, Card, Typography, Tag, Space, Button, message, Modal, Descriptions } from "antd";
+import { ReconciliationOutlined, ReloadOutlined, EyeOutlined } from "@ant-design/icons";
 import axios from "axios";
 import dayjs from "dayjs";
 import { API_URL } from "@/lib/apiConfig";
@@ -14,6 +14,8 @@ const { Title, Text } = Typography;
 export default function ShipmentsPage() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    const [detailVisible, setDetailVisible] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState<any>(null);
     const { language } = useLanguage();
 
     const fetchShipments = async () => {
@@ -35,6 +37,36 @@ export default function ShipmentsPage() {
     useEffect(() => {
         fetchShipments();
     }, []);
+
+    const showDetail = (record: any) => {
+        setSelectedRecord(record);
+        setDetailVisible(true);
+    };
+
+    const renderDetailContent = () => {
+        if (!selectedRecord) return null;
+        const d = selectedRecord;
+
+        return (
+            <Descriptions bordered column={1} size="small">
+                <Descriptions.Item label={language === 'my' ? "ရက်စွဲ" : "Date"}>{dayjs(d.created_at).format("DD/MM/YYYY HH:mm:ss")}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "ပေးပို့သူ" : "Sender"}>{d.full_name || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "ဖုန်း" : "Phone"}>{d.phone || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "နိုင်ငံ" : "Country"}>{d.country || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "ပို့ဆောင်မှု" : "Shipping"}>{d.shipping || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "ပစ္စည်းအမျိုးအစား" : "Type"}>{d.item_type || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "ပစ္စည်း" : "Item"}>{d.item_name || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "အလေးချိန်" : "Weight"}>{d.weight || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "တန်ဖိုး" : "Item Value"}>{d.item_value || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "လိပ်စာ" : "Address"}>{d.address || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "အခြေအနေ" : "Status"}>
+                    <Tag color={d.status === "completed" ? "success" : "processing"}>
+                        {d.status?.toUpperCase()}
+                    </Tag>
+                </Descriptions.Item>
+            </Descriptions>
+        );
+    };
 
     const columns = [
         {
@@ -79,6 +111,17 @@ export default function ShipmentsPage() {
                     {status?.toUpperCase()}
                 </Tag>
             )
+        },
+        {
+            title: language === 'my' ? "လုပ်ဆောင်ချက်" : "Action",
+            key: "action",
+            fixed: 'right' as const,
+            width: 120,
+            render: (_: any, record: any) => (
+                <Button icon={<EyeOutlined />} size="small" onClick={() => showDetail(record)}>
+                    {language === 'my' ? "အသေးစိတ်" : "Detail"}
+                </Button>
+            )
         }
     ];
 
@@ -103,10 +146,24 @@ export default function ShipmentsPage() {
                         dataSource={data}
                         rowKey="id"
                         loading={loading}
-                        pagination={{ pageSize: 10 }}
+                        pagination={{ pageSize: 12 }}
                         scroll={{ x: 900 }}
                     />
                 </Card>
+
+                <Modal
+                    title={language === 'my' ? "အသေးစိတ် အချက်အလက်" : "Shipment Details"}
+                    open={detailVisible}
+                    onCancel={() => setDetailVisible(false)}
+                    footer={[
+                        <Button key="close" onClick={() => setDetailVisible(false)}>
+                            {language === 'my' ? "ပိတ်မည်" : "Close"}
+                        </Button>
+                    ]}
+                    width={600}
+                >
+                    {renderDetailContent()}
+                </Modal>
             </div>
         </AuthGuard>
     );
