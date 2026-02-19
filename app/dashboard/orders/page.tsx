@@ -9,6 +9,8 @@ import dayjs from "dayjs";
 import { API_URL } from "@/lib/apiConfig";
 import AuthGuard from "@/components/AuthGuard";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const { Title, Text } = Typography;
 
@@ -69,6 +71,71 @@ export default function OrdersPage() {
     const showDetail = (record: any) => {
         setSelectedRecord(record);
         setDetailVisible(true);
+    };
+
+    const handleDownloadPDF = () => {
+        try {
+            const doc = new jsPDF();
+            const isCargo = businessType === 'cargo';
+            const title = isCargo ? "Shipment Report (Last 7 Days)" : "Order Report (Last 7 Days)";
+            const filename = isCargo ? `shipments_${dayjs().format("YYYYMMDD")}.pdf` : `orders_${dayjs().format("YYYYMMDD")}.pdf`;
+
+            // Filter data for last 7 days
+            const sevenDaysAgo = dayjs().subtract(7, 'day');
+            const filteredData = data.filter((item: any) => dayjs(item.created_at).isAfter(sevenDaysAgo));
+
+            if (filteredData.length === 0) {
+                message.warning(language === 'my' ? "နောက်ဆုံး ၇ ရက်အတွင်း အချက်အလက်မရှိပါ။" : "No data found for the last 7 days.");
+                return;
+            }
+
+            // PDF Styling
+            doc.setFontSize(18);
+            doc.text(title, 14, 22);
+            doc.setFontSize(11);
+            doc.setTextColor(100);
+            doc.text(`Generated on: ${dayjs().format("DD/MM/YYYY HH:mm")}`, 14, 30);
+
+            // Table Columns & Rows
+            let columns, rows;
+
+            if (isCargo) {
+                columns = ["ID", "Date", "Sender", "Item", "Weight", "Status"];
+                rows = filteredData.map((item: any) => [
+                    item.id.slice(-6).toUpperCase(),
+                    dayjs(item.created_at).format("DD/MM/YYYY"),
+                    item.full_name || "-",
+                    item.item_name || "-",
+                    item.weight || "-",
+                    item.status?.toUpperCase()
+                ]);
+            } else {
+                columns = ["ID", "Date", "Customer", "Item", "Qty", "Status"];
+                rows = filteredData.map((item: any) => [
+                    item.id.slice(-6).toUpperCase(),
+                    dayjs(item.created_at).format("DD/MM/YYYY"),
+                    item.full_name || "-",
+                    item.item_name || "-",
+                    item.quantity || "1",
+                    item.status?.toUpperCase()
+                ]);
+            }
+
+            autoTable(doc, {
+                startY: 40,
+                head: [columns],
+                body: rows,
+                theme: 'striped',
+                headStyles: { fillColor: isCargo ? [245, 158, 11] : [99, 102, 241] },
+                styles: { fontSize: 9 },
+            });
+
+            doc.save(filename);
+            message.success(language === 'my' ? "PDF ဒေါင်းလုဒ်လုပ်ပြီးပါပြီ။" : "PDF downloaded successfully.");
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            message.error("Failed to generate PDF");
+        }
     };
 
     const renderDetailContent = () => {
@@ -293,9 +360,25 @@ export default function OrdersPage() {
                             }
                         </Title>
                     </Space>
-                    <Button icon={<ReloadOutlined />} onClick={fetchData} loading={loading}>
-                        {language === 'my' ? "ပြန်ပွင့်ပါ" : "Refresh"}
-                    </Button>
+                    <Space>
+                        <Button
+                            icon={<ReloadOutlined />}
+                            onClick={fetchData}
+                            loading={loading}
+                        >
+                            {language === 'my' ? "ပြန်ပွင့်ပါ" : "Refresh"}
+                        </Button>
+                        <Button
+                            type="primary"
+                            onClick={handleDownloadPDF}
+                            style={{
+                                backgroundColor: businessType === 'cargo' ? '#f59e0b' : '#6366f1',
+                                borderColor: businessType === 'cargo' ? '#f59e0b' : '#6366f1'
+                            }}
+                        >
+                            {language === 'my' ? "PDF ဒေါင်းမည်" : "Download PDF"}
+                        </Button>
+                    </Space>
                 </div>
 
                 <Card bordered={false} style={{ borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
