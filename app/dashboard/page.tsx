@@ -143,7 +143,7 @@ export default function UserDashboard() {
                         </Col>
                         {stats?.business_type === 'cargo' ? (
                             <Col xs={24} sm={8}>
-                                <Card bordered={false} style={{ background: "#fffbeb", borderRadius: "16px", cursor: "pointer", border: "1px solid #fef3c7" }} onClick={() => router.push("/dashboard/shipments")}>
+                                <Card bordered={false} style={{ background: "#fffbeb", borderRadius: "16px", cursor: "pointer", border: "1px solid #fef3c7" }} onClick={() => router.push("/dashboard/orders")}>
                                     <Statistic
                                         title={<Text type="secondary" style={{ color: "#92400e" }}>Shipment Requests</Text>}
                                         value={stats?.shipments_count || 0}
@@ -301,8 +301,8 @@ export default function UserDashboard() {
 
                                     <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "12px" }}>
                                         {stats?.business_type === 'cargo' ? (
-                                            <Button block size="large" type="primary" style={{ background: "#f59e0b", borderColor: "#f59e0b" }} onClick={() => router.push("/dashboard/shipments")}>
-                                                <SendOutlined /> View Shipments ({stats?.shipments_count || 0})
+                                            <Button block size="large" type="primary" style={{ background: "#f59e0b", borderColor: "#f59e0b" }} onClick={() => router.push("/dashboard/orders")}>
+                                                <SendOutlined /> View Shipment Requests ({stats?.shipments_count || 0})
                                             </Button>
                                         ) : (
                                             <Button block size="large" type="primary" onClick={() => router.push("/dashboard/orders")}>
