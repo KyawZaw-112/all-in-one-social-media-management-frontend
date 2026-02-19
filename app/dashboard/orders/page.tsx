@@ -170,6 +170,7 @@ export default function OrdersPage() {
                 )}
 
                 <Descriptions.Item label={language === 'my' ? "လိပ်စာ" : "Address"}>{selectedRecord.address}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "မှတ်ချက်/KPay" : "Note/KPay"}>{selectedRecord.notes || "-"}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "အခြေအနေ" : "Status"}>
                     <Tag color={selectedRecord.status === 'pending' ? 'processing' : 'success'}>
                         {selectedRecord.status?.toUpperCase()}
