@@ -26,7 +26,7 @@ function SignupForm() {
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
 
-    const plan = searchParams.get("plan") || "shop";
+    const plan = searchParams.get("plan") || "online_shop";
     const isCargo = plan === "cargo";
 
     // Sync URL plan to form field
@@ -170,8 +170,8 @@ function SignupForm() {
                                 <Col span={12}>
                                     <div
                                         onClick={() => {
-                                            router.replace(`/signup?plan=shop`);
-                                            form.setFieldsValue({ business_type: "shop" });
+                                            router.replace(`/signup?plan=online_shop`);
+                                            form.setFieldsValue({ business_type: "online_shop" });
                                         }}
                                         style={{
                                             padding: "16px 12px",

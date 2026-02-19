@@ -128,7 +128,7 @@ export default function MerchantManagement() {
 
             await axios.put(`${API_URL}/api/admin/merchants/${merchant.id}/subscription`, {
                 status: 'active',
-                plan: merchant.subscription_plan || 'shop',
+                plan: merchant.subscription_plan || 'online_shop',
                 trial_ends_at: oneMonthLater
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -320,7 +320,7 @@ export default function MerchantManagement() {
                     </Form.Item>
                     <Form.Item label="Plan Type" name="subscription_plan" rules={[{ required: true }]}>
                         <Select>
-                            <Select.Option value="shop">Online Shop (15,000 Ks)</Select.Option>
+                            <Select.Option value="online_shop">Online Shop (15,000 Ks)</Select.Option>
                             <Select.Option value="cargo">Cargo & Delivery (20,000 Ks)</Select.Option>
                         </Select>
                     </Form.Item>
@@ -349,9 +349,9 @@ export default function MerchantManagement() {
                     <Form.Item label="Password" name="password" rules={[{ required: true, min: 6, message: 'Password must be at least 6 chars' }]}>
                         <Input.Password placeholder="Set a temporary password" />
                     </Form.Item>
-                    <Form.Item label="Initial Plan" name="plan" initialValue="shop">
+                    <Form.Item label="Initial Plan" name="plan" initialValue="online_shop">
                         <Select>
-                            <Select.Option value="shop">Online Shop (15,000 Ks)</Select.Option>
+                            <Select.Option value="online_shop">Online Shop (15,000 Ks)</Select.Option>
                             <Select.Option value="cargo">Cargo & Delivery (20,000 Ks)</Select.Option>
                         </Select>
                     </Form.Item>

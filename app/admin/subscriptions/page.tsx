@@ -57,7 +57,7 @@ export default function SubscriptionsPage() {
 
     const activeSubs = merchants.filter((m) => m.subscription_status === "active");
     const expiredSubs = merchants.filter((m) => m.subscription_status !== "active");
-    const shopCount = merchants.filter((m) => m.subscription_plan === "shop").length;
+    const shopCount = merchants.filter((m) => m.subscription_plan === "online_shop" || m.subscription_plan === "shop").length;
     const cargoCount = merchants.filter((m) => m.subscription_plan === "cargo").length;
 
     const filteredData = merchants.filter(
@@ -108,7 +108,7 @@ export default function SubscriptionsPage() {
                 </Tag>
             ),
             filters: [
-                { text: "Shop", value: "shop" },
+                { text: "Online Shop", value: "online_shop" },
                 { text: "Cargo", value: "cargo" },
             ],
             onFilter: (value: any, record: any) => record.subscription_plan === value,
