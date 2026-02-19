@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import axios from 'axios';
 import { Button, Modal, Form, Input, Tabs, Table, Space, message, Empty, Spin, Tag } from 'antd';
-import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 interface Template {
     id: string;
@@ -59,6 +60,7 @@ interface RuleFormValues {
 
 export default function AutoReplyPage() {
     const { token } = useAuth();
+    const router = useRouter();
 
     const [templates, setTemplates] = useState<Template[]>([]);
     const [rules, setRules] = useState<Rule[]>([]);
@@ -351,7 +353,15 @@ export default function AutoReplyPage() {
     return (
         <div style={{ padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h1>Auto-Reply Management</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <Button
+                        icon={<ArrowLeftOutlined />}
+                        onClick={() => router.push('/dashboard')}
+                        type="text"
+                        style={{ fontSize: '18px' }}
+                    />
+                    <h1 style={{ margin: 0 }}>Auto-Reply Management</h1>
+                </div>
                 <Button onClick={fetchData} loading={loading}>
                     Refresh
                 </Button>

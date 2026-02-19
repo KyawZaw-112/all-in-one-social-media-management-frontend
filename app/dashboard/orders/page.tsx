@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, Card, Typography, Tag, Space, Button, message, Modal, Descriptions } from "antd";
-import { ShoppingCartOutlined, ReloadOutlined, SendOutlined, EyeOutlined } from "@ant-design/icons";
+import { Table, Card, Typography, Tag, Space, Button, message, Modal, Descriptions, Tooltip } from "antd";
+import { ShoppingCartOutlined, ReloadOutlined, SendOutlined, EyeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import dayjs from "dayjs";
 import { API_URL } from "@/lib/apiConfig";
@@ -18,6 +19,7 @@ export default function OrdersPage() {
     const [detailVisible, setDetailVisible] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<any>(null);
     const { t, language } = useLanguage();
+    const router = useRouter();
 
     const fetchData = async () => {
         setLoading(true);
@@ -261,6 +263,12 @@ export default function OrdersPage() {
             <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
                     <Space size="middle">
+                        <Button
+                            icon={<ArrowLeftOutlined />}
+                            onClick={() => router.push("/dashboard")}
+                            type="text"
+                            style={{ fontSize: "18px" }}
+                        />
                         {businessType === 'cargo' ? (
                             <SendOutlined style={{ fontSize: "24px", color: "#f59e0b" }} />
                         ) : (

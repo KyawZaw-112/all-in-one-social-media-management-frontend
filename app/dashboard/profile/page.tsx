@@ -21,8 +21,10 @@ import {
     SafetyCertificateOutlined,
     LockOutlined,
     ShopOutlined,
-    SaveOutlined
+    SaveOutlined,
+    ArrowLeftOutlined
 } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
 import { API_URL } from "@/lib/apiConfig";
@@ -38,6 +40,7 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [form] = Form.useForm();
+    const router = useRouter();
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -98,8 +101,18 @@ export default function ProfilePage() {
                 <div style={{ maxWidth: "800px", margin: "0 auto" }}>
 
                     <div style={{ marginBottom: "32px" }}>
-                        <Title level={2}>{t.dashboard.editProfile || "Profile Settings"}</Title>
-                        <Text type="secondary">Manage your account and business details</Text>
+                        <Space align="center" style={{ marginBottom: "16px" }}>
+                            <Button
+                                icon={<ArrowLeftOutlined />}
+                                onClick={() => router.push("/dashboard")}
+                                type="text"
+                                style={{ fontSize: "18px" }}
+                            />
+                            <Title level={2} style={{ margin: 0 }}>{t.dashboard.editProfile || "Profile Settings"}</Title>
+                        </Space>
+                        <div style={{ paddingLeft: "42px" }}>
+                            <Text type="secondary">Manage your account and business details</Text>
+                        </div>
                     </div>
 
                     <Card bordered={false} loading={loading} style={{ borderRadius: "16px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}>

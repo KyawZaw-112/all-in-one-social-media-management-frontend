@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Layout, Spin } from "antd";
+import { Layout, Spin, Button, Space } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 import ConversationList from "@/components/ConversationList";
 import ChatWindow from "@/components/ChatWindow";
 import DataPanel from "@/components/DataPanel";
@@ -13,6 +15,7 @@ export default function ConversationsPage() {
     const [conversations, setConversations] = useState<any[]>([]);
     const [selected, setSelected] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         fetchData();
@@ -28,7 +31,16 @@ export default function ConversationsPage() {
 
     return (
         <Layout style={{ height: "100vh" }}>
-            <Sider width={300} theme="light">
+            <Sider width={300} theme="light" style={{ borderRight: "1px solid #f0f0f0", display: "flex", flexDirection: "column" }}>
+                <div style={{ padding: "12px 16px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <Button
+                        icon={<ArrowLeftOutlined />}
+                        onClick={() => router.push("/dashboard")}
+                        type="text"
+                        size="small"
+                    />
+                    <strong style={{ fontSize: "16px" }}>Chat</strong>
+                </div>
                 <ConversationList
                     conversations={conversations}
                     onSelect={setSelected}

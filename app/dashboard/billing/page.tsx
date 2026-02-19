@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Table, Card, Typography, Tag, Space, Alert } from "antd";
-import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { Table, Card, Typography, Tag, Space, Alert, Button } from "antd";
+import { CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import axios from "axios";
 import { API_URL } from "@/lib/apiConfig";
@@ -12,6 +13,7 @@ const { Title, Text } = Typography;
 export default function PaymentHistory() {
     const [payments, setPayments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -100,8 +102,18 @@ export default function PaymentHistory() {
     return (
         <div style={{ padding: "24px", maxWidth: "1000px", margin: "0 auto" }}>
             <div style={{ marginBottom: "24px" }}>
-                <Title level={2}>Billing History</Title>
-                <Text type="secondary">View your past payments and subscription history</Text>
+                <Space align="center" style={{ marginBottom: "8px" }}>
+                    <Button
+                        icon={<ArrowLeftOutlined />}
+                        onClick={() => router.push("/dashboard")}
+                        type="text"
+                        style={{ fontSize: "18px" }}
+                    />
+                    <Title level={2} style={{ margin: 0 }}>Billing History</Title>
+                </Space>
+                <div style={{ paddingLeft: "42px" }}>
+                    <Text type="secondary">View your past payments and subscription history</Text>
+                </div>
             </div>
 
             <Card bordered={false} style={{ borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>

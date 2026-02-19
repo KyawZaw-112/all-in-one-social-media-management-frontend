@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, Card, Typography, Tag, Space, Button, message, Modal, Descriptions } from "antd";
-import { ReconciliationOutlined, ReloadOutlined, EyeOutlined } from "@ant-design/icons";
+import { Table, Card, Typography, Tag, Space, Button, message, Modal, Descriptions, Tooltip } from "antd";
+import { ReconciliationOutlined, ReloadOutlined, EyeOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import dayjs from "dayjs";
 import { API_URL } from "@/lib/apiConfig";
@@ -17,6 +18,7 @@ export default function ShipmentsPage() {
     const [detailVisible, setDetailVisible] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<any>(null);
     const { language } = useLanguage();
+    const router = useRouter();
 
     const fetchShipments = async () => {
         setLoading(true);
@@ -141,6 +143,12 @@ export default function ShipmentsPage() {
             <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
                     <Space size="middle">
+                        <Button
+                            icon={<ArrowLeftOutlined />}
+                            onClick={() => router.push("/dashboard")}
+                            type="text"
+                            style={{ fontSize: "18px" }}
+                        />
                         <ReconciliationOutlined style={{ fontSize: "24px", color: "#6366f1" }} />
                         <Title level={2} style={{ margin: 0, fontWeight: 300 }}>
                             {language === 'my' ? "ကုန်ပစ္စည်းပို့ဆောင်မှု" : "Cargo Shipments"}
