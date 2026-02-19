@@ -83,13 +83,13 @@ export default function UserDashboard() {
             });
             setAutoReplyOn(checked);
             message.success(checked ? "Auto-Reply ဖွင့်လိုက်ပါပြီ ✅" : "Auto-Reply ပိတ်လိုက်ပါပြီ");
-            fetchStats();
         } catch (err) {
             message.error("Toggle failed");
         } finally {
             setToggling(false);
         }
     };
+
 
     const getStatusIcon = (status: string) => {
         if (status === "replied") return <SendOutlined style={{ color: "#10b981" }} />;
@@ -116,7 +116,7 @@ export default function UserDashboard() {
                     <div style={{ marginBottom: "48px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                         <div>
                             <Text type="secondary" style={{ fontSize: "14px", letterSpacing: "1px", textTransform: "uppercase" }}>{t.dashboard.overview}</Text>
-                            <Title level={2} style={{ margin: "4px 0 0 0", fontWeight: 300 }}>{t.dashboard.dashboard}</Title>
+                            <Title level={2} className="hidden md:block" style={{ margin: "4px 0 0 0", fontWeight: 300 }}>{t.dashboard.dashboard}</Title>
                         </div>
                         <Button
                             icon={<SettingOutlined />}
