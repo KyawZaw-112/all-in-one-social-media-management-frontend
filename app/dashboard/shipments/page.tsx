@@ -49,6 +49,7 @@ export default function ShipmentsPage() {
 
         return (
             <Descriptions bordered column={1} size="small">
+                <Descriptions.Item label={language === 'my' ? "အိုင်ဒီ" : "ID"}>{d.id}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ရက်စွဲ" : "Date"}>{dayjs(d.created_at).format("DD/MM/YYYY HH:mm:ss")}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ပေးပို့သူ" : "Sender"}>{d.full_name || "-"}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ဖုန်း" : "Phone"}>{d.phone || "-"}</Descriptions.Item>
@@ -70,9 +71,19 @@ export default function ShipmentsPage() {
 
     const columns = [
         {
+            title: language === 'my' ? "အိုင်ဒီ" : "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 90,
+            responsive: ['md'] as any,
+            render: (id: string) => <Text copyable={{ text: id }}>{`#...${id.slice(-6).toUpperCase()}`}</Text>
+        },
+        {
             title: language === 'my' ? "ရက်စွဲ" : "Date",
             dataIndex: "created_at",
             key: "created_at",
+            width: 120,
+            responsive: ['sm'] as any,
             render: (date: string) => dayjs(date).format("DD/MM/YYYY HH:mm"),
             sorter: (a: any, b: any) => dayjs(a.created_at).unix() - dayjs(b.created_at).unix(),
         },

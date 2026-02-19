@@ -76,6 +76,7 @@ export default function OrdersPage() {
 
         return (
             <Descriptions bordered column={1} size="small">
+                <Descriptions.Item label={language === 'my' ? "အိုင်ဒီ" : "ID"}>{selectedRecord.id}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "အမည်" : "Name"}>{selectedRecord.full_name || "-"}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ဖုန်း" : "Phone"}>{selectedRecord.phone || "-"}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ရက်စွဲ" : "Date"}>{dayjs(selectedRecord.created_at).format("DD/MM/YYYY HH:mm")}</Descriptions.Item>
@@ -111,10 +112,19 @@ export default function OrdersPage() {
 
     const shopColumns = [
         {
+            title: language === 'my' ? "အိုင်ဒီ" : "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 90,
+            responsive: ['md'] as any,
+            render: (id: string) => <Text copyable={{ text: id }}>{`#...${id.slice(-6).toUpperCase()}`}</Text>
+        },
+        {
             title: language === 'my' ? "ရက်စွဲ" : "Date",
             dataIndex: "created_at",
             key: "created_at",
-            width: 150,
+            width: 120,
+            responsive: ['sm'] as any,
             render: (date: string) => dayjs(date).format("DD/MM/YYYY HH:mm"),
             sorter: (a: any, b: any) => dayjs(a.created_at).unix() - dayjs(b.created_at).unix(),
         },
@@ -175,10 +185,19 @@ export default function OrdersPage() {
 
     const cargoColumns = [
         {
+            title: language === 'my' ? "အိုင်ဒီ" : "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 90,
+            responsive: ['md'] as any,
+            render: (id: string) => <Text copyable={{ text: id }}>{`#...${id.slice(-6).toUpperCase()}`}</Text>
+        },
+        {
             title: language === 'my' ? "ရက်စွဲ" : "Date",
             dataIndex: "created_at",
             key: "created_at",
-            width: 150,
+            width: 120,
+            responsive: ['sm'] as any,
             render: (date: string) => dayjs(date).format("DD/MM/YYYY HH:mm"),
         },
         {
