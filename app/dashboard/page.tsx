@@ -28,7 +28,8 @@ import {
     ShoppingCartOutlined,
     SendOutlined,
     MessageOutlined,
-    CheckCircleOutlined
+    CheckCircleOutlined,
+    CustomerServiceOutlined
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
@@ -213,11 +214,11 @@ export default function UserDashboard() {
 
                             <Row gutter={[16, 16]}>
                                 <Col span={12}>
-                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #6366f1" }} onClick={() => router.push("/automation/facebook")}>
+                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #6366f1" }} onClick={() => window.open("https://m.me/vibe.myanmar.app", "_blank")}>
                                         <Space direction="vertical">
-                                            <RobotOutlined style={{ fontSize: "24px", color: "#6366f1" }} />
-                                            <Text strong>{t.dashboard.createNewFlow}</Text>
-                                            <Text type="secondary" style={{ fontSize: "12px" }}>{t.dashboard.automateResponses}</Text>
+                                            <CustomerServiceOutlined style={{ fontSize: "24px", color: "#6366f1" }} />
+                                            <Text strong>{t.dashboard.contactAdmin}</Text>
+                                            <Text type="secondary" style={{ fontSize: "12px" }}>{t.dashboard.getSupport}</Text>
                                         </Space>
                                     </Card>
                                 </Col>

@@ -136,8 +136,8 @@ export type TranslationKeys = {
         status: string;
         systemActive: string;
         quickActions: string;
-        createNewFlow: string;
-        automateResponses: string;
+        contactAdmin: string;
+        getSupport: string;
         connectPage: string;
         linkFacebook: string;
         recentActivity: string;
@@ -349,8 +349,8 @@ export const translations: Record<Language, TranslationKeys> = {
             status: "Status",
             systemActive: "System Active",
             quickActions: "Quick Actions",
-            createNewFlow: "Create New Flow",
-            automateResponses: "Automate responses",
+            contactAdmin: "Contact Admin",
+            getSupport: "Get support from our team",
             connectPage: "Connect Page",
             linkFacebook: "Link Facebook",
             recentActivity: "Recent Activity",
@@ -560,8 +560,8 @@ export const translations: Record<Language, TranslationKeys> = {
             status: "Status",
             systemActive: "• System Active",
             quickActions: "Quick Actions",
-            createNewFlow: "Flow အသစ်ဖန်တီးရန်",
-            automateResponses: "Reply များ automate လုပ်ရန်",
+            contactAdmin: "အက်မင်ကိုဆက်သွယ်ရန်",
+            getSupport: "အကူအညီရယူရန်",
             connectPage: "Page ချိတ်ဆက်ရန်",
             linkFacebook: "Facebook ချိတ်ဆက်ရန်",
             recentActivity: "လတ်တလော Activity",
