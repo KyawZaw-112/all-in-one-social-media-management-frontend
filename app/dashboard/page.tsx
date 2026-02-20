@@ -315,7 +315,7 @@ export default function UserDashboard() {
                                                 <ShoppingCartOutlined /> View Orders ({stats?.orders_count || 0})
                                             </Button>
                                         )}
-                                        <Button block size="large" type="dashed" icon={<CreditCardOutlined />} onClick={() => router.push("/subscribe")}>
+                                        <Button block size="large" type="dashed" icon={<CreditCardOutlined />} onClick={() => router.push("/subscribe/manual")}>
                                             {t.dashboard.renewPlan}
                                         </Button>
                                         <Button block size="large" onClick={() => router.push("/dashboard/platforms")} icon={<FacebookOutlined />}>
