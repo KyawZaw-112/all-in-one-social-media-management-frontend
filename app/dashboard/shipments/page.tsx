@@ -67,6 +67,28 @@ export default function ShipmentsPage() {
                         {d.status?.toUpperCase()}
                     </Tag>
                 </Descriptions.Item>
+                {d.item_photos && d.item_photos.length > 0 && (
+                    <Descriptions.Item label={language === 'my' ? "ဓာတ်ပုံများ" : "Photos"}>
+                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                            {d.item_photos.map((url: string, idx: number) => (
+                                <img
+                                    key={idx}
+                                    src={url}
+                                    alt={`Photo ${idx + 1}`}
+                                    style={{
+                                        width: "80px",
+                                        height: "80px",
+                                        objectFit: "cover",
+                                        borderRadius: "8px",
+                                        cursor: "pointer",
+                                        border: "1px solid #eee"
+                                    }}
+                                    onClick={() => window.open(url, '_blank')}
+                                />
+                            ))}
+                        </div>
+                    </Descriptions.Item>
+                )}
             </Descriptions>
         );
     };

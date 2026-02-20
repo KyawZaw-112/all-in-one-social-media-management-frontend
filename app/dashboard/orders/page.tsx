@@ -268,6 +268,32 @@ export default function OrdersPage() {
                 <Field label={language === 'my' ? "လိပ်စာ" : "Address"} field="address" value={d.address} />
                 <Field label={language === 'my' ? "မှတ်ချက်/KPay" : "Note/KPay"} field="notes" value={d.notes} />
 
+                {d.item_photos && d.item_photos.length > 0 && (
+                    <div style={{ marginTop: "16px" }}>
+                        <div style={{ fontWeight: 600, color: "#555", marginBottom: "8px" }}>
+                            {language === 'my' ? "တောင်းဆိုထားသော ဓာတ်ပုံများ" : "Requested Photos"} ({d.item_photos.length})
+                        </div>
+                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                            {d.item_photos.map((url: string, idx: number) => (
+                                <img
+                                    key={idx}
+                                    src={url}
+                                    alt={`Photo ${idx + 1}`}
+                                    style={{
+                                        width: "100px",
+                                        height: "100px",
+                                        objectFit: "cover",
+                                        borderRadius: "8px",
+                                        cursor: "pointer",
+                                        border: "1px solid #eee"
+                                    }}
+                                    onClick={() => window.open(url, '_blank')}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div style={{ display: "flex", borderBottom: "1px solid #f0f0f0", padding: "8px 0" }}>
                     <div style={{ width: "140px", fontWeight: 600, color: "#555" }}>{language === 'my' ? "အခြေအနေ" : "Status"}</div>
                     <div style={{ flex: 1 }}>
@@ -291,12 +317,6 @@ export default function OrdersPage() {
                     </div>
                 </div>
 
-                <div style={{ marginTop: "20px", paddingTop: "10px", borderTop: "2px dashed #eee" }}>
-                    <Text type="secondary" style={{ fontSize: "11px" }}>Raw Data (Internal ID: {selectedRecord.id})</Text>
-                    <pre style={{ fontSize: "10px", background: "#f9f9f9", padding: "10px", borderRadius: "8px", marginTop: "5px", overflow: "auto", maxHeight: "150px" }}>
-                        {JSON.stringify(selectedRecord, null, 2)}
-                    </pre>
-                </div>
             </div>
         );
     };
