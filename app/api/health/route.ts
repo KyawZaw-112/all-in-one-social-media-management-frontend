@@ -1,7 +1,7 @@
 export async function GET() {
     try {
         const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/health`;
-        console.log("🔍 Testing backend connection to:", backendUrl);
+
 
         const response = await fetch(backendUrl, {
             method: "GET",
@@ -9,7 +9,7 @@ export async function GET() {
 
         if (response.ok) {
             const data = await response.json();
-            console.log("✅ Backend is reachable:", data);
+
             return new Response(JSON.stringify({
                 status: "ok",
                 message: "Backend is reachable",

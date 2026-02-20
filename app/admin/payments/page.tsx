@@ -1,17 +1,17 @@
 "use client";
 
-import {useEffect, useState} from "react";
-import {Table, Tag, Button, Space, Card, Typography, message} from "antd";
+import { useEffect, useState } from "react";
+import { Table, Tag, Button, Space, Card, Typography, message } from "antd";
 import supabase from "@/lib/supabase";
 import { Modal } from "antd";
 import Image from "next/image";
-const {Title} = Typography;
+const { Title } = Typography;
 interface Payment {
     id: string;
     user_id: string;
     amount: number;
     status: string;
-    proof_url:string;
+    proof_url: string;
 }
 export default function PaymentsPage() {
     const [payments, setPayments] = useState<any[]>([]);
@@ -20,7 +20,7 @@ export default function PaymentsPage() {
     const [preview, setPreview] = useState<string | null>(null);
     const fetchPayments = async () => {
         const {
-            data: {session},
+            data: { session },
         } = await supabase.auth.getSession();
 
         if (!session) return;
@@ -35,13 +35,13 @@ export default function PaymentsPage() {
         );
 
         const data = await res.json();
-        console.log(data)
+
 
         setPayments(data || []);
         setLoading(false);
     };
 
-    console.log("Payments:", payments);
+
 
     const getProofUrl = async (path: string) => {
         const { data, error } = await supabase.storage
@@ -85,7 +85,7 @@ export default function PaymentsPage() {
 
     const rejectPayment = async (id: string) => {
         const {
-            data: {session},
+            data: { session },
         } = await supabase.auth.getSession();
 
         await fetch(
@@ -96,7 +96,7 @@ export default function PaymentsPage() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${session?.access_token}`,
                 },
-                body: JSON.stringify({paymentId: id}),
+                body: JSON.stringify({ paymentId: id }),
             }
         );
 
@@ -121,10 +121,10 @@ export default function PaymentsPage() {
             title: "Payment Method",
             dataIndex: "payment_provider",
         },
-        {title: "Amount", dataIndex: "amount",},
+        { title: "Amount", dataIndex: "amount", },
         {
             title: "Proof",
-            render: (_:unknown, record:Payment) => (
+            render: (_: unknown, record: Payment) => (
                 <Button
                     type="primary"
                     onClick={async () => {
@@ -137,7 +137,7 @@ export default function PaymentsPage() {
             ),
         },
 
-        {title: "User ID", dataIndex: "user_id"},
+        { title: "User ID", dataIndex: "user_id" },
         {
             title: "Status",
             dataIndex: "status",

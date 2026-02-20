@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { getPlatforms } from "@/lib/api";
-import  supabase  from "@/lib/supabase";
-import {Button} from "antd";
-import {useRouter} from "next/navigation";
+import supabase from "@/lib/supabase";
+import { Button } from "antd";
+import { useRouter } from "next/navigation";
 
 interface Platform {
     id: string;
@@ -41,8 +41,7 @@ export default function PagesListPage() {
                     setPages([]);
                 }
 
-                console.log("SESSION USER:", session.user.id);
-                console.log("PLATFORM RESPONSE:", response);
+
 
             } catch (err: any) {
                 console.error("Failed to load pages:", err.message);
@@ -69,7 +68,7 @@ export default function PagesListPage() {
 
     const router = useRouter();
 
-    console.log(router)
+
 
     return (
         <div className="p-6">

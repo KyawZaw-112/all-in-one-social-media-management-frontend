@@ -1,6 +1,6 @@
 "use client";
 
-import  supabase  from "@/lib/supabase";
+import supabase from "@/lib/supabase";
 
 export default function LoginPage() {
     const login = async () => {
@@ -9,8 +9,7 @@ export default function LoginPage() {
             password: "Password123!", // must match dashboard
         });
 
-        console.log("DATA:", data);
-        console.log("ERROR:", error);
+
     };
 
     return (

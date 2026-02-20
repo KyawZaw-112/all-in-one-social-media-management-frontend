@@ -79,7 +79,7 @@ export function useSubscription() {
                         filter: `user_id=eq.${session.user.id}`,
                     },
                     (payload) => {
-                        console.log("Realtime subscription update:", payload);
+
                         fetchSubscription(); // auto refresh when updated
                     }
                 )

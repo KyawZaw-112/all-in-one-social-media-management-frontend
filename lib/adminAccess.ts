@@ -17,21 +17,20 @@ export function hasAdminAccess(record: AdminRecord | null): boolean {
 
 
 export async function checkCurrentUserAdminAccess(userId: string) {
-    const {data: adminData, error: adminError} = await supabase
+    const { data: adminData, error: adminError } = await supabase
         .from("admin_users")
         .select("*")
         .eq("user_id", userId)
         .limit(1)
         .maybeSingle();
     // ADD THESE LOGS:
-    console.log('Admin data query:', {adminData, adminError});
-    console.log('Has admin access from admin_users:', hasAdminAccess(adminData));
+
 
     if (!adminError && hasAdminAccess((adminData as AdminRecord | null) ?? null)) {
         return true;
     }
 
-    const {data: profileData, error: profileError} = await supabase
+    const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", userId)
