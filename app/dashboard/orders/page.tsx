@@ -290,6 +290,13 @@ export default function OrdersPage() {
                         )}
                     </div>
                 </div>
+
+                <div style={{ marginTop: "20px", paddingTop: "10px", borderTop: "2px dashed #eee" }}>
+                    <Text type="secondary" style={{ fontSize: "11px" }}>Raw Data (Internal ID: {selectedRecord.id})</Text>
+                    <pre style={{ fontSize: "10px", background: "#f9f9f9", padding: "10px", borderRadius: "8px", marginTop: "5px", overflow: "auto", maxHeight: "150px" }}>
+                        {JSON.stringify(selectedRecord, null, 2)}
+                    </pre>
+                </div>
             </div>
         );
     };
