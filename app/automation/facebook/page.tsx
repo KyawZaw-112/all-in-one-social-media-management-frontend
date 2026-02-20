@@ -33,7 +33,8 @@ import {
     MessageOutlined,
     ArrowLeftOutlined,
     SettingOutlined,
-    InfoCircleOutlined
+    InfoCircleOutlined,
+    CopyOutlined
 } from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
@@ -81,6 +82,12 @@ const FLOW_STEPS_DEFINITION = {
         { field: "phone", label: "Contact Phone" },
         { field: "address", label: "Delivery Address" }
     ]
+};
+
+const PLACEHOLDERS_LIST = {
+    common: ["senderName", "pageName"],
+    online_shop: ["orderNo", "full_name", "phone", "address", "item_name", "quantity", "delivery", "notes"],
+    cargo: ["refNo", "full_name", "phone", "address", "country", "shipping", "item_type", "item_name", "weight", "item_value"]
 };
 
 export default function FacebookAutoReply() {
@@ -241,6 +248,11 @@ export default function FacebookAutoReply() {
         }
     };
 
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(`{{${text}}}`);
+        message.success(`${t.common.copied}: {{${text}}}`);
+    };
+
     return (
         <AuthGuard>
             <div style={{ minHeight: "100vh", background: "#f8fafc", paddingBottom: "100px" }}>
@@ -386,9 +398,9 @@ export default function FacebookAutoReply() {
                     onCancel={() => setModalVisible(false)}
                     footer={null}
                     centered
-                    width={450}
+                    width={500}
                     styles={{ body: { padding: "10px 24px 24px 24px" } }}
-                    style={{ borderRadius: "24px", overflow: "hidden" }}
+                    style={{ borderRadius: "24px", maxWidth: "95vw" }}
                 >
                     <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false}>
                         <Form.Item label={<Text strong>{t.automation.flowName}</Text>} name="name" rules={[{ required: true, message: t.automation.nameRequired }]}>
@@ -421,9 +433,9 @@ export default function FacebookAutoReply() {
                     onCancel={() => setCustomModalVisible(false)}
                     footer={null}
                     centered
-                    width={600}
-                    styles={{ body: { padding: "10px 24px 24px 24px", maxHeight: "80vh", overflowY: "auto" } }}
-                    style={{ borderRadius: "24px" }}
+                    width={700}
+                    styles={{ body: { padding: "12px 16px 24px 16px", maxHeight: "85vh", overflowY: "auto" } }}
+                    style={{ borderRadius: "24px", maxWidth: "98vw", margin: "10px auto" }}
                 >
                     <Form form={customForm} layout="vertical" onFinish={handleCustomSubmit} requiredMark={false}>
                         <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "16px", marginBottom: "20px" }}>
@@ -431,8 +443,31 @@ export default function FacebookAutoReply() {
                                 <InfoCircleOutlined style={{ color: "#3b82f6" }} />
                                 <Text strong style={{ fontSize: "14px", color: "#334155" }}>Tips</Text>
                             </Space>
-                            <div style={{ fontSize: "12px", color: "#64748b" }}>
+                            <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "12px" }}>
                                 {t.automation.placeholders}
+                            </div>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                                {editingFlow && [
+                                    ...PLACEHOLDERS_LIST.common,
+                                    ...(editingFlow.business_type === 'cargo' ? PLACEHOLDERS_LIST.cargo : PLACEHOLDERS_LIST.online_shop)
+                                ].map(p => (
+                                    <Tag
+                                        key={p}
+                                        icon={<CopyOutlined />}
+                                        style={{
+                                            cursor: "pointer",
+                                            borderRadius: "10px",
+                                            padding: "6px 12px",
+                                            background: "#fff",
+                                            border: "1px solid #e2e8f0",
+                                            fontSize: "13px",
+                                            margin: "4px 0"
+                                        }}
+                                        onClick={() => copyToClipboard(p)}
+                                    >
+                                        {`{{${p}}}`}
+                                    </Tag>
+                                ))}
                             </div>
                         </div>
 

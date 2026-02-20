@@ -233,6 +233,7 @@ export type TranslationKeys = {
         error: string;
         warning: string;
         confirm: string;
+        copied: string;
     };
 };
 
@@ -459,6 +460,7 @@ export const translations: Record<Language, TranslationKeys> = {
             error: "Error",
             warning: "Warning",
             confirm: "Confirm",
+            copied: "Copied to clipboard",
         },
     },
     my: {
@@ -683,6 +685,7 @@ export const translations: Record<Language, TranslationKeys> = {
             error: "အမှား",
             warning: "သတိပေးချက်",
             confirm: "အတည်ပြု",
+            copied: "Copy ကူးပြီးပါပြီ",
         },
     },
 };
