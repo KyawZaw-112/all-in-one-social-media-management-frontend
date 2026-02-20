@@ -16,7 +16,6 @@ import {
     Tooltip,
     Badge,
     Divider,
-    FloatButton,
     Spin,
     Typography
 } from "antd";
@@ -381,15 +380,6 @@ export default function FacebookAutoReply() {
                     )}
                 </div>
 
-                {/* FAB */}
-                {!loading && flows.length > 0 && (
-                    <FloatButton
-                        icon={<PlusOutlined />}
-                        type="primary"
-                        style={{ right: 32, bottom: 32, width: 60, height: 60, boxShadow: "0 10px 20px rgba(99, 102, 241, 0.3)" }}
-                        onClick={() => openModal()}
-                    />
-                )}
 
                 {/* Premium Modal */}
                 <Modal
