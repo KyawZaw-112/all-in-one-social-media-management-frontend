@@ -759,7 +759,7 @@ export default function LandingPage() {
                         }}>
                             🤖
                         </div>
-                        <span style={{ fontSize: 14, fontWeight: 600, color: "#94a3b8" }}>AutoReply</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: "#94a3b8" }}>Vibe</span>
                     </div>
 
                     <div style={{ display: "flex", gap: 24, fontSize: 13 }}>

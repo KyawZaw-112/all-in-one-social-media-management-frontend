@@ -72,7 +72,6 @@ export type TranslationKeys = {
         step2Title: string;
         step2Desc: string;
         step3Title: string;
-        step3Desc: string;
         step4Title: string;
         step4Desc: string;
         ctaTitle: string;
@@ -286,7 +285,6 @@ export const translations: Record<Language, TranslationKeys> = {
             step2Title: "Connect Facebook Page",
             step2Desc: "Link your Facebook Page — just 1 click!",
             step3Title: "Setup Auto-Reply Flows",
-            step3Desc: "Set trigger keywords and create reply templates",
             step4Title: "Start Receiving Orders!",
             step4Desc: "You're all set! Orders & bookings will come in automatically! 🎉",
             ctaTitle: "Ready to automate your business?",
@@ -498,7 +496,6 @@ export const translations: Record<Language, TranslationKeys> = {
             step2Title: "Facebook Page ချိတ်ဆက်ပါ",
             step2Desc: "သင့် Facebook Page ချိတ်ဆက်ပါ — 1 click!",
             step3Title: "Auto-Reply Flows Setup",
-            step3Desc: "Trigger keywords သတ်မှတ်ပြီး reply templates ဖန်တီးပါ",
             step4Title: "Order/Booking များ လက်ခံပါ!",
             step4Desc: "ပြီးပါပြီ! Order/Booking တွေ အလိုအလျောက် လက်ခံပါမယ်! 🎉",
             ctaTitle: "သင့်လုပ်ငန်းကို automate လုပ်ဖို့ အဆင်သင့်ဖြစ်ပြီလား?",
