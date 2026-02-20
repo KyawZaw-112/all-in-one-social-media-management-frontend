@@ -206,6 +206,18 @@ export type TranslationKeys = {
         businessTypeRequired: string;
         keywordRequired: string;
         noDescription: string;
+        customize: string;
+        customizeDesc: string;
+        welcomeMsg: string;
+        welcomePlaceholder: string;
+        completionMsg: string;
+        completionPlaceholder: string;
+        stepsTitle: string;
+        stepQuestion: string;
+        stepEnabled: string;
+        saveCustomization: string;
+        customizationSaved: string;
+        placeholders: string;
     };
     common: {
         loading: string;
@@ -420,6 +432,18 @@ export const translations: Record<Language, TranslationKeys> = {
             businessTypeRequired: "Please select a business type",
             keywordRequired: "Please enter a trigger keyword",
             noDescription: "No description provided.",
+            customize: "Customize Flow",
+            customizeDesc: "Edit messages and questions for this flow",
+            welcomeMsg: "Welcome Message",
+            welcomePlaceholder: "e.g. Hello {{senderName}}, welcome to {{pageName}}!",
+            completionMsg: "Completion Message",
+            completionPlaceholder: "e.g. Order #{{orderNo}} received! We will contact {{full_name}} soon.",
+            stepsTitle: "Conversation Steps",
+            stepQuestion: "Question Text",
+            stepEnabled: "Enabled",
+            saveCustomization: "Save Customization",
+            customizationSaved: "Customization saved successfully",
+            placeholders: "Available placeholders: {{senderName}}, {{pageName}}, {{orderNo}}, {{full_name}}, {{phone}}, etc."
         },
         common: {
             loading: "Loading...",
@@ -632,6 +656,18 @@ export const translations: Record<Language, TranslationKeys> = {
             businessTypeRequired: "လုပ်ငန်းအမျိုးအစား ရွေးပေးပါ",
             keywordRequired: "Trigger keyword ထည့်ပေးပါ",
             noDescription: "အကြောင်းအရာ မထည့်ထားပါ",
+            customize: "Flow ကို ကိုယ်တိုင်ပြင်ဆင်ရန်",
+            customizeDesc: "မေးခွန်းများနှင့် မက်ဆေ့ချ်များကို စိတ်ကြိုက်ပြင်ဆင်ပါ",
+            welcomeMsg: "နှုတ်ဆက်စာ (Welcome Message)",
+            welcomePlaceholder: "ဥပမာ - မင်္ဂလာပါ {{senderName}}၊ {{pageName}} မှ ကြိုဆိုပါတယ်။",
+            completionMsg: "ပြီးဆုံးကြောင်းပြစာ (Completion Message)",
+            completionPlaceholder: "ဥပမာ - Order #{{orderNo}} လက်ခံရရှိပါပြီ။ {{full_name}} ထံ မကြာခင် ဆက်သွယ်ပါမယ်။",
+            stepsTitle: "မေးမြန်းမည့် အဆင့်ဆင့်",
+            stepQuestion: "မေးခွန်းစာသား",
+            stepEnabled: "အသုံးပြုမည်",
+            saveCustomization: "သိမ်းဆည်းမည်",
+            customizationSaved: "ပြင်ဆင်မှုများ သိမ်းဆည်းပြီးပါပြီ",
+            placeholders: "အသုံးပြုနိုင်သော placeholders များ: {{senderName}}, {{pageName}}, {{orderNo}}, {{full_name}}, {{phone}} စသည်ဖြင့်..."
         },
         common: {
             loading: "Loading...",

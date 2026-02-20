@@ -32,6 +32,8 @@ import {
     RobotOutlined,
     MessageOutlined,
     ArrowLeftOutlined,
+    SettingOutlined,
+    InfoCircleOutlined
 } from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
@@ -49,7 +51,37 @@ interface AutomationFlow {
     ai_prompt?: string;
     is_active: boolean;
     created_at: string;
+    metadata?: {
+        welcome_message?: string;
+        completion_message?: string;
+        steps?: Record<string, { question: string, enabled: boolean }>;
+    };
 }
+
+const FLOW_STEPS_DEFINITION = {
+    online_shop: [
+        { field: "order_source", label: "Order Source (e.g. Live, Message)" },
+        { field: "item_name", label: "Product Name" },
+        { field: "item_variant", label: "Color/Size" },
+        { field: "quantity", label: "Quantity" },
+        { field: "delivery", label: "Delivery Type (Pickup/Delivery)" },
+        { field: "address", label: "Delivery Address" },
+        { field: "full_name", label: "Customer Name" },
+        { field: "phone", label: "Phone Number" },
+        { field: "notes", label: "Notes/KPay Ref" }
+    ],
+    cargo: [
+        { field: "country", label: "Shipping Country" },
+        { field: "shipping", label: "Shipping Method (Air/Sea)" },
+        { field: "item_type", label: "Item Category" },
+        { field: "item_name", label: "Item Description" },
+        { field: "weight", label: "Approx. Weight" },
+        { field: "item_value", label: "Item Value" },
+        { field: "full_name", label: "Sender/Receiver Name" },
+        { field: "phone", label: "Contact Phone" },
+        { field: "address", label: "Delivery Address" }
+    ]
+};
 
 export default function FacebookAutoReply() {
     const router = useRouter();
@@ -57,8 +89,10 @@ export default function FacebookAutoReply() {
     const [flows, setFlows] = useState<AutomationFlow[]>([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [customModalVisible, setCustomModalVisible] = useState(false);
     const [editingFlow, setEditingFlow] = useState<AutomationFlow | null>(null);
     const [form] = Form.useForm();
+    const [customForm] = Form.useForm();
 
     const fetchFlows = async () => {
         setLoading(true);
@@ -162,6 +196,51 @@ export default function FacebookAutoReply() {
         setModalVisible(true);
     };
 
+    const openCustomModal = (flow: AutomationFlow, e: any) => {
+        e.stopPropagation();
+        setEditingFlow(flow);
+
+        // Prepare initial values from metadata or defaults
+        const metadata = flow.metadata || {};
+        const stepsData: any = {};
+
+        const businessType = flow.business_type === 'cargo' ? 'cargo' : 'online_shop';
+        const defaultSteps = FLOW_STEPS_DEFINITION[businessType];
+
+        defaultSteps.forEach(s => {
+            stepsData[s.field] = {
+                question: metadata.steps?.[s.field]?.question || "",
+                enabled: metadata.steps?.[s.field]?.enabled ?? true
+            };
+        });
+
+        customForm.setFieldsValue({
+            welcome_message: metadata.welcome_message || "",
+            completion_message: metadata.completion_message || "",
+            steps: stepsData
+        });
+
+        setCustomModalVisible(true);
+    };
+
+    const handleCustomSubmit = async (values: any) => {
+        if (!editingFlow) return;
+
+        try {
+            const token = localStorage.getItem("authToken");
+            await axios.put(`${API_URL}/api/merchants/flows/${editingFlow.id}`, {
+                metadata: values
+            }, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            message.success(t.automation.customizationSaved);
+            setCustomModalVisible(false);
+            fetchFlows();
+        } catch (error: any) {
+            message.error(t.common.error);
+        }
+    };
+
     return (
         <AuthGuard>
             <div style={{ minHeight: "100vh", background: "#f8fafc", paddingBottom: "100px" }}>
@@ -257,6 +336,15 @@ export default function FacebookAutoReply() {
                                                 </div>
                                             </div>
                                             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                                <Tooltip title={t.automation.customize}>
+                                                    <Button
+                                                        type="text"
+                                                        shape="circle"
+                                                        icon={<SettingOutlined />}
+                                                        onClick={(e) => openCustomModal(flow, e)}
+                                                        style={{ background: "#f1f5f9" }}
+                                                    />
+                                                </Tooltip>
                                                 <Tooltip title={flow.is_active ? "Turn Off" : "Turn On"}>
                                                     <Switch
                                                         checked={flow.is_active}
@@ -316,6 +404,67 @@ export default function FacebookAutoReply() {
                         <div style={{ marginTop: "24px" }}>
                             <Button type="primary" htmlType="submit" block size="large" style={{ height: "50px", borderRadius: "12px", fontWeight: 700, background: "#0f172a", border: "none" }}>
                                 {editingFlow ? t.automation.saveChanges : t.automation.createFlow}
+                            </Button>
+                        </div>
+                    </Form>
+                </Modal>
+
+                {/* Customization Modal */}
+                <Modal
+                    title={
+                        <Space direction="vertical" style={{ gap: 0 }}>
+                            <div style={{ fontSize: "20px", fontWeight: 700 }}>{t.automation.customize}</div>
+                            <Text type="secondary" style={{ fontSize: "12px" }}>{t.automation.customizeDesc}</Text>
+                        </Space>
+                    }
+                    open={customModalVisible}
+                    onCancel={() => setCustomModalVisible(false)}
+                    footer={null}
+                    centered
+                    width={600}
+                    styles={{ body: { padding: "10px 24px 24px 24px", maxHeight: "80vh", overflowY: "auto" } }}
+                    style={{ borderRadius: "24px" }}
+                >
+                    <Form form={customForm} layout="vertical" onFinish={handleCustomSubmit} requiredMark={false}>
+                        <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "16px", marginBottom: "20px" }}>
+                            <Space size={4} style={{ marginBottom: "8px", display: "flex", alignItems: "center" }}>
+                                <InfoCircleOutlined style={{ color: "#3b82f6" }} />
+                                <Text strong style={{ fontSize: "14px", color: "#334155" }}>Tips</Text>
+                            </Space>
+                            <div style={{ fontSize: "12px", color: "#64748b" }}>
+                                {t.automation.placeholders}
+                            </div>
+                        </div>
+
+                        <Form.Item label={<Text strong>{t.automation.welcomeMsg}</Text>} name="welcome_message">
+                            <TextArea placeholder={t.automation.welcomePlaceholder} rows={3} style={{ borderRadius: "10px" }} />
+                        </Form.Item>
+
+                        <Form.Item label={<Text strong>{t.automation.completionMsg}</Text>} name="completion_message">
+                            <TextArea placeholder={t.automation.completionPlaceholder} rows={4} style={{ borderRadius: "10px" }} />
+                        </Form.Item>
+
+                        <Divider style={{ margin: "24px 0" }}>
+                            <Text strong style={{ fontSize: "16px" }}>{t.automation.stepsTitle}</Text>
+                        </Divider>
+
+                        {editingFlow && (FLOW_STEPS_DEFINITION[editingFlow.business_type === 'cargo' ? 'cargo' : 'online_shop']).map((step) => (
+                            <Card key={step.field} size="small" style={{ marginBottom: "12px", borderRadius: "12px", border: "1px solid #f1f5f9" }} styles={{ body: { padding: "12px 16px" } }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                                    <Text strong>{step.label}</Text>
+                                    <Form.Item name={["steps", step.field, "enabled"]} valuePropName="checked" noStyle initialValue={true}>
+                                        <Switch size="small" />
+                                    </Form.Item>
+                                </div>
+                                <Form.Item name={["steps", step.field, "question"]} noStyle>
+                                    <Input placeholder={t.automation.stepQuestion} style={{ borderRadius: "8px" }} />
+                                </Form.Item>
+                            </Card>
+                        ))}
+
+                        <div style={{ marginTop: "32px", position: "sticky", bottom: 0, background: "#fff", paddingTop: "16px", borderTop: "1px solid #f1f5f9" }}>
+                            <Button type="primary" htmlType="submit" block size="large" style={{ height: "50px", borderRadius: "12px", fontWeight: 700, background: "#0f172a", border: "none" }}>
+                                {t.automation.saveCustomization}
                             </Button>
                         </div>
                     </Form>
