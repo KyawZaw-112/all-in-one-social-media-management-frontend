@@ -617,7 +617,7 @@ export default function LandingPage() {
                             color: "#22c55e",
                         },
                         {
-                            step: "04",
+                            step: "03",
                             title: t.landing.step4Title,
                             desc: t.landing.step4Desc,
                             color: "#fb923c",
