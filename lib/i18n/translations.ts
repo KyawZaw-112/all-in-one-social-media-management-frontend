@@ -149,6 +149,7 @@ export type TranslationKeys = {
         freeUser: string;
         editProfile: string;
         billingHistory: string;
+        renewPlan: string;
     };
     platforms: {
         title: string;
@@ -362,6 +363,7 @@ export const translations: Record<Language, TranslationKeys> = {
             freeUser: "Free User",
             editProfile: "Edit Profile",
             billingHistory: "Billing History",
+            renewPlan: "Renew / Upgrade Plan",
         },
         platforms: {
             title: "Social Platforms",
@@ -573,6 +575,7 @@ export const translations: Record<Language, TranslationKeys> = {
             freeUser: "Free User",
             editProfile: "Profile ပြင်ဆင်ရန်",
             billingHistory: "Billing History",
+            renewPlan: "အစီအစဉ်အသစ်ဝယ်ရန် / သက်တမ်းတိုးရန်",
         },
         platforms: {
             title: "Social Platforms",
