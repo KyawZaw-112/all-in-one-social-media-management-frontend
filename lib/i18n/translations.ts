@@ -138,6 +138,8 @@ export type TranslationKeys = {
         quickActions: string;
         contactAdmin: string;
         getSupport: string;
+        automationSettings: string;
+        manageFlows: string;
         connectPage: string;
         linkFacebook: string;
         recentActivity: string;
@@ -365,6 +367,8 @@ export const translations: Record<Language, TranslationKeys> = {
             quickActions: "Quick Actions",
             contactAdmin: "Contact Admin",
             getSupport: "Get support from our team",
+            automationSettings: "Bot Settings",
+            manageFlows: "Manage Auto-Reply Flows",
             connectPage: "Connect Page",
             linkFacebook: "Link Facebook",
             recentActivity: "Recent Activity",
@@ -590,6 +594,8 @@ export const translations: Record<Language, TranslationKeys> = {
             quickActions: "Quick Actions",
             contactAdmin: "အက်မင်ကိုဆက်သွယ်ရန်",
             getSupport: "အကူအညီရယူရန်",
+            automationSettings: "အလိုအလျောက်ပြန်စာ စနစ်",
+            manageFlows: "Flow များကို ပြင်ဆင်ရန်",
             connectPage: "Page ချိတ်ဆက်ရန်",
             linkFacebook: "Facebook ချိတ်ဆက်ရန်",
             recentActivity: "လတ်တလော Activity",

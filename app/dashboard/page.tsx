@@ -214,11 +214,11 @@ export default function UserDashboard() {
 
                             <Row gutter={[16, 16]}>
                                 <Col span={12}>
-                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #6366f1" }} onClick={() => window.open("https://m.me/vibe.myanmar.app", "_blank")}>
+                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #6366f1" }} onClick={() => router.push("/automation/facebook")}>
                                         <Space direction="vertical">
-                                            <CustomerServiceOutlined style={{ fontSize: "24px", color: "#6366f1" }} />
-                                            <Text strong>{t.dashboard.contactAdmin}</Text>
-                                            <Text type="secondary" style={{ fontSize: "12px" }}>{t.dashboard.getSupport}</Text>
+                                            <RobotOutlined style={{ fontSize: "24px", color: "#6366f1" }} />
+                                            <Text strong>{t.dashboard.automationSettings}</Text>
+                                            <Text type="secondary" style={{ fontSize: "12px" }}>{t.dashboard.manageFlows}</Text>
                                         </Space>
                                     </Card>
                                 </Col>

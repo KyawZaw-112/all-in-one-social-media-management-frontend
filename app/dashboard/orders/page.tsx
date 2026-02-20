@@ -162,9 +162,9 @@ export default function OrdersPage() {
             let columns, rows;
 
             if (isCargo) {
-                columns = ["ID", "Date", "Sender", "Phone", "Item", "Weight", "Country", "Shipping", "Address", "Status"];
+                columns = ["Ref No", "Date", "Sender", "Phone", "Item", "Weight", "Country", "Shipping", "Address", "Status"];
                 rows = filteredData.map((item: any) => [
-                    item.id,
+                    item.order_no || (item.id ? `#...${item.id.slice(-6).toUpperCase()}` : "-"),
                     dayjs(item.created_at).format("DD/MM/YYYY"),
                     item.full_name || "-",
                     item.phone || "-",
@@ -176,9 +176,9 @@ export default function OrdersPage() {
                     item.status?.toUpperCase()
                 ]);
             } else {
-                columns = ["ID", "Date", "Customer", "Phone", "Item", "Qty", "Delivery", "Address", "Note/KPay", "Status"];
+                columns = ["Order No", "Date", "Customer", "Phone", "Item", "Qty", "Delivery", "Address", "Note/KPay", "Status"];
                 rows = filteredData.map((item: any) => [
-                    item.id,
+                    item.order_no || (item.id ? `#...${item.id.slice(-6).toUpperCase()}` : "-"),
                     dayjs(item.created_at).format("DD/MM/YYYY"),
                     item.full_name || "-",
                     item.phone || "-",
@@ -199,7 +199,7 @@ export default function OrdersPage() {
                 headStyles: { fillColor: headerColor as any, fontSize: 7, fontStyle: 'bold' },
                 styles: { fontSize: 7, cellPadding: 2 },
                 columnStyles: {
-                    0: { cellWidth: 30 },
+                    0: { cellWidth: 35 },
                 },
             });
 
@@ -237,7 +237,11 @@ export default function OrdersPage() {
 
         return (
             <div>
-                <Field label={language === 'my' ? "အိုင်ဒီ" : "ID"} field="id" value={d.id} />
+                <Field
+                    label={isCargo ? (language === 'my' ? "Ref No" : "Ref No") : (language === 'my' ? "Order No" : "Order No")}
+                    field="order_no"
+                    value={d.order_no || `#...${d.id?.slice(-6).toUpperCase()}`}
+                />
                 <Field label={language === 'my' ? "အမည်" : "Name"} field="full_name" value={d.full_name} />
                 <Field label={language === 'my' ? "ဖုန်း" : "Phone"} field="phone" value={d.phone} />
                 <Field label={language === 'my' ? "ရက်စွဲ" : "Date"} field="" value={dayjs(d.created_at).format("DD/MM/YYYY HH:mm")} />
@@ -292,12 +296,15 @@ export default function OrdersPage() {
 
     const shopColumns = [
         {
-            title: language === 'my' ? "အိုင်ဒီ" : "ID",
-            dataIndex: "id",
-            key: "id",
-            width: 90,
-            responsive: ['md'] as any,
-            render: (id: string) => <Text copyable={{ text: id }}>{`#...${id.slice(-6).toUpperCase()}`}</Text>
+            title: language === 'my' ? "အော်ဒါနံပါတ်" : "Order No",
+            dataIndex: "order_no",
+            key: "order_no",
+            width: 120,
+            render: (orderNo: string, record: any) => (
+                <Text strong copyable={{ text: orderNo || record.id }}>
+                    {orderNo || `#...${record.id.slice(-6).toUpperCase()}`}
+                </Text>
+            )
         },
         {
             title: language === 'my' ? "ရက်စွဲ" : "Date",
@@ -371,12 +378,15 @@ export default function OrdersPage() {
 
     const cargoColumns = [
         {
-            title: language === 'my' ? "အိုင်ဒီ" : "ID",
-            dataIndex: "id",
-            key: "id",
-            width: 90,
-            responsive: ['md'] as any,
-            render: (id: string) => <Text copyable={{ text: id }}>{`#...${id.slice(-6).toUpperCase()}`}</Text>
+            title: language === 'my' ? "Ref No" : "Ref No",
+            dataIndex: "order_no",
+            key: "order_no",
+            width: 120,
+            render: (orderNo: string, record: any) => (
+                <Text strong copyable={{ text: orderNo || record.id }}>
+                    {orderNo || `#...${record.id.slice(-6).toUpperCase()}`}
+                </Text>
+            )
         },
         {
             title: language === 'my' ? "ရက်စွဲ" : "Date",
