@@ -69,7 +69,7 @@ export default function Navbar() {
             }}
         >
             <Link href="/dashboard" style={{ fontWeight: 600 }}>
-                🚀 AutoReply
+                Vibe
             </Link>
 
             <Menu

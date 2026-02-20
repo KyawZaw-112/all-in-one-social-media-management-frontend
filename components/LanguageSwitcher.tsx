@@ -30,16 +30,7 @@ export default function LanguageSwitcher() {
             ),
             onClick: () => setLanguage("en"),
         },
-        {
-            key: "th",
-            label: (
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span>{languageFlags.th}</span>
-                    <span>{languageNames.th}</span>
-                </div>
-            ),
-            onClick: () => setLanguage("th"),
-        },
+
     ];
 
     return (
