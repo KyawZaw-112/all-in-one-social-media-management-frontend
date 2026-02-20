@@ -64,7 +64,7 @@ export default function LandingPage() {
                     }}>
                         🤖
                     </div>
-                    <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>AutoReply</span>
+                    <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>Vibe</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <div className="hidden sm:block">
@@ -615,12 +615,6 @@ export default function LandingPage() {
                             title: t.landing.step2Title,
                             desc: t.landing.step2Desc,
                             color: "#22c55e",
-                        },
-                        {
-                            step: "03",
-                            title: t.landing.step3Title,
-                            desc: t.landing.step3Desc,
-                            color: "#a78bfa",
                         },
                         {
                             step: "04",
