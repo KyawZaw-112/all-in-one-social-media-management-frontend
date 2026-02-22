@@ -436,7 +436,7 @@ export default function FacebookAutoReply() {
                             <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "12px" }}>
                                 {t.automation.placeholders}
                             </div>
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "16px" }}>
                                 {editingFlow && [
                                     ...PLACEHOLDERS_LIST.common,
                                     ...(editingFlow.business_type === 'cargo' ? PLACEHOLDERS_LIST.cargo : PLACEHOLDERS_LIST.online_shop)
@@ -459,6 +459,33 @@ export default function FacebookAutoReply() {
                                     </Tag>
                                 ))}
                             </div>
+
+                            {/* Quick Management Link */}
+                            {editingFlow && editingFlow.business_type !== 'default' && (
+                                <div style={{
+                                    borderTop: "1px solid #e2e8f0",
+                                    paddingTop: "16px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "8px"
+                                }}>
+                                    <Text type="secondary" style={{ fontSize: "12px" }}>
+                                        {editingFlow.business_type === 'online_shop' ? t.automation.manageProductsTip : t.automation.manageRatesTip}
+                                    </Text>
+                                    <Button
+                                        icon={editingFlow.business_type === 'online_shop' ? <ShopOutlined /> : <CarOutlined />}
+                                        style={{
+                                            borderRadius: "10px",
+                                            width: "fit-content",
+                                            background: "#fff",
+                                            fontWeight: 600
+                                        }}
+                                        onClick={() => router.push(editingFlow.business_type === 'online_shop' ? "/dashboard/products" : "/dashboard/rates")}
+                                    >
+                                        {editingFlow.business_type === 'online_shop' ? t.automation.manageProducts : t.automation.manageRates}
+                                    </Button>
+                                </div>
+                            )}
                         </div>
 
                         <Form.Item label={<Text strong>{t.automation.welcomeMsg}</Text>} name="welcome_message">

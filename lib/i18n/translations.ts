@@ -220,6 +220,10 @@ export type TranslationKeys = {
         saveCustomization: string;
         customizationSaved: string;
         placeholders: string;
+        manageProducts: string;
+        manageRates: string;
+        manageProductsTip: string;
+        manageRatesTip: string;
     };
     common: {
         loading: string;
@@ -448,7 +452,11 @@ export const translations: Record<Language, TranslationKeys> = {
             stepEnabled: "Enabled",
             saveCustomization: "Save Customization",
             customizationSaved: "Customization saved successfully",
-            placeholders: "Available placeholders: {{senderName}}, {{pageName}}, {{orderNo}}, {{full_name}}, {{phone}}, etc."
+            placeholders: "Available placeholders: {{senderName}}, {{pageName}}, {{orderNo}}, {{full_name}}, {{phone}}, etc.",
+            manageProducts: "Manage Products",
+            manageRates: "Manage Rates",
+            manageProductsTip: "Add or edit products to use in your flow.",
+            manageRatesTip: "Add or edit shipping rates to use in your flow.",
         },
         common: {
             loading: "Loading...",
@@ -675,7 +683,11 @@ export const translations: Record<Language, TranslationKeys> = {
             stepEnabled: "အသုံးပြုမည်",
             saveCustomization: "သိမ်းဆည်းမည်",
             customizationSaved: "ပြင်ဆင်မှုများ သိမ်းဆည်းပြီးပါပြီ",
-            placeholders: "အသုံးပြုနိုင်သော placeholders များ: {{senderName}}, {{pageName}}, {{orderNo}}, {{full_name}}, {{phone}} စသည်ဖြင့်..."
+            placeholders: "အသုံးပြုနိုင်သော placeholders များ: {{senderName}}, {{pageName}}, {{orderNo}}, {{full_name}}, {{phone}} စသည်ဖြင့်...",
+            manageProducts: "Product စာရင်း ပြင်ဆင်ရန်",
+            manageRates: "ပို့ဆောင်ခနှုန်းထား ပြင်ဆင်ရန်",
+            manageProductsTip: "Flow ထဲမှာ သုံးဖို့ product တွေကို ဒီမှာ အရင်ထည့်ထားပေးပါ။",
+            manageRatesTip: "Flow ထဲမှာ သုံးဖို့ shipping rate တွေကို ဒီမှာ အရင်ထည့်ထားပေးပါ။",
         },
         common: {
             loading: "Loading...",
