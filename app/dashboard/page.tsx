@@ -29,7 +29,10 @@ import {
     SendOutlined,
     MessageOutlined,
     CheckCircleOutlined,
-    CustomerServiceOutlined
+    CustomerServiceOutlined,
+    ShoppingOutlined,
+    InboxOutlined,
+    CalculatorOutlined
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
@@ -45,7 +48,7 @@ const { Title, Text } = Typography;
 
 export default function UserDashboard() {
     const router = useRouter();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [stats, setStats] = useState<any>(null);
     const [autoReplyOn, setAutoReplyOn] = useState(false);
     const [toggling, setToggling] = useState(false);
@@ -213,7 +216,7 @@ export default function UserDashboard() {
                             </div>
 
                             <Row gutter={[16, 16]}>
-                                <Col span={12}>
+                                <Col xs={12} md={8}>
                                     <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #6366f1" }} onClick={() => router.push("/automation/facebook")}>
                                         <Space direction="vertical">
                                             <RobotOutlined style={{ fontSize: "24px", color: "#6366f1" }} />
@@ -222,7 +225,7 @@ export default function UserDashboard() {
                                         </Space>
                                     </Card>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={12} md={8}>
                                     <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #1877f2" }} onClick={() => router.push("/dashboard/platforms")}>
                                         <Space direction="vertical">
                                             <FacebookOutlined style={{ fontSize: "24px", color: "#1877f2" }} />
@@ -231,6 +234,38 @@ export default function UserDashboard() {
                                         </Space>
                                     </Card>
                                 </Col>
+                                {stats?.business_type === 'cargo' ? (
+                                    <Col xs={12} md={8}>
+                                        <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #f59e0b" }} onClick={() => router.push("/dashboard/rates")}>
+                                            <Space direction="vertical">
+                                                <CalculatorOutlined style={{ fontSize: "24px", color: "#f59e0b" }} />
+                                                <Text strong>{language === 'my' ? 'ပို့ဆောင်ခ တွက်ချက်' : 'Rate Calculator'}</Text>
+                                                <Text type="secondary" style={{ fontSize: "12px" }}>{language === 'my' ? 'ပို့ဆောင်ခ သတ်မှတ်ရန်' : 'Set shipping rates'}</Text>
+                                            </Space>
+                                        </Card>
+                                    </Col>
+                                ) : (
+                                    <>
+                                        <Col xs={12} md={8}>
+                                            <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #10b981" }} onClick={() => router.push("/dashboard/products")}>
+                                                <Space direction="vertical">
+                                                    <ShoppingOutlined style={{ fontSize: "24px", color: "#10b981" }} />
+                                                    <Text strong>{language === 'my' ? 'ပစ္စည်းစာရင်း' : 'Products'}</Text>
+                                                    <Text type="secondary" style={{ fontSize: "12px" }}>{language === 'my' ? 'ပစ္စည်းစီမံရန်' : 'Manage catalog'}</Text>
+                                                </Space>
+                                            </Card>
+                                        </Col>
+                                        <Col xs={12} md={8}>
+                                            <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #8b5cf6" }} onClick={() => router.push("/dashboard/warehouse")}>
+                                                <Space direction="vertical">
+                                                    <InboxOutlined style={{ fontSize: "24px", color: "#8b5cf6" }} />
+                                                    <Text strong>{language === 'my' ? 'သိုလှောင်ရုံ' : 'Warehouse'}</Text>
+                                                    <Text type="secondary" style={{ fontSize: "12px" }}>{language === 'my' ? 'လက်ကျန်စစ်ဆေးရန်' : 'Stock management'}</Text>
+                                                </Space>
+                                            </Card>
+                                        </Col>
+                                    </>
+                                )}
                             </Row>
 
                             <Divider style={{ margin: "40px 0" }} />
