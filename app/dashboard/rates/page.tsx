@@ -31,6 +31,7 @@ export default function RatesPage() {
     // Calculator state
     const [calcCountry, setCalcCountry] = useState<string>("");
     const [calcShipping, setCalcShipping] = useState<string>("");
+    const [calcCategory, setCalcCategory] = useState<string>("");
     const [calcWeight, setCalcWeight] = useState<number>(1);
     const [calcResult, setCalcResult] = useState<any>(null);
     const [calculating, setCalculating] = useState(false);
@@ -92,7 +93,7 @@ export default function RatesPage() {
     };
 
     const handleCalculate = async () => {
-        if (!calcCountry || !calcShipping || !calcWeight) {
+        if (!calcCountry || !calcShipping || !calcCategory || !calcWeight) {
             message.warning(language === "my" ? "အချက်အလက်အားလုံးဖြည့်ပေးပါ" : "Please fill all fields");
             return;
         }
@@ -102,6 +103,7 @@ export default function RatesPage() {
             const res = await axios.post(`${API_URL}/api/rates/calculate`, {
                 country: calcCountry,
                 shipping_type: calcShipping,
+                item_category: calcCategory,
                 weight_kg: calcWeight
             }, { headers: { Authorization: `Bearer ${token}` } });
             setCalcResult(res.data.data);
@@ -129,7 +131,8 @@ export default function RatesPage() {
 
     // Get unique countries and shipping types for calculator dropdowns
     const countries = [...new Set(rates.map(r => r.country))];
-    const shippingTypes = [...new Set(rates.map(r => r.shipping_type))];
+    const shippingTypes = [...new Set(rates.filter(r => r.country === calcCountry).map(r => r.shipping_type))];
+    const categories = [...new Set(rates.filter(r => r.country === calcCountry && r.shipping_type === calcShipping).map(r => r.item_category))];
 
     const columns = [
         {
@@ -147,6 +150,12 @@ export default function RatesPage() {
                     {t === "Air" || t === "လေကြောင်း" ? "✈️" : "⚡"} {t}
                 </Tag>
             )
+        },
+        {
+            title: language === "my" ? "အမျိုးအစား" : "Category",
+            dataIndex: "item_category",
+            key: "item_category",
+            render: (cat: string) => <Tag color="cyan">{cat}</Tag>
         },
         {
             title: language === "my" ? "နှုန်း (per kg)" : "Rate (per kg)",
@@ -220,18 +229,31 @@ export default function RatesPage() {
                                 {countries.map(c => <Select.Option key={c} value={c}>{c}</Select.Option>)}
                             </Select>
                         </Col>
-                        <Col xs={24} sm={6}>
+                        <Col xs={24} sm={5}>
                             <Text type="secondary">{language === "my" ? "ပို့ဆောင်မှု" : "Shipping"}</Text>
                             <Select
                                 style={{ width: "100%", marginTop: 4 }}
                                 placeholder={language === "my" ? "ရွေးပါ" : "Select"}
                                 value={calcShipping || undefined}
                                 onChange={setCalcShipping}
+                                disabled={!calcCountry}
                             >
                                 {shippingTypes.map(t => <Select.Option key={t} value={t}>{t}</Select.Option>)}
                             </Select>
                         </Col>
                         <Col xs={24} sm={5}>
+                            <Text type="secondary">{language === "my" ? "ပစ္စည်းအမျိုးအစား" : "Category"}</Text>
+                            <Select
+                                style={{ width: "100%", marginTop: 4 }}
+                                placeholder={language === "my" ? "ရွေးပါ" : "Select"}
+                                value={calcCategory || undefined}
+                                onChange={setCalcCategory}
+                                disabled={!calcShipping}
+                            >
+                                {categories.map(c => <Select.Option key={c} value={c}>{c}</Select.Option>)}
+                            </Select>
+                        </Col>
+                        <Col xs={24} sm={4}>
                             <Text type="secondary">{language === "my" ? "အလေးချိန် (kg)" : "Weight (kg)"}</Text>
                             <InputNumber
                                 style={{ width: "100%", marginTop: 4 }}
@@ -241,7 +263,7 @@ export default function RatesPage() {
                                 onChange={v => setCalcWeight(v || 1)}
                             />
                         </Col>
-                        <Col xs={24} sm={3}>
+                        <Col xs={24} sm={2}>
                             <div style={{ marginTop: 20 }}>
                                 <Button
                                     type="primary"
@@ -250,7 +272,7 @@ export default function RatesPage() {
                                     onClick={handleCalculate}
                                     style={{ background: "#f59e0b", borderColor: "#f59e0b" }}
                                 >
-                                    {language === "my" ? "တွက်မည်" : "Calculate"}
+                                    {language === "my" ? "တွက်ရှာ" : "Calc"}
                                 </Button>
                             </div>
                         </Col>
@@ -320,6 +342,17 @@ export default function RatesPage() {
                                 <Select.Option value="Air">✈️ Air (လေကြောင်း)</Select.Option>
                                 <Select.Option value="Express">⚡ Express</Select.Option>
                                 <Select.Option value="Sea">🚢 Sea (ရေကြောင်း)</Select.Option>
+                            </Select>
+                        </Form.Item>
+                        <Form.Item name="item_category" label={language === "my" ? "ပစ္စည်းအမျိုးအစား" : "Item Category"}
+                            initialValue="General"
+                            rules={[{ required: true, message: "Required" }]}>
+                            <Select placeholder={language === "my" ? "ရွေးပါ" : "Select"}>
+                                <Select.Option value="General">📦 General</Select.Option>
+                                <Select.Option value="Electronics">📱 Electronics</Select.Option>
+                                <Select.Option value="Cosmetics">🧴 Cosmetics</Select.Option>
+                                <Select.Option value="Food">🍜 Food</Select.Option>
+                                <Select.Option value="Clothing">👗 Clothing</Select.Option>
                             </Select>
                         </Form.Item>
                         <Row gutter={16}>
