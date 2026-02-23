@@ -328,21 +328,72 @@ export default function RatesPage() {
                     <Form form={form} layout="vertical" onFinish={handleSave}>
                         <Form.Item name="country" label={language === "my" ? "နိုင်ငံ" : "Country"}
                             rules={[{ required: true, message: "Required" }]}>
-                            <Select placeholder={language === "my" ? "နိုင်ငံရွေးပါ" : "Select country"}>
-                                <Select.Option value="ထိုင်း">🇹🇭 ထိုင်း (Thailand)</Select.Option>
-                                <Select.Option value="ဂျပန်">🇯🇵 ဂျပန် (Japan)</Select.Option>
-                                <Select.Option value="တရုတ်">🇨🇳 တရုတ် (China)</Select.Option>
-                                <Select.Option value="ကိုရီးယား">🇰🇷 ကိုရီးယား (Korea)</Select.Option>
-                                <Select.Option value="အခြား">🌍 အခြား (Other)</Select.Option>
-                            </Select>
+                            <Select
+                                showSearch
+                                placeholder={language === "my" ? "နိုင်ငံရွေးပါ သို့မဟုတ် အသစ်ရိုက်ထည့်ပါ" : "Select or type new country"}
+                                tokenSeparators={[',']}
+                                options={[
+                                    { value: 'ထိုင်း', label: '🇹🇭 ထိုင်း (Thailand)' },
+                                    { value: 'ဂျပန်', label: '🇯🇵 ဂျပန် (Japan)' },
+                                    { value: 'တရုတ်', label: '🇨🇳 တရုတ် (China)' },
+                                    { value: 'ကိုရီးယား', label: '🇰🇷 ကိုရီးယား (Korea)' },
+                                    { value: 'အခြား', label: '🌍 အခြား (Other)' },
+                                    ...countries.filter(c => !['ထိုင်း', 'ဂျပန်', 'တရုတ်', 'ကိုရီးယား', 'အခြား'].includes(c)).map(c => ({ value: c, label: c }))
+                                ]}
+                                dropdownRender={(menu) => (
+                                    <>
+                                        {menu}
+                                        <Divider style={{ margin: '8px 0' }} />
+                                        <div style={{ padding: '0 8px 4px' }}>
+                                            <Input
+                                                placeholder={language === "my" ? "နိုင်ငံအမည်အသစ်..." : "Type new country..."}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        const val = (e.target as HTMLInputElement).value;
+                                                        if (val) {
+                                                            form.setFieldsValue({ country: val });
+                                                            e.stopPropagation();
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            />
                         </Form.Item>
                         <Form.Item name="shipping_type" label={language === "my" ? "ပို့ဆောင်မှုအမျိုးအစား" : "Shipping Type"}
                             rules={[{ required: true, message: "Required" }]}>
-                            <Select placeholder={language === "my" ? "ရွေးပါ" : "Select"}>
-                                <Select.Option value="Air">✈️ Air (လေကြောင်း)</Select.Option>
-                                <Select.Option value="Express">⚡ Express</Select.Option>
-                                <Select.Option value="Sea">🚢 Sea (ရေကြောင်း)</Select.Option>
-                            </Select>
+                            <Select
+                                showSearch
+                                placeholder={language === "my" ? "ရွေးပါ သို့မဟုတ် အသစ်ရိုက်ပါ" : "Select or type new"}
+                                options={[
+                                    { value: 'Air', label: '✈️ Air (လေကြောင်း)' },
+                                    { value: 'Express', label: '⚡ Express' },
+                                    { value: 'Sea', label: '🚢 Sea (ရေကြောင်း)' },
+                                    ...shippingTypes.filter(t => !['Air', 'Express', 'Sea'].includes(t)).map(t => ({ value: t, label: t }))
+                                ]}
+                                dropdownRender={(menu) => (
+                                    <>
+                                        {menu}
+                                        <Divider style={{ margin: '8px 0' }} />
+                                        <div style={{ padding: '0 8px 4px' }}>
+                                            <Input
+                                                placeholder={language === "my" ? "အမျိုးအစားအသစ်..." : "Type new type..."}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        const val = (e.target as HTMLInputElement).value;
+                                                        if (val) {
+                                                            form.setFieldsValue({ shipping_type: val });
+                                                            e.stopPropagation();
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            />
                         </Form.Item>
                         <Form.Item name="item_category" label={language === "my" ? "ပစ္စည်းအမျိုးအစား" : "Item Category"}
                             initialValue="General"
