@@ -51,27 +51,16 @@ export default function ProductsPage() {
         try {
             const token = localStorage.getItem("authToken");
 
-            // 🚀 Upload Image to Supabase if new file selected
+            // 🚀 Handle Image Upload via Base64 to Backend
             if (fileList.length > 0 && fileList[0].originFileObj) {
                 const file = fileList[0].originFileObj;
-                const { data: { session } } = await supabase.auth.getSession();
-                const userId = session?.user.id || 'unknown';
-
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Date.now()}.${fileExt}`;
-                const filePath = `${userId}/${fileName}`;
-
-                const { error: uploadError } = await supabase.storage
-                    .from('product-images')
-                    .upload(filePath, file);
-
-                if (uploadError) throw uploadError;
-
-                const { data: { publicUrl } } = supabase.storage
-                    .from('product-images')
-                    .getPublicUrl(filePath);
-
-                values.image_url = publicUrl;
+                const base64: string = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = error => reject(error);
+                });
+                values.image_base64 = base64;
             }
             if (editing) {
                 await axios.patch(`${API_URL}/api/products/${editing.id}`, values, {
