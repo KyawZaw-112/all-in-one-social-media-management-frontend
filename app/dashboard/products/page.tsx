@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import {
     Table, Card, Typography, Tag, Space, Button, message,
-    Modal, Input, InputNumber, Form, Switch, Popconfirm, Row, Col, Statistic
+    Modal, Input, InputNumber, Form, Switch, Popconfirm, Row, Col, Statistic, Upload
 } from "antd";
 import {
     ShoppingOutlined, PlusOutlined, ArrowLeftOutlined,
-    EditOutlined, DeleteOutlined, InboxOutlined
+    EditOutlined, DeleteOutlined, InboxOutlined, UploadOutlined
 } from "@ant-design/icons";
+import supabase from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { API_URL } from "@/lib/apiConfig";
@@ -23,6 +24,7 @@ export default function ProductsPage() {
     const [modalVisible, setModalVisible] = useState(false);
     const [editing, setEditing] = useState<any>(null);
     const [saving, setSaving] = useState(false);
+    const [fileList, setFileList] = useState<any[]>([]);
     const [form] = Form.useForm();
     const { language } = useLanguage();
     const router = useRouter();
@@ -48,6 +50,29 @@ export default function ProductsPage() {
         setSaving(true);
         try {
             const token = localStorage.getItem("authToken");
+
+            // 🚀 Upload Image to Supabase if new file selected
+            if (fileList.length > 0 && fileList[0].originFileObj) {
+                const file = fileList[0].originFileObj;
+                const { data: { session } } = await supabase.auth.getSession();
+                const userId = session?.user.id || 'unknown';
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+                const filePath = `${userId}/${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('product-images')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('product-images')
+                    .getPublicUrl(filePath);
+
+                values.image_url = publicUrl;
+            }
             if (editing) {
                 await axios.patch(`${API_URL}/api/products/${editing.id}`, values, {
                     headers: { Authorization: `Bearer ${token}` }
@@ -61,6 +86,7 @@ export default function ProductsPage() {
             }
             setModalVisible(false);
             setEditing(null);
+            setFileList([]);
             form.resetFields();
             fetchProducts();
         } catch {
@@ -86,12 +112,23 @@ export default function ProductsPage() {
     const openEdit = (record: any) => {
         setEditing(record);
         form.setFieldsValue(record);
+        if (record.image_url) {
+            setFileList([{
+                uid: '-1',
+                name: 'image.png',
+                status: 'done',
+                url: record.image_url,
+            }]);
+        } else {
+            setFileList([]);
+        }
         setModalVisible(true);
     };
 
     const openAdd = () => {
         setEditing(null);
         form.resetFields();
+        setFileList([]);
         form.setFieldsValue({ price: 0, stock: 0, low_stock_threshold: 5, currency: "MMK", is_active: true });
         setModalVisible(true);
     };
@@ -220,7 +257,7 @@ export default function ProductsPage() {
                         : (language === "my" ? "ပစ္စည်းအသစ်ထည့်ရန်" : "Add Product")
                     }
                     open={modalVisible}
-                    onCancel={() => { setModalVisible(false); setEditing(null); }}
+                    onCancel={() => { setModalVisible(false); setEditing(null); setFileList([]); }}
                     footer={null}
                     destroyOnClose
                 >
@@ -259,8 +296,27 @@ export default function ProductsPage() {
                                 </Form.Item>
                             </Col>
                         </Row>
-                        <Form.Item name="image_url" label={language === "my" ? "ပုံ URL" : "Image URL"}>
-                            <Input placeholder="https://..." />
+                        <Form.Item label={language === "my" ? "ပစ္စည်းပုံ" : "Product Image"}>
+                            <Upload
+                                listType="picture-card"
+                                fileList={fileList}
+                                onRemove={() => setFileList([])}
+                                beforeUpload={(file) => {
+                                    setFileList([{ originFileObj: file, name: file.name }]);
+                                    return false; // prevent auto upload
+                                }}
+                                maxCount={1}
+                            >
+                                {fileList.length < 1 && (
+                                    <div>
+                                        <PlusOutlined />
+                                        <div style={{ marginTop: 8 }}>{language === "my" ? "တင်မည်" : "Upload"}</div>
+                                    </div>
+                                )}
+                            </Upload>
+                        </Form.Item>
+                        <Form.Item name="image_url" label={language === "my" ? "သို့မဟုတ် ပုံ URL" : "Or Image URL"}>
+                            <Input placeholder="https://..." onChange={() => setFileList([])} />
                         </Form.Item>
                         <Form.Item name="is_active" label={language === "my" ? "အသုံးပြုနိုင်မှု" : "Active"} valuePropName="checked">
                             <Switch />

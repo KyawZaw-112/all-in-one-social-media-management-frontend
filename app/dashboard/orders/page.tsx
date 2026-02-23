@@ -469,7 +469,7 @@ export default function OrdersPage() {
             fixed: 'right' as const,
             width: 180,
             render: (_: any, record: any) => (
-                <Space>
+                <Space orientation="vertical">
                     <Button icon={<EyeOutlined />} size="small" onClick={() => showDetail(record)}>
                         {language === 'my' ? "အသေးစိတ်" : "Detail"}
                     </Button>
