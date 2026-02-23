@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <title>AutoReply — Facebook Auto-Reply Platform for Myanmar Businesses</title>
                 <meta
                     name="description"
-                    content="Myanmar's #1 Facebook Auto-Reply Platform. Automate your Online Shop and Cargo business replies. No AI cost, mobile-first, Myanmar + English support."
+                    content="Myanmar's #1 Facebook Auto-Reply Platform. Automate your Online Shop and Cargo business replies. No extra cost, mobile-first, Myanmar + English support."
                 />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <meta name="theme-color" content="#0a0a0f" />
