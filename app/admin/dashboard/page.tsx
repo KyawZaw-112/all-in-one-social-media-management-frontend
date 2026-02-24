@@ -172,26 +172,46 @@ export default function AdminDashboard() {
                     <Card title="🔔 System Activity" bordered={false} style={{ borderRadius: "16px", minHeight: "350px" }}>
                         <List
                             itemLayout="horizontal"
-                            dataSource={[
-                                { title: "New Sign Up", desc: "Kyaw Kyaw joined Online Shop plan", time: "2 mins ago", icon: <UserAddOutlined />, color: "#1890ff" },
-                                { title: "Payment Received", desc: "Cargo Plus (20,000 Ks)", time: "1 hour ago", icon: <WalletOutlined />, color: "#52c41a" },
-                                { title: "Trial Ending", desc: "Thin Thin trial expires in 24h", time: "3 hours ago", icon: <ClockCircleOutlined />, color: "#faad14" },
-                                { title: "New Page Connected", desc: "Mandalay One Delivery", time: "5 hours ago", icon: <GlobalOutlined />, color: "#722ed1" },
-                            ]}
-                            renderItem={(item) => (
-                                <List.Item>
-                                    <List.Item.Meta
-                                        avatar={<Avatar icon={item.icon} style={{ backgroundColor: item.color }} />}
-                                        title={<Text strong>{item.title}</Text>}
-                                        description={
-                                            <div>
-                                                <div style={{ fontSize: "12px" }}>{item.desc}</div>
-                                                <Text type="secondary" style={{ fontSize: "11px" }}>{item.time}</Text>
-                                            </div>
-                                        }
-                                    />
-                                </List.Item>
-                            )}
+                            dataSource={stats?.systemActivity || []}
+                            renderItem={(item: any) => {
+                                const getIcon = (iconName: string) => {
+                                    switch (iconName) {
+                                        case 'user': return <UserAddOutlined />;
+                                        case 'wallet': return <WalletOutlined />;
+                                        case 'global': return <GlobalOutlined />;
+                                        case 'clock': return <ClockCircleOutlined />;
+                                        default: return <ClockCircleOutlined />;
+                                    }
+                                };
+
+                                const getTimeDisplay = (time: string) => {
+                                    const date = new Date(time);
+                                    const now = new Date();
+                                    const diffMs = now.getTime() - date.getTime();
+                                    const diffMins = Math.floor(diffMs / 60000);
+                                    const diffHours = Math.floor(diffMins / 60);
+                                    const diffDays = Math.floor(diffHours / 24);
+
+                                    if (diffMins < 60) return `${diffMins} mins ago`;
+                                    if (diffHours < 24) return `${diffHours} hours ago`;
+                                    return `${diffDays} days ago`;
+                                };
+
+                                return (
+                                    <List.Item>
+                                        <List.Item.Meta
+                                            avatar={<Avatar icon={getIcon(item.icon)} style={{ backgroundColor: item.color }} />}
+                                            title={<Text strong>{item.title}</Text>}
+                                            description={
+                                                <div>
+                                                    <div style={{ fontSize: "12px" }}>{item.desc}</div>
+                                                    <Text type="secondary" style={{ fontSize: "11px" }}>{getTimeDisplay(item.time)}</Text>
+                                                </div>
+                                            }
+                                        />
+                                    </List.Item>
+                                );
+                            }}
                         />
                     </Card>
                 </Col>
