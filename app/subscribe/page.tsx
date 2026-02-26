@@ -123,7 +123,7 @@ export default function SubscribePage() {
 
                                         <Space align="baseline">
                                             <Title level={2} style={{ margin: 0 }}>
-                                                {plan === "monthly" ? "2,000 Baht" : "20,000 Baht"}
+                                                {plan === "monthly" ? "1,000 Baht" : "10,000 Baht"}
                                             </Title>
                                             <Text type="secondary">
                                                 / {plan === "monthly" ? "month" : "year"}

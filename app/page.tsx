@@ -443,7 +443,7 @@ export default function LandingPage() {
                         </p>
 
                         <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
-                            <span style={{ fontSize: 42, fontWeight: 800, color: "#f1f5f9" }}>2,000</span>
+                            <span style={{ fontSize: 42, fontWeight: 800, color: "#f1f5f9" }}>1,000</span>
                             <span style={{ fontSize: 16, color: "#94a3b8" }}>{t.landing.planPrice}</span>
                         </div>
 
@@ -537,7 +537,7 @@ export default function LandingPage() {
                         </p>
 
                         <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
-                            <span style={{ fontSize: 42, fontWeight: 800, color: "#f1f5f9" }}>2,000</span>
+                            <span style={{ fontSize: 42, fontWeight: 800, color: "#f1f5f9" }}>1,000</span>
                             <span style={{ fontSize: 16, color: "#94a3b8" }}>{t.landing.planPrice}</span>
                         </div>
 
