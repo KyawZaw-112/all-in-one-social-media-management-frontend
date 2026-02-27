@@ -162,7 +162,7 @@ export default function OrdersPage() {
             let columns, rows;
 
             if (isCargo) {
-                columns = ["Ref No", "Date", "Sender", "Phone", "Item", "Weight", "Country", "Shipping", "Address", "Status"];
+                columns = ["Ref No", "Date", "Sender", "Phone", "Item", "Weight", "Route", "Shipping", "Address", "Status"];
                 rows = filteredData.map((item: any) => [
                     item.order_no || (item.id ? `#...${item.id.slice(-6).toUpperCase()}` : "-"),
                     dayjs(item.created_at).format("DD/MM/YYYY"),
@@ -248,7 +248,7 @@ export default function OrdersPage() {
 
                 {isCargo ? (
                     <>
-                        <Field label={language === 'my' ? "နိုင်ငံ" : "Country"} field="country" value={d.country} />
+                        <Field label={language === 'my' ? "လမ်းကြောင်း" : "Route"} field="country" value={d.country} />
                         <Field label={language === 'my' ? "ပို့ဆောင်မှု" : "Shipping"} field="shipping" value={d.shipping} />
                         <Field label={language === 'my' ? "ပစ္စည်းအမျိုးအစား" : "Type"} field="item_type" value={d.item_type} />
                         <Field label={language === 'my' ? "ပစ္စည်း" : "Item"} field="item_name" value={d.item_name} />

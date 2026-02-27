@@ -136,7 +136,7 @@ export default function RatesPage() {
 
     const columns = [
         {
-            title: language === "my" ? "နိုင်ငံ" : "Country",
+            title: language === "my" ? "လမ်းကြောင်း" : "Route",
             dataIndex: "country",
             key: "country",
             render: (c: string) => <Space><GlobalOutlined /><Text strong>{c}</Text></Space>
@@ -195,12 +195,12 @@ export default function RatesPage() {
                         <Button icon={<ArrowLeftOutlined />} onClick={() => router.push("/dashboard")} type="text" style={{ fontSize: 18 }} />
                         <CalculatorOutlined style={{ fontSize: 24, color: "#f59e0b" }} />
                         <Title level={2} style={{ margin: 0, fontWeight: 300 }}>
-                            {language === "my" ? "ပို့ဆောင်ခ တွက်ချက်မှု" : "Rate Calculator"}
+                            {language === "my" ? "လမ်းကြောင်းအလိုက် ပို့ဆောင်ခ" : "Route Rates"}
                         </Title>
                     </Space>
                     <Button type="primary" icon={<PlusOutlined />} onClick={openAdd}
                         style={{ background: "#f59e0b", borderColor: "#f59e0b" }}>
-                        {language === "my" ? "နှုန်းထည့်မည်" : "Add Rate"}
+                        {language === "my" ? "လမ်းကြောင်းထည့်မည်" : "Add Route"}
                     </Button>
                 </div>
 
@@ -219,14 +219,18 @@ export default function RatesPage() {
                     </Title>
                     <Row gutter={[16, 16]} align="middle">
                         <Col xs={24} sm={6}>
-                            <Text type="secondary">{language === "my" ? "နိုင်ငံ" : "Country"}</Text>
+                            <Text type="secondary">{language === "my" ? "လမ်းကြောင်း" : "Route"}</Text>
                             <Select
                                 style={{ width: "100%", marginTop: 4 }}
                                 placeholder={language === "my" ? "ရွေးပါ" : "Select"}
                                 value={calcCountry || undefined}
                                 onChange={setCalcCountry}
                             >
-                                {countries.map(c => <Select.Option key={c} value={c}>{c}</Select.Option>)}
+                                {countries.map(c => (
+                                    <Select.Option key={c} value={c}>
+                                        {c.includes('->') ? c : `Route: ${c}`}
+                                    </Select.Option>
+                                ))}
                             </Select>
                         </Col>
                         <Col xs={24} sm={5}>
@@ -296,7 +300,7 @@ export default function RatesPage() {
                     title={
                         <Space>
                             <DollarOutlined />
-                            <span>{language === "my" ? "ပို့ဆောင်ခ နှုန်းထားများ" : "Your Shipping Rates"}</span>
+                            <span>{language === "my" ? "လမ်းကြောင်းအလိုက် နှုန်းထားများ" : "Shipping Route Rates"}</span>
                         </Space>
                     }
                 >
@@ -304,8 +308,8 @@ export default function RatesPage() {
                         <div style={{ textAlign: "center", padding: "40px 0" }}>
                             <Text type="secondary">
                                 {language === "my"
-                                    ? "ပို့ဆောင်ခ နှုန်းထားများ မရှိသေးပါ။ \"နှုန်းထည့်မည်\" ကိုနှိပ်ပြီး ထည့်သွင်းပါ။"
-                                    : "No rates yet. Click \"Add Rate\" to get started."}
+                                    ? "ပို့ဆောင်ခ နှုန်းထားများ မရှိသေးပါ။ \"လမ်းကြောင်းထည့်မည်\" ကိုနှိပ်ပြီး ထည့်သွင်းပါ။"
+                                    : "No rates yet. Click \"Add Route\" to get started."}
                             </Text>
                         </div>
                     ) : (
@@ -317,8 +321,8 @@ export default function RatesPage() {
                 {/* Add/Edit Rate Modal */}
                 <Modal
                     title={editing
-                        ? (language === "my" ? "နှုန်းပြင်ဆင်ရန်" : "Edit Rate")
-                        : (language === "my" ? "နှုန်းအသစ်ထည့်ရန်" : "Add Rate")
+                        ? (language === "my" ? "လမ်းကြောင်းပြင်ဆင်ရန်" : "Edit Route")
+                        : (language === "my" ? "လမ်းကြောင်းအသစ်ထည့်ရန်" : "Add Route")
                     }
                     open={modalVisible}
                     onCancel={() => { setModalVisible(false); setEditing(null); }}
@@ -326,19 +330,19 @@ export default function RatesPage() {
                     destroyOnClose
                 >
                     <Form form={form} layout="vertical" onFinish={handleSave}>
-                        <Form.Item name="country" label={language === "my" ? "နိုင်ငံ" : "Country"}
+                        <Form.Item name="country" label={language === "my" ? "လမ်းကြောင်း" : "Route"}
                             rules={[{ required: true, message: "Required" }]}>
                             <Select
                                 showSearch
-                                placeholder={language === "my" ? "နိုင်ငံရွေးပါ သို့မဟုတ် အသစ်ရိုက်ထည့်ပါ" : "Select or type new country"}
+                                placeholder={language === "my" ? "လမ်းကြောင်းရွေးပါ သို့မဟုတ် အသစ်ရိုက်ထည့်ပါ" : "Select or type new Route"}
                                 tokenSeparators={[',']}
                                 options={[
-                                    { value: 'ထိုင်း', label: '🇹🇭 ထိုင်း (Thailand)' },
-                                    { value: 'ဂျပန်', label: '🇯🇵 ဂျပန် (Japan)' },
-                                    { value: 'တရုတ်', label: '🇨🇳 တရုတ် (China)' },
-                                    { value: 'ကိုရီးယား', label: '🇰🇷 ကိုရီးယား (Korea)' },
-                                    { value: 'အခြား', label: '🌍 အခြား (Other)' },
-                                    ...countries.filter(c => !['ထိုင်း', 'ဂျပန်', 'တရုတ်', 'ကိုရီးယား', 'အခြား'].includes(c)).map(c => ({ value: c, label: c }))
+                                    { value: 'Thailand -> Myanmar', label: '🇹🇭 ထိုင်း -> မြန်မာ 🇲🇲' },
+                                    { value: 'China -> Myanmar', label: '🇨🇳 တရုတ် -> မြန်မာ 🇲🇲' },
+                                    { value: 'Korea -> Myanmar', label: '🇰🇷 ကိုရီးယား -> မြန်မာ 🇲🇲' },
+                                    { value: 'Japan -> Myanmar', label: '🇯🇵 ဂျပန် -> မြန်မာ 🇲🇲' },
+                                    { value: 'Other', label: '🌍 အခြား (Other)' },
+                                    ...countries.filter(c => !['Thailand -> Myanmar', 'China -> Myanmar', 'Korea -> Myanmar', 'Japan -> Myanmar', 'Other'].includes(c)).map(c => ({ value: c, label: c }))
                                 ]}
                                 dropdownRender={(menu) => (
                                     <>

@@ -55,7 +55,7 @@ export default function ShipmentsPage() {
                 <Descriptions.Item label={language === 'my' ? "ရက်စွဲ" : "Date"}>{dayjs(d.created_at).format("DD/MM/YYYY HH:mm:ss")}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ပေးပို့သူ" : "Sender"}>{d.full_name || "-"}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ဖုန်း" : "Phone"}>{d.phone || "-"}</Descriptions.Item>
-                <Descriptions.Item label={language === 'my' ? "နိုင်ငံ" : "Country"}>{d.country || "-"}</Descriptions.Item>
+                <Descriptions.Item label={language === 'my' ? "လမ်းကြောင်း" : "Route"}>{d.country || "-"}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ပို့ဆောင်မှု" : "Shipping"}>{d.shipping || "-"}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ပစ္စည်းအမျိုးအစား" : "Type"}>{d.item_type || "-"}</Descriptions.Item>
                 <Descriptions.Item label={language === 'my' ? "ပစ္စည်း" : "Item"}>{d.item_name || "-"}</Descriptions.Item>
@@ -117,7 +117,7 @@ export default function ShipmentsPage() {
             key: "full_name",
         },
         {
-            title: language === 'my' ? "နိုင်ငံ" : "Country",
+            title: language === 'my' ? "လမ်းကြောင်း" : "Route",
             dataIndex: "country",
             key: "country",
             render: (c: string) => <Tag color="blue">{c}</Tag>
