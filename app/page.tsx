@@ -769,9 +769,17 @@ export default function LandingPage() {
                     borderTop: "1px solid rgba(255,255,255,0.04)",
                     textAlign: "center",
                     fontSize: 12,
-                    color: "#475569",
+                    color: "#94a3b8",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8
                 }}>
-                    {t.landing.footerCopy}
+                    <div style={{ color: "#64748b" }}>
+                        Kyaw Zaw Win , 60 Rom Klao Rd, Khwaeng Min Buri, Khet Min Buri, Krung Thep Maha Nakhon 10510 | 0947527836
+                    </div>
+                    <div>
+                        {t.landing.footerCopy}
+                    </div>
                 </div>
             </footer>
         </div>

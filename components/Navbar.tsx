@@ -7,11 +7,13 @@ import supabase from "@/lib/supabase";
 import { Menu, Button } from "antd";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useFestivalTheme } from "@/lib/ThemeContext";
 
 export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const { t, language } = useLanguage();
+    const { theme } = useFestivalTheme();
 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -60,17 +62,42 @@ export default function Navbar() {
         <header
             style={{
                 height: 56,
-                borderBottom: "1px solid #f0f0f0",
+                borderBottom: `2px solid ${theme.primaryColor}33`, // 20% opacity
                 padding: "0 24px",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 background: "#fff",
+                position: "sticky",
+                top: 0,
+                zIndex: 1000,
             }}
         >
-            <Link href="/dashboard" style={{ fontWeight: 600 }}>
-                Vibe
-            </Link>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Link href="/dashboard" style={{ fontWeight: 800, fontSize: 20, color: theme.primaryColor, letterSpacing: -0.5 }}>
+                    Vibe
+                </Link>
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        background: `${theme.primaryColor}10`,
+                        padding: "4px 10px",
+                        borderRadius: 20,
+                        border: `1px solid ${theme.primaryColor}25`,
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: theme.primaryColor
+                    }}
+                    title={theme.description}
+                >
+                    <span>{theme.icon}</span>
+                    <span style={{ whiteSpace: "nowrap" }}>
+                        {language === 'my' ? theme.burmeseMonth : theme.festivalName}
+                    </span>
+                </div>
+            </div>
 
             <Menu
                 mode="horizontal"
