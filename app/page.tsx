@@ -775,7 +775,7 @@ export default function LandingPage() {
                     gap: 8
                 }}>
                     <div style={{ color: "#64748b" }}>
-                        Kyaw Zaw Win , 60 Rom Klao Rd, Khwaeng Min Buri, Khet Min Buri, Krung Thep Maha Nakhon 10510 | 0947527836
+                        Kyaw Zaw Win ,Kasem Bundit University Dormitory 60 Rom Klao Rd, Khwaeng Min Buri, Khet Min Buri, Krung Thep Maha Nakhon 10510 | 0947527836
                     </div>
                     <div>
                         {t.landing.footerCopy}
