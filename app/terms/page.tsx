@@ -4,8 +4,8 @@ export default function TermsOfService() {
             <h1>Terms of Service</h1>
 
             <p>
-                Welcome to <strong>vibe</strong>. By using this application, you agree to the
-                following terms.
+                Welcome to <strong>vibe</strong>. This service is provided by <strong>Kyaw Zaw Win</strong>.
+                By using this application, you agree to the following terms.
             </p>
 
             <h2>Service Description</h2>
@@ -48,7 +48,10 @@ export default function TermsOfService() {
             <p>
                 For questions regarding these terms, contact:
                 <br />
-                <strong>holeokyawzawwin@gmail.com</strong>
+                <strong>Business Name:</strong> Kyaw Zaw Win<br />
+                <strong>Address:</strong> ถนน ร่มเกล้า, Kasem Bundit University Dormitory Building-E Dorm-713, กรุงเทพมหานคร, Bangkok, 10510, TH<br />
+                <strong>Phone:</strong> +66947527836<br />
+                <strong>Email:</strong> holeokyawzawwin@gmail.com
             </p>
         </div>
     );

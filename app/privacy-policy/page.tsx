@@ -4,8 +4,8 @@ export default function PrivacyPolicy() {
             <h1>Privacy Policy</h1>
 
             <p>
-                This Privacy Policy describes how <strong>vibe</strong> ("we", "our", or "us")
-                collects, uses, and protects user information.
+                This Privacy Policy describes how <strong>Kyaw Zaw Win</strong> ("we", "our", or "us"),
+                operating as <strong>vibe</strong>, collects, uses, and protects user information.
             </p>
 
             <h2>Information We Collect</h2>
@@ -42,6 +42,9 @@ export default function PrivacyPolicy() {
                 Users may request deletion of their data at any time by contacting us at:
             </p>
             <p>
+                <strong>Business Name:</strong> Kyaw Zaw Win<br />
+                <strong>Address:</strong> ถนน ร่มเกล้า, Kasem Bundit University Dormitory Building-E Dorm-713, กรุงเทพมหานคร, Bangkok, 10510, TH<br />
+                <strong>Phone:</strong> +66947527836<br />
                 <strong>Email:</strong> holeokyawzawwin@gmail.com
             </p>
 
@@ -60,7 +63,10 @@ export default function PrivacyPolicy() {
             <p>
                 If you have any questions about this Privacy Policy, please contact us at:
                 <br />
-                <strong>holeokyawzawwin@gmail.com</strong>
+                <strong>Business Name:</strong> Kyaw Zaw Win<br />
+                <strong>Address:</strong> ถนน ร่มเกล้า, Kasem Bundit University Dormitory Building-E Dorm-713, กรุงเทพมหานคร, Bangkok, 10510, TH<br />
+                <strong>Phone:</strong> +66947527836<br />
+                <strong>Email:</strong> holeokyawzawwin@gmail.com
             </p>
         </div>
     );
