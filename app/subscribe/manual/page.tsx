@@ -16,6 +16,8 @@ import supabase from "@/lib/supabase";
 import { Dropdown } from 'antd';
 import Image from "next/image";
 import AuthGuard from "@/components/AuthGuard";
+import InvoiceModal from "@/components/InvoiceModal";
+import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
 
@@ -26,6 +28,10 @@ export default function ManualPaymentPage() {
     const [baseAmountBaht] = useState(2000);
     const BAHT_TO_MMK = 155; // Update rate here
     const [payment_provider, setPaymentProvider] = useState("KPlus");
+
+    // Invoice State
+    const [isInvoiceVisible, setIsInvoiceVisible] = useState(false);
+    const [invoiceData, setInvoiceData] = useState<any>(null);
 
     const getDisplayAmount = () => {
         if (payment_provider === "KPlus") {
@@ -66,23 +72,34 @@ export default function ManualPaymentPage() {
             const userId = user.id;
 
             // 🔥 Ensure Supabase client is aware of the session for storage upload
-            await supabase.auth.setSession({
+            const { error: sessionError } = await supabase.auth.setSession({
                 access_token: token,
                 refresh_token: "", // not used in this flow
             });
+
+            if (sessionError) {
+                console.error("Supabase Session Error:", sessionError);
+                message.error("Session sync failed. Please try logging in again.");
+                return;
+            }
 
             const finalAmount = payment_provider === "KPlus" ? baseAmountBaht : baseAmountBaht * BAHT_TO_MMK;
 
             const fileExt = file.name.split(".").pop();
             const filePath = `${userId}/${Date.now()}.${fileExt}`;
 
+            console.log("📤 Uploading proof to path:", filePath);
+
             const { error: uploadError } = await supabase.storage
                 .from("payment-proofs")
-                .upload(filePath, file);
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
 
             if (uploadError) {
-                console.error("Upload Error:", uploadError);
-                message.error("Upload failed: " + uploadError.message);
+                console.error("Full Upload Error Object:", uploadError);
+                message.error(`Upload failed: ${uploadError.message}. If this is an RLS error, please run the setup_payment_storage.sql script in Supabase Dashboard.`);
                 return;
             }
 
@@ -109,6 +126,20 @@ export default function ManualPaymentPage() {
             }
 
             message.success("Payment submitted. Await admin approval. ✅");
+
+            // Set invoice data for the modal
+            setInvoiceData({
+                userId: user.id,
+                userName: user.user_metadata?.full_name || user.email,
+                userEmail: user.email,
+                amount: getDisplayAmount(),
+                reference: reference,
+                provider: payment_provider,
+                date: dayjs().format('DD MMM YYYY, HH:mm'),
+                plan: "Monthly Pro"
+            });
+            setIsInvoiceVisible(true);
+
             setReference("");
             setFile(null);
         } catch (err: any) {
@@ -234,9 +265,26 @@ export default function ManualPaymentPage() {
                             >
                                 Submit Payment
                             </Button>
+
+                            {invoiceData && (
+                                <Button
+                                    type="default"
+                                    block
+                                    style={{ marginTop: 8, borderColor: '#722ed1', color: '#722ed1' }}
+                                    onClick={() => setIsInvoiceVisible(true)}
+                                >
+                                    View Last Invoice
+                                </Button>
+                            )}
                         </div>
                     </Space>
                 </Card>
+
+                <InvoiceModal
+                    visible={isInvoiceVisible}
+                    onClose={() => setIsInvoiceVisible(false)}
+                    paymentData={invoiceData}
+                />
             </div>
         </AuthGuard>
     );
