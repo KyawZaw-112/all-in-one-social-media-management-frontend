@@ -226,6 +226,10 @@ export type TranslationKeys = {
         manageRates: string;
         manageProductsTip: string;
         manageRatesTip: string;
+        aiPrompt: string;
+        aiPromptPlaceholder: string;
+        aiPromptTip: string;
+        aiEnabled: string;
     };
     common: {
         loading: string;
@@ -459,6 +463,10 @@ export const translations: Record<Language, TranslationKeys> = {
             manageRates: "Manage Rates",
             manageProductsTip: "Add or edit products to use in your flow.",
             manageRatesTip: "Add or edit shipping rates to use in your flow.",
+            aiPrompt: "AI Prompt (Custom Instructions)",
+            aiPromptPlaceholder: "e.g., Extract product info and reply politely in Burmese. If order, ask for phone.",
+            aiPromptTip: "If set, Gemini AI will handle the conversation using these instructions.",
+            aiEnabled: "AI ENABLED",
         },
         common: {
             loading: "Loading...",
@@ -690,6 +698,10 @@ export const translations: Record<Language, TranslationKeys> = {
             manageRates: "ပို့ဆောင်ခနှုန်းထား ပြင်ဆင်ရန်",
             manageProductsTip: "Flow ထဲမှာ သုံးဖို့ product တွေကို ဒီမှာ အရင်ထည့်ထားပေးပါ။",
             manageRatesTip: "Flow ထဲမှာ သုံးဖို့ shipping rate တွေကို ဒီမှာ အရင်ထည့်ထားပေးပါ။",
+            aiPrompt: "AI Prompt (အလိုအလျောက် ညွှန်ကြားချက်)",
+            aiPromptPlaceholder: "ဥပမာ - ဝယ်ယူတဲ့ပစ္စည်းကို ခွဲထုတ်ပေးပါ။ ယဉ်ကျေးစွာ ပြန်ကြားပေးပါ။ ဖုန်းနံပါတ် တောင်းပေးပါ။",
+            aiPromptTip: "ဤနေရာတွင် ဖြည့်စွက်ထားပါက Gemini AI က အလိုအလျောက် ပြန်ကြားပေးမည် ဖြစ်သည်။",
+            aiEnabled: "AI အသုံးပြုထားသည်",
         },
         common: {
             loading: "Loading...",

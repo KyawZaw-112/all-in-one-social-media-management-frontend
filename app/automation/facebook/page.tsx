@@ -341,6 +341,11 @@ export default function FacebookAutoReply() {
                                                     <Tag bordered={false} style={{ background: "#f1f5f9", color: "#64748b", fontWeight: 600, borderRadius: "6px" }}>
                                                         <MessageOutlined /> {flow.trigger_keyword}
                                                     </Tag>
+                                                    {flow.ai_prompt && (
+                                                        <Tag bordered={false} color="purple" style={{ borderRadius: "6px", fontWeight: 700 }}>
+                                                            <ThunderboltOutlined /> {t.automation.aiEnabled}
+                                                        </Tag>
+                                                    )}
                                                 </Space>
                                                 <div style={{ color: "#64748b", fontSize: "14px", lineHeight: "1.5" }}>
                                                     {flow.description || t.automation.noDescription}
@@ -402,6 +407,23 @@ export default function FacebookAutoReply() {
                         </Form.Item>
                         <Form.Item label={<Text strong>{t.automation.description}</Text>} name="description">
                             <TextArea rows={3} placeholder={t.automation.placeholderDesc} style={{ borderRadius: "10px" }} />
+                        </Form.Item>
+                        <Divider style={{ margin: "24px 0" }}>
+                            <Space>
+                                <RobotOutlined style={{ color: "#8b5cf6" }} />
+                                <Text strong style={{ color: "#8b5cf6" }}>AI Power-Up</Text>
+                            </Space>
+                        </Divider>
+                        <Form.Item
+                            label={<Text strong>{t.automation.aiPrompt}</Text>}
+                            name="ai_prompt"
+                            tooltip={t.automation.aiPromptTip}
+                        >
+                            <TextArea
+                                rows={4}
+                                placeholder={t.automation.aiPromptPlaceholder}
+                                style={{ borderRadius: "10px", border: "1px solid #ddd" }}
+                            />
                         </Form.Item>
                         <div style={{ marginTop: "24px" }}>
                             <Button type="primary" htmlType="submit" block size="large" style={{ height: "50px", borderRadius: "12px", fontWeight: 700, background: "#0f172a", border: "none" }}>
