@@ -13,6 +13,7 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     NotificationOutlined,
+    DollarOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -54,6 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { key: "/admin/dashboard", icon: <DashboardOutlined />, label: "Stats Overview" },
         { key: "/admin/users", icon: <UserOutlined />, label: "Merchant Management" },
         { key: "/admin/subscriptions", icon: <CreditCardOutlined />, label: "Active Subscriptions" },
+        { key: "/admin/payments", icon: <DollarOutlined />, label: "Payment Approvals" },
         { key: "/admin/analytics", icon: <LineChartOutlined />, label: "System Health" },
         { key: "/admin/settings", icon: <SettingOutlined />, label: "Global Settings" },
     ];
