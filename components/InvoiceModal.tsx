@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Button, Typography, Space, Divider, Row, Col, Table } from 'antd';
 import { DownloadOutlined, FileTextOutlined } from '@ant-design/icons';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 const { Title, Text } = Typography;
 
@@ -56,7 +56,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ visible, onClose, paymentDa
         doc.text(`Status: Pending Approval`, 140, 62);
 
         // Table
-        (doc as any).autoTable({
+        autoTable(doc, {
             startY: 75,
             head: [['Description', 'Provider', 'Amount']],
             body: [
