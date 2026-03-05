@@ -933,6 +933,10 @@ export const translations: Record<Language, TranslationKeys> = {
             manageRates: "จัดการอัตราค่าขนส่ง",
             manageProductsTip: "เพิ่มหรือแก้ไขสินค้าเพื่อใช้ในลำดับงานของคุณ",
             manageRatesTip: "เพิ่มหรือแก้ไขอัตราค่าขนส่งเพื่อใช้ในลำดับงานของคุณ",
+            aiPrompt: "AI Prompt (คำแนะนำ)",
+            aiPromptPlaceholder: "เช่น ตอบกลับเป็นกันเอง ใช้ภาษาพม่า...",
+            aiPromptTip: "ป้อนคำแนะนำแบบกำหนดเองเพื่อควบคุมลักษณะการตอบกลับของ AI",
+            aiEnabled: "เปิดใช้งาน AI",
         },
         common: {
             loading: "กำลังโหลด...",

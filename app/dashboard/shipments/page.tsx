@@ -89,6 +89,32 @@ export default function ShipmentsPage() {
                         </div>
                     </Descriptions.Item>
                 )}
+                {d.status_history && d.status_history.length > 0 && (
+                    <Descriptions.Item label={language === 'my' ? "အခြေအနေမှတ်တမ်း" : "Status History"}>
+                        <div style={{ padding: "10px 0" }}>
+                            {/* Import Timeline from antd if not already imported or use it if available */}
+                            <div className="ant-timeline" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                                {d.status_history.map((h: any, i: number) => (
+                                    <div key={i} style={{ position: "relative", padding: "0 0 20px 20px", borderLeft: i === d.status_history.length - 1 ? "none" : "2px solid #f0f0f0" }}>
+                                        <div style={{
+                                            position: "absolute",
+                                            left: "-7px",
+                                            top: "0",
+                                            width: "12px",
+                                            height: "12px",
+                                            borderRadius: "50%",
+                                            backgroundColor: i === 0 ? "#52c41a" : "#1890ff",
+                                            border: "2px solid #fff"
+                                        }} />
+                                        <Text strong style={{ fontSize: "12px", display: "block" }}>{h.status?.toUpperCase()}</Text>
+                                        <Text type="secondary" style={{ fontSize: "11px", display: "block" }}>{dayjs(h.timestamp).format("DD/MM/YYYY HH:mm")}</Text>
+                                        <Text style={{ fontSize: "13px" }}>{h.message}{h.location ? ` - ${h.location}` : ""}</Text>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </Descriptions.Item>
+                )}
             </Descriptions>
         );
     };
