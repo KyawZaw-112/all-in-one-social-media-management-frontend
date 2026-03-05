@@ -37,8 +37,13 @@ export default function ProductsPage() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setData(res.data.data || []);
-        } catch {
-            message.error("Failed to fetch products");
+        } catch (err: any) {
+            if (err.response?.status === 401) {
+                message.error("Session expired, please login again");
+                router.replace("/login");
+            } else {
+                message.error("Failed to fetch products");
+            }
         } finally {
             setLoading(false);
         }
@@ -78,8 +83,15 @@ export default function ProductsPage() {
             setFileList([]);
             form.resetFields();
             fetchProducts();
-        } catch {
-            message.error("Failed to save");
+        } catch (err: any) {
+            console.error("❌ Save failed:", err.response?.data || err.message);
+            if (err.response?.status === 401) {
+                message.error("Session expired, please login again");
+                router.replace("/login");
+            } else {
+                const errorMsg = err.response?.data?.error || (language === "my" ? "သိမ်းဆည်းရခြင်း မအောင်မြင်ပါ" : "Failed to save");
+                message.error(errorMsg);
+            }
         } finally {
             setSaving(false);
         }

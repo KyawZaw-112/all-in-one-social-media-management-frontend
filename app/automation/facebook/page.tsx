@@ -223,6 +223,7 @@ export default function FacebookAutoReply() {
         customForm.setFieldsValue({
             welcome_message: metadata.welcome_message || "",
             completion_message: metadata.completion_message || "",
+            ai_prompt: flow.ai_prompt || "",
             steps: stepsData
         });
 
@@ -234,8 +235,11 @@ export default function FacebookAutoReply() {
 
         try {
             const token = localStorage.getItem("authToken");
+            const { welcome_message, completion_message, steps, ai_prompt } = values;
+
             await axios.put(`${API_URL}/api/merchants/flows/${editingFlow.id}`, {
-                metadata: values
+                metadata: { welcome_message, completion_message, steps },
+                ai_prompt: ai_prompt
             }, {
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -515,7 +519,26 @@ export default function FacebookAutoReply() {
                         </Form.Item>
 
                         <Form.Item label={<Text strong>{t.automation.completionMsg}</Text>} name="completion_message">
-                            <TextArea placeholder={t.automation.completionPlaceholder} rows={4} style={{ borderRadius: "10px" }} />
+                            <TextArea placeholder={t.automation.completionPlaceholder} rows={3} style={{ borderRadius: "10px" }} />
+                        </Form.Item>
+
+                        <Divider style={{ margin: "24px 0" }}>
+                            <Space>
+                                <RobotOutlined style={{ color: "#8b5cf6" }} />
+                                <Text strong style={{ color: "#8b5cf6" }}>AI Intelligence & Automation</Text>
+                            </Space>
+                        </Divider>
+
+                        <Form.Item
+                            label={<Text strong>{t.automation.aiPrompt}</Text>}
+                            name="ai_prompt"
+                            tooltip={t.automation.aiPromptTip}
+                        >
+                            <TextArea
+                                rows={4}
+                                placeholder={t.automation.aiPromptPlaceholder}
+                                style={{ borderRadius: "10px", border: "2px solid #dddfe2" }}
+                            />
                         </Form.Item>
 
                         <Divider style={{ margin: "24px 0" }}>
