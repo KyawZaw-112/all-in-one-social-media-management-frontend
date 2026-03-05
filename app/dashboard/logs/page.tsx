@@ -12,7 +12,8 @@ import {
     message,
     Popconfirm,
     Empty,
-    Spin
+    Spin,
+    Divider
 } from "antd";
 import {
     DeleteOutlined,
@@ -108,7 +109,7 @@ const LogsPage = () => {
             render: (text: string, record: any) => (
                 <Space direction="vertical" size={0}>
                     <Text strong style={{ color: isDark ? '#f8fafc' : '#1e293b' }}>{text}</Text>
-                    <Text type="secondary" size="small">
+                    <Text type="secondary" className="text-xs">
                         {new Date(record.created_at).toLocaleString()}
                     </Text>
                 </Space>
