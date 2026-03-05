@@ -24,6 +24,18 @@ export type TranslationKeys = {
         darkMode: string;
         dynamicTheme: string;
         subscription: string;
+        systemHealth: string;
+    };
+    logs: {
+        title: string;
+        level: string;
+        message: string;
+        details: string;
+        resolve: string;
+        resolved: string;
+        delete: string;
+        noLogs: string;
+        confirmDelete: string;
     };
     landing: {
         badge: string;
@@ -267,6 +279,18 @@ export const translations: Record<Language, TranslationKeys> = {
             darkMode: "Dark Mode",
             dynamicTheme: "Dynamic (Myanmar 12 Months)",
             subscription: "Subscription Fee",
+            systemHealth: "System Health",
+        },
+        logs: {
+            title: "System Error Logs",
+            level: "Level",
+            message: "Message",
+            details: "Details",
+            resolve: "Resolve",
+            resolved: "Resolved",
+            delete: "Delete",
+            noLogs: "No system logs found.",
+            confirmDelete: "Are you sure you want to delete this log?",
         },
         landing: {
             badge: "Myanmar's #1 Auto-Reply Platform",
@@ -508,6 +532,18 @@ export const translations: Record<Language, TranslationKeys> = {
             darkMode: "Dark Mode",
             dynamicTheme: "မြန်မာ ၁၂ လ ရာသီ Theme",
             subscription: "Subscription Fee ပေးရန်",
+            systemHealth: "စနစ် ကျန်းမာရေး",
+        },
+        logs: {
+            title: "စနစ် အမှားမှတ်တမ်းများ",
+            level: "အဆင့်",
+            message: "စာသား",
+            details: "အသေးစိတ်",
+            resolve: "ဖြေရှင်းမည်",
+            resolved: "ဖြေရှင်းပြီး",
+            delete: "ဖျက်မည်",
+            noLogs: "စနစ်မှတ်တမ်းများ မရှိပါ။",
+            confirmDelete: "ဤမှတ်တမ်းကို ဖျက်ရန် သေချာပါသလား?",
         },
         landing: {
             badge: "Myanmar ၏ နံပါတ်တစ် Auto-Reply Platform",
@@ -749,6 +785,18 @@ export const translations: Record<Language, TranslationKeys> = {
             darkMode: "โหมดมืด",
             dynamicTheme: "ธีม 12 เดือนของเมียนมา",
             subscription: "ค่าธรรมเนียมการสมัครสมาชิก",
+            systemHealth: "สุขภาพระบบ",
+        },
+        logs: {
+            title: "บันทึกข้อผิดพลาดของระบบ",
+            level: "ระดับ",
+            message: "ข้อความ",
+            details: "รายละเอียด",
+            resolve: "แก้ไข",
+            resolved: "แก้ไขแล้ว",
+            delete: "ลบ",
+            noLogs: "ไม่พบข้อมูลบันทึกระบบ",
+            confirmDelete: "คุณแน่ใจหรือไม่ว่าต้องการลบบันทึกนี้?",
         },
         landing: {
             badge: "แพลตฟอร์มตอบกลับอัตโนมัติอันดับ 1 ในเมียนมา",

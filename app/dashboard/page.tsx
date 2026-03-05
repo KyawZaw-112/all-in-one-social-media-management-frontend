@@ -34,7 +34,8 @@ import {
     CalculatorOutlined,
     BgColorsOutlined,
     BulbOutlined,
-    BookOutlined
+    BookOutlined,
+    SafetyCertificateOutlined
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
@@ -125,6 +126,12 @@ export default function UserDashboard() {
             icon: <CreditCardOutlined />,
             label: t.nav.subscription,
             onClick: () => router.push("/subscribe/manual")
+        },
+        {
+            key: 'systemHealth',
+            icon: <SafetyCertificateOutlined />,
+            label: t.nav.systemHealth,
+            onClick: () => router.push("/dashboard/logs")
         },
         { type: 'divider' },
         {
