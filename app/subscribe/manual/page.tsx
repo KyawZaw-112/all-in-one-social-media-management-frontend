@@ -164,7 +164,7 @@ export default function ManualPaymentPage() {
         <AuthGuard>
             <div style={{ maxWidth: 500, margin: "50px auto", padding: "0 20px" }}>
                 <Card style={{ borderRadius: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-                    <Space orientation="vertical" size={24} style={{ width: "100%" }}>
+                    <Space direction="vertical" size={24} style={{ width: "100%" }}>
                         <div style={{ textAlign: "center" }}>
                             <Title level={2} style={{ margin: 0 }}>💳 Manual Payment</Title>
                             <Text type="secondary">လစဉ်ကြေး ပေးဆောင်ရန် အချက်အလက်များ</Text>
