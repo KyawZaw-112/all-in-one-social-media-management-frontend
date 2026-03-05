@@ -18,19 +18,21 @@ import Image from "next/image";
 import AuthGuard from "@/components/AuthGuard";
 import InvoiceModal from "@/components/InvoiceModal";
 import dayjs from "dayjs";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const { Title, Text } = Typography;
 
 export default function ManualPaymentPage() {
+    const { t, language } = useLanguage();
     const [reference, setReference] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
-    const [pageCount, setPageCount] = useState(1);
-    const PRICE_PER_PAGE = 500;
+    const [monthCount, setMonthCount] = useState(1);
+    const PRICE_PER_MONTH = 500;
     const BAHT_TO_MMK = 155;
     const [payment_provider, setPaymentProvider] = useState("KPlus");
 
-    const baseAmountBaht = pageCount * PRICE_PER_PAGE;
+    const baseAmountBaht = monthCount * PRICE_PER_MONTH;
 
     // Invoice State
     const [isInvoiceVisible, setIsInvoiceVisible] = useState(false);
@@ -75,15 +77,15 @@ export default function ManualPaymentPage() {
             const userId = user.id;
 
             // 🔥 Ensure Supabase client is aware of the session for storage upload
-            const { error: sessionError } = await supabase.auth.setSession({
-                access_token: token,
-                refresh_token: "", // not used in this flow
-            });
-
-            if (sessionError) {
-                console.error("Supabase Session Error:", sessionError);
-                message.error("Session sync failed. Please try logging in again.");
-                return;
+            // We use a try-catch for setSession to avoid blocking valid tokens
+            try {
+                await supabase.auth.setSession({
+                    access_token: token,
+                    refresh_token: "", // not strictly required for storage upload if access_token is valid
+                });
+            } catch (sessionError) {
+                console.warn("Supabase Session Sync Warning:", sessionError);
+                // We don't return here because upload might still work if headers are set or if it's intermittent
             }
 
             const finalAmount = payment_provider === "KPlus" ? baseAmountBaht : baseAmountBaht * BAHT_TO_MMK;
@@ -114,11 +116,15 @@ export default function ManualPaymentPage() {
                 },
                 body: JSON.stringify({
                     reference,
-                    plan: "monthly",
+                    plan: `${monthCount} months`,
                     amount: finalAmount,
                     currency: payment_provider === "KPlus" ? "THB" : "MMK",
                     payment_provider: payment_provider,
                     proof_url: filePath,
+                    metadata: {
+                        monthCount,
+                        pageCount: 1
+                    }
                 }),
             });
 
@@ -139,7 +145,7 @@ export default function ManualPaymentPage() {
                 reference: reference,
                 provider: payment_provider,
                 date: dayjs().format('DD MMM YYYY, HH:mm'),
-                plan: "Monthly Pro"
+                plan: `${monthCount} Month${monthCount > 1 ? 's' : ''} Pro (1 Page)`
             });
             setIsInvoiceVisible(true);
 
@@ -165,22 +171,24 @@ export default function ManualPaymentPage() {
                         </div>
 
                         <div style={{ background: "#f9f9f9", borderRadius: 12, padding: 16, border: "1px solid #f0f0f0" }}>
-                            <Text strong style={{ display: "block", marginBottom: 8 }}>Page အရေအတွက် ရွေးချယ်ပါ</Text>
+                            <Text strong style={{ display: "block", marginBottom: 8 }}>{language === 'my' ? "သက်တမ်းရွေးချယ်ပါ (လ)" : "Select Duration (Months)"}</Text>
                             <Segmented
                                 block
-                                value={pageCount}
-                                onChange={(value) => setPageCount(value as number)}
+                                value={monthCount}
+                                onChange={(value) => setMonthCount(value as number)}
                                 options={[
-                                    { label: '1 Page', value: 1 },
-                                    { label: '2 Pages', value: 2 },
-                                    { label: '3 Pages', value: 3 },
-                                    { label: '5 Pages', value: 5 },
+                                    { label: '1 Month', value: 1 },
+                                    { label: '3 Months', value: 3 },
+                                    { label: '6 Months', value: 6 },
+                                    { label: '12 Months', value: 12 },
                                 ]}
                             />
                         </div>
 
                         <Card style={{ background: "#f9f9f9", borderRadius: 12, textAlign: "center", border: "1px dashed #d9d9d9" }}>
-                            <Text type="secondary" style={{ fontSize: 14 }}>Total Amount to Pay ({pageCount} Page{pageCount > 1 ? 's' : ''})</Text>
+                            <Text type="secondary" style={{ fontSize: 14 }}>
+                                Total Amount to Pay ({monthCount} Month{monthCount > 1 ? 's' : ''})
+                            </Text>
                             <div style={{ fontSize: 32, fontWeight: 800, color: "#722ed1" }}>
                                 {getDisplayAmount()}
                             </div>

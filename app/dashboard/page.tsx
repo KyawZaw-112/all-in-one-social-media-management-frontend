@@ -9,7 +9,6 @@ import {
     Button,
     Typography,
     Space,
-    List,
     Avatar,
     Tag,
     Divider,
@@ -29,8 +28,6 @@ import {
     LogoutOutlined,
     ShoppingCartOutlined,
     SendOutlined,
-    MessageOutlined,
-    CheckCircleOutlined,
     CustomerServiceOutlined,
     ShoppingOutlined,
     InboxOutlined,
@@ -45,10 +42,7 @@ import axios from "axios";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { API_URL } from "@/lib/apiConfig";
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { useFestivalTheme, festivalThemes } from "@/lib/ThemeContext";
-
-dayjs.extend(relativeTime);
 
 const { Title, Text } = Typography;
 
@@ -101,13 +95,6 @@ export default function UserDashboard() {
         } finally {
             setToggling(false);
         }
-    };
-
-
-    const getStatusIcon = (status: string) => {
-        if (status === "replied") return <SendOutlined style={{ color: "#10b981" }} />;
-        if (status === "received") return <MessageOutlined style={{ color: "#6366f1" }} />;
-        return <CheckCircleOutlined style={{ color: "#94a3b8" }} />;
     };
 
     if (loading) {
@@ -358,61 +345,6 @@ export default function UserDashboard() {
                                 )}
                             </Row>
 
-                            <Divider style={{ margin: "40px 0" }} />
-
-                            {/* Recent Activity - REAL DATA */}
-                            <div style={{ marginBottom: "24px" }}>
-                                <Title level={4} style={{ margin: 0, fontWeight: 400 }}>{t.dashboard.recentActivity}</Title>
-                            </div>
-
-                            {stats?.recent_activities && stats.recent_activities.length > 0 ? (
-                                <List
-                                    itemLayout="horizontal"
-                                    dataSource={stats.recent_activities}
-                                    renderItem={(item: any) => (
-                                        <List.Item style={{ padding: "16px 0", borderBottom: "1px solid #f1f5f9" }}>
-                                            <List.Item.Meta
-                                                avatar={
-                                                    <Avatar
-                                                        style={{
-                                                            backgroundColor: item.status === 'replied' ? '#ecfdf5' : '#f1f5f9',
-                                                            color: item.status === 'replied' ? '#10b981' : '#64748b'
-                                                        }}
-                                                        icon={getStatusIcon(item.status)}
-                                                    />
-                                                }
-                                                title={
-                                                    <Space>
-                                                        <Text strong style={{ fontSize: "14px" }}>{item.sender_name}</Text>
-                                                        <Tag
-                                                            bordered={false}
-                                                            color={item.status === 'replied' ? 'success' : item.status === 'received' ? 'processing' : 'default'}
-                                                            style={{ fontSize: "11px" }}
-                                                        >
-                                                            {item.status?.toUpperCase()}
-                                                        </Tag>
-                                                    </Space>
-                                                }
-                                                description={
-                                                    <div>
-                                                        <Text type="secondary" style={{ fontSize: "13px" }}>
-                                                            {item.body?.substring(0, 80)}{item.body?.length > 80 ? "..." : ""}
-                                                        </Text>
-                                                        <br />
-                                                        <Text type="secondary" style={{ fontSize: "11px", color: "#94a3b8" }}>
-                                                            {dayjs(item.created_at).fromNow()} • {item.channel}
-                                                        </Text>
-                                                    </div>
-                                                }
-                                            />
-                                        </List.Item>
-                                    )}
-                                />
-                            ) : (
-                                <div style={{ padding: "60px 0", textAlign: "center", background: "#fafafa", borderRadius: "16px" }}>
-                                    <Text type="secondary">{t.dashboard.noActivity}</Text>
-                                </div>
-                            )}
                         </Col>
 
                         <Col xs={24} md={8}>
