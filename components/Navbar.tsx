@@ -13,7 +13,8 @@ export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const { t, language } = useLanguage();
-    const { theme } = useFestivalTheme();
+    const { theme, mode } = useFestivalTheme();
+    const isDark = mode === 'dark';
 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -62,15 +63,16 @@ export default function Navbar() {
         <header
             style={{
                 height: 56,
-                borderBottom: `2px solid ${theme.primaryColor}33`, // 20% opacity
+                borderBottom: `1px solid ${isDark ? '#334155' : theme.primaryColor + '33'}`,
                 padding: "0 24px",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                background: "#fff",
+                background: isDark ? "#1e293b" : "#fff",
                 position: "sticky",
                 top: 0,
                 zIndex: 1000,
+                transition: 'all 0.3s ease'
             }}
         >
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

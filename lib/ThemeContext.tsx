@@ -125,15 +125,32 @@ const festivalThemes: Record<number, BurmeseFestivalTheme> = {
 
 interface ThemeContextType {
     theme: BurmeseFestivalTheme;
+    mode: 'light' | 'dark';
+    themeSelection: 'auto' | number;
+    setMode: (mode: 'light' | 'dark') => void;
+    setThemeSelection: (selection: 'auto' | number) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [mode, setModeState] = useState<'light' | 'dark'>('light');
+    const [themeSelection, setThemeSelectionState] = useState<'auto' | number>('auto');
     const [currentTheme, setCurrentTheme] = useState<BurmeseFestivalTheme>(festivalThemes[new Date().getMonth()]);
 
     useEffect(() => {
-        const month = new Date().getMonth();
+        // Load from localStorage
+        const savedMode = localStorage.getItem('theme-mode') as 'light' | 'dark';
+        if (savedMode) setModeState(savedMode);
+
+        const savedSelection = localStorage.getItem('theme-selection');
+        if (savedSelection) {
+            setThemeSelectionState(savedSelection === 'auto' ? 'auto' : parseInt(savedSelection));
+        }
+    }, []);
+
+    useEffect(() => {
+        const month = themeSelection === 'auto' ? new Date().getMonth() : themeSelection;
         const theme = festivalThemes[month];
         setCurrentTheme(theme);
 
@@ -141,15 +158,34 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         document.documentElement.style.setProperty('--primary-500', theme.primaryColor);
         document.documentElement.style.setProperty('--festival-name', `'${theme.festivalName}'`);
 
+        // Mode specific CSS variables
+        if (mode === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.body.style.background = "#0f172a"; // slate-900
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.body.style.background = "#ffffff";
+        }
+
         // Also update Meta theme-color for PWA/Mobile address bar
         const metaThemeColor = document.querySelector('meta[name="theme-color"]');
         if (metaThemeColor) {
-            metaThemeColor.setAttribute('content', theme.primaryColor);
+            metaThemeColor.setAttribute('content', mode === 'dark' ? '#0f172a' : theme.primaryColor);
         }
-    }, []);
+    }, [themeSelection, mode]);
+
+    const setMode = (m: 'light' | 'dark') => {
+        setModeState(m);
+        localStorage.setItem('theme-mode', m);
+    };
+
+    const setThemeSelection = (s: 'auto' | number) => {
+        setThemeSelectionState(s);
+        localStorage.setItem('theme-selection', s.toString());
+    };
 
     return (
-        <ThemeContext.Provider value={{ theme: currentTheme }}>
+        <ThemeContext.Provider value={{ theme: currentTheme, mode, themeSelection, setMode, setThemeSelection }}>
             {children}
         </ThemeContext.Provider>
     );
@@ -162,3 +198,5 @@ export const useFestivalTheme = () => {
     }
     return context;
 };
+
+export { festivalThemes };

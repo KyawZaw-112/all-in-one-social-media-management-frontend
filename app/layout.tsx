@@ -8,25 +8,31 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { ThemeProvider, useFestivalTheme } from "@/lib/ThemeContext";
 
+import { theme as antdTheme } from "antd";
+
 function RootLayoutContent({ children }: { children: ReactNode }) {
-    const { theme } = useFestivalTheme();
+    const { theme, mode } = useFestivalTheme();
+    const isDark = mode === 'dark';
 
     return (
         <ConfigProvider
             theme={{
+                algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
                 token: {
                     colorPrimary: theme.primaryColor,
                     borderRadius: 12,
-                    colorBgContainer: "#ffffff",
-                    colorText: "#0f172a",
-                    colorTextSecondary: "#64748b",
+                    colorBgContainer: isDark ? "#1e293b" : "#ffffff",
+                    colorBgLayout: isDark ? "#0f172a" : "#f8fafc",
+                    colorText: isDark ? "#f1f5f9" : "#0f172a",
+                    colorTextSecondary: isDark ? "#94a3b8" : "#64748b",
                     fontSize: 14,
                     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
                 },
                 components: {
                     Card: {
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                        boxShadow: isDark ? "0 4px 6px -1px rgba(0, 0, 0, 0.2)" : "0 1px 3px rgba(0,0,0,0.04)",
                         borderRadius: 20,
+                        colorBgContainer: isDark ? "#1e293b" : "#ffffff",
                     },
                     Button: {
                         borderRadius: 12,

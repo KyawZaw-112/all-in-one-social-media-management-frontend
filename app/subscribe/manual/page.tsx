@@ -25,9 +25,12 @@ export default function ManualPaymentPage() {
     const [reference, setReference] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
-    const [baseAmountBaht] = useState(2000);
-    const BAHT_TO_MMK = 155; // Update rate here
+    const [pageCount, setPageCount] = useState(1);
+    const PRICE_PER_PAGE = 500;
+    const BAHT_TO_MMK = 155;
     const [payment_provider, setPaymentProvider] = useState("KPlus");
+
+    const baseAmountBaht = pageCount * PRICE_PER_PAGE;
 
     // Invoice State
     const [isInvoiceVisible, setIsInvoiceVisible] = useState(false);
@@ -161,8 +164,23 @@ export default function ManualPaymentPage() {
                             <Text type="secondary">လစဉ်ကြေး ပေးဆောင်ရန် အချက်အလက်များ</Text>
                         </div>
 
+                        <div style={{ background: "#f9f9f9", borderRadius: 12, padding: 16, border: "1px solid #f0f0f0" }}>
+                            <Text strong style={{ display: "block", marginBottom: 8 }}>Page အရေအတွက် ရွေးချယ်ပါ</Text>
+                            <Segmented
+                                block
+                                value={pageCount}
+                                onChange={(value) => setPageCount(value as number)}
+                                options={[
+                                    { label: '1 Page', value: 1 },
+                                    { label: '2 Pages', value: 2 },
+                                    { label: '3 Pages', value: 3 },
+                                    { label: '5 Pages', value: 5 },
+                                ]}
+                            />
+                        </div>
+
                         <Card style={{ background: "#f9f9f9", borderRadius: 12, textAlign: "center", border: "1px dashed #d9d9d9" }}>
-                            <Text type="secondary" style={{ fontSize: 14 }}>Total Amount to Pay</Text>
+                            <Text type="secondary" style={{ fontSize: 14 }}>Total Amount to Pay ({pageCount} Page{pageCount > 1 ? 's' : ''})</Text>
                             <div style={{ fontSize: 32, fontWeight: 800, color: "#722ed1" }}>
                                 {getDisplayAmount()}
                             </div>

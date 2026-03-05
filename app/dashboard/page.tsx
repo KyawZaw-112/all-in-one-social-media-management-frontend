@@ -15,6 +15,8 @@ import {
     Divider,
     Switch,
     message,
+    Dropdown,
+    MenuProps,
     Spin,
     Table
 } from "antd";
@@ -32,7 +34,10 @@ import {
     CustomerServiceOutlined,
     ShoppingOutlined,
     InboxOutlined,
-    CalculatorOutlined
+    CalculatorOutlined,
+    BgColorsOutlined,
+    BulbOutlined,
+    BookOutlined
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
@@ -41,6 +46,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { API_URL } from "@/lib/apiConfig";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useFestivalTheme, festivalThemes } from "@/lib/ThemeContext";
 
 dayjs.extend(relativeTime);
 
@@ -49,10 +55,13 @@ const { Title, Text } = Typography;
 export default function UserDashboard() {
     const router = useRouter();
     const { t, language } = useLanguage();
+    const { theme, mode, themeSelection, setMode, setThemeSelection } = useFestivalTheme();
     const [stats, setStats] = useState<any>(null);
     const [autoReplyOn, setAutoReplyOn] = useState(false);
     const [toggling, setToggling] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    const isDark = mode === 'dark';
 
     const fetchStats = async () => {
         const token = localStorage.getItem("authToken");
@@ -111,23 +120,104 @@ export default function UserDashboard() {
         );
     }
 
+    const settingsMenu: MenuProps['items'] = [
+        {
+            key: 'profile',
+            icon: <UserOutlined />,
+            label: language === 'my' ? "Profile စစ်ဆေးရန်" : "Check Profile",
+            onClick: () => router.push("/dashboard/profile")
+        },
+        {
+            key: 'manual',
+            icon: <BookOutlined />,
+            label: t.nav.manual,
+            onClick: () => router.push("/dashboard/manual")
+        },
+        {
+            key: 'subscription',
+            icon: <CreditCardOutlined />,
+            label: t.nav.subscription,
+            onClick: () => router.push("/subscribe/manual")
+        },
+        { type: 'divider' },
+        {
+            key: 'mode',
+            label: language === 'my' ? "Display Mode" : "Display Mode",
+            children: [
+                {
+                    key: 'light',
+                    icon: <BulbOutlined />,
+                    label: t.nav.lightMode,
+                    disabled: !isDark,
+                    onClick: () => setMode('light')
+                },
+                {
+                    key: 'dark',
+                    icon: <BulbOutlined style={{ color: '#fbbf24' }} />,
+                    label: t.nav.darkMode,
+                    disabled: isDark,
+                    onClick: () => setMode('dark')
+                }
+            ]
+        },
+        {
+            key: 'theme',
+            label: t.nav.theme,
+            icon: <BgColorsOutlined />,
+            children: [
+                {
+                    key: 'auto',
+                    label: t.nav.dynamicTheme,
+                    onClick: () => setThemeSelection('auto'),
+                    style: themeSelection === 'auto' ? { fontWeight: 'bold', color: theme.primaryColor } : {}
+                },
+                { type: 'divider' },
+                ...Object.entries(festivalThemes).map(([index, f]) => ({
+                    key: `month-${index}`,
+                    label: `${f.icon} ${language === 'my' ? f.burmeseMonth : f.monthName}`,
+                    onClick: () => setThemeSelection(parseInt(index)),
+                    style: themeSelection === parseInt(index) ? { fontWeight: 'bold', color: theme.primaryColor } : {}
+                }))
+            ]
+        },
+        { type: 'divider' },
+        {
+            key: 'logout',
+            danger: true,
+            icon: <LogoutOutlined />,
+            label: t.nav.signOut,
+            onClick: () => { localStorage.clear(); router.push("/login"); }
+        }
+    ];
+
     return (
         <AuthGuard>
-            <div style={{ minHeight: "100vh", background: "#ffffff", padding: "40px 24px" }}>
+            <div style={{
+                minHeight: "100vh",
+                background: isDark ? "#0f172a" : "#f8fafc",
+                padding: "40px 24px",
+                transition: 'background 0.3s ease'
+            }}>
                 <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
                     {/* Header */}
-                    <div style={{ marginBottom: "48px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                    <div style={{ marginBottom: "48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <div>
                             <Text type="secondary" style={{ fontSize: "14px", letterSpacing: "1px", textTransform: "uppercase" }}>{t.dashboard.overview}</Text>
-                            <Title level={2} className="hidden md:block" style={{ margin: "4px 0 0 0", fontWeight: 300 }}>{t.dashboard.dashboard}</Title>
+                            <Title level={2} style={{ margin: "4px 0 0 0", fontWeight: 300 }}>{t.dashboard.dashboard}</Title>
                         </div>
-                        <Button
-                            icon={<SettingOutlined />}
-                            type="text"
-                            size="large"
-                            onClick={() => router.push("/dashboard/profile")}
-                        />
+                        <Dropdown menu={{ items: settingsMenu }} trigger={['click']} placement="bottomRight">
+                            <Button
+                                icon={<SettingOutlined style={{ fontSize: '20px' }} />}
+                                type="text"
+                                size="large"
+                                style={{
+                                    background: isDark ? "#1e293b" : "#fff",
+                                    borderRadius: '12px',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                                }}
+                            />
+                        </Dropdown>
                     </div>
 
                     {/* Stats Grid */}

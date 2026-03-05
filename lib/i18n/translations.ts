@@ -18,6 +18,12 @@ export type TranslationKeys = {
         login: string;
         getStarted: string;
         signOut: string;
+        manual: string;
+        theme: string;
+        lightMode: string;
+        darkMode: string;
+        dynamicTheme: string;
+        subscription: string;
     };
     landing: {
         badge: string;
@@ -255,6 +261,12 @@ export const translations: Record<Language, TranslationKeys> = {
             login: "Login",
             getStarted: "Get Started",
             signOut: "Sign Out",
+            manual: "Manual",
+            theme: "Theme",
+            lightMode: "Light Mode",
+            darkMode: "Dark Mode",
+            dynamicTheme: "Dynamic (Myanmar 12 Months)",
+            subscription: "Subscription Fee",
         },
         landing: {
             badge: "Myanmar's #1 Auto-Reply Platform",
@@ -490,6 +502,12 @@ export const translations: Record<Language, TranslationKeys> = {
             login: "Login ဝင်ရန်",
             getStarted: "စတင်မည်",
             signOut: "ထွက်မည်",
+            manual: "အသုံးပြုပုံ လက်စွဲ",
+            theme: "Theme ပြောင်းရန်",
+            lightMode: "Light Mode",
+            darkMode: "Dark Mode",
+            dynamicTheme: "မြန်မာ ၁၂ လ ရာသီ Theme",
+            subscription: "Subscription Fee ပေးရန်",
         },
         landing: {
             badge: "Myanmar ၏ နံပါတ်တစ် Auto-Reply Platform",
@@ -725,6 +743,12 @@ export const translations: Record<Language, TranslationKeys> = {
             login: "เข้าสู่ระบบ",
             getStarted: "เริ่มต้นใช้งาน",
             signOut: "ออกจากระบบ",
+            manual: "คู่มือการใช้งาน",
+            theme: "ธีม",
+            lightMode: "โหมดสว่าง",
+            darkMode: "โหมดมืด",
+            dynamicTheme: "ธีม 12 เดือนของเมียนมา",
+            subscription: "ค่าธรรมเนียมการสมัครสมาชิก",
         },
         landing: {
             badge: "แพลตฟอร์มตอบกลับอัตโนมัติอันดับ 1 ในเมียนมา",
