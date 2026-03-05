@@ -11,9 +11,9 @@ import {
     DollarOutlined,
     WalletOutlined,
 } from "@ant-design/icons";
-import Image from "next/image";
 import axios from "axios";
 import { API_URL } from "@/lib/apiConfig";
+import supabase from "@/lib/supabase";
 import dayjs from "dayjs";
 
 const { Title, Text } = Typography;
@@ -22,7 +22,19 @@ export default function PaymentsPage() {
     const [payments, setPayments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [preview, setPreview] = useState<string | null>(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
+
+    const getSignedUrl = async (path: string): Promise<string | null> => {
+        const { data, error } = await supabase.storage
+            .from("payment-proofs")
+            .createSignedUrl(path, 600);
+        if (error) {
+            console.error("Signed URL error:", error);
+            return null;
+        }
+        return data.signedUrl;
+    };
 
     const fetchPayments = async () => {
         try {
@@ -129,7 +141,19 @@ export default function PaymentsPage() {
                 <Button
                     type="link"
                     icon={<EyeOutlined />}
-                    onClick={() => setPreview(record.screenshot_url || record.proof_url)}
+                    loading={previewLoading}
+                    onClick={async () => {
+                        const path = record.proof_url || record.screenshot_url;
+                        if (!path) return;
+                        setPreviewLoading(true);
+                        const signedUrl = await getSignedUrl(path);
+                        setPreviewLoading(false);
+                        if (signedUrl) {
+                            setPreview(signedUrl);
+                        } else {
+                            message.error("Failed to load proof image");
+                        }
+                    }}
                 >
                     View
                 </Button>
