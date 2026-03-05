@@ -31,7 +31,7 @@ import Navbar from "@/components/Navbar";
 
 const { Title, Text, Paragraph } = Typography;
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const API_URL = process.env.APP_URL || "http://localhost:4000";
 
 const LogsPage = () => {
     const { t, language } = useLanguage();
