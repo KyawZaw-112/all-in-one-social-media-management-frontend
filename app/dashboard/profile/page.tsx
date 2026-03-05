@@ -18,7 +18,6 @@ import {
     UserOutlined,
     MailOutlined,
     PhoneOutlined,
-    SafetyCertificateOutlined,
     LockOutlined,
     ShopOutlined,
     SaveOutlined,

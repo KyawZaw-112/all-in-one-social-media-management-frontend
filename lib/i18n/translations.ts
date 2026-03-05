@@ -24,7 +24,6 @@ export type TranslationKeys = {
         darkMode: string;
         dynamicTheme: string;
         subscription: string;
-        systemHealth: string;
     };
     logs: {
         title: string;
@@ -279,7 +278,6 @@ export const translations: Record<Language, TranslationKeys> = {
             darkMode: "Dark Mode",
             dynamicTheme: "Dynamic (Myanmar 12 Months)",
             subscription: "Subscription Fee",
-            systemHealth: "System Health",
         },
         logs: {
             title: "System Error Logs",
@@ -532,7 +530,6 @@ export const translations: Record<Language, TranslationKeys> = {
             darkMode: "Dark Mode",
             dynamicTheme: "မြန်မာ ၁၂ လ ရာသီ Theme",
             subscription: "Subscription Fee ပေးရန်",
-            systemHealth: "စနစ် ကျန်းမာရေး",
         },
         logs: {
             title: "စနစ် အမှားမှတ်တမ်းများ",
@@ -785,7 +782,6 @@ export const translations: Record<Language, TranslationKeys> = {
             darkMode: "โหมดมืด",
             dynamicTheme: "ธีม 12 เดือนของเมียนมา",
             subscription: "ค่าธรรมเนียมการสมัครสมาชิก",
-            systemHealth: "สุขภาพระบบ",
         },
         logs: {
             title: "บันทึกข้อผิดพลาดของระบบ",
