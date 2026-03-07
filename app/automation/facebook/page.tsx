@@ -101,6 +101,7 @@ export default function FacebookAutoReply() {
     const [editingFlow, setEditingFlow] = useState<AutomationFlow | null>(null);
     const [form] = Form.useForm();
     const [customForm] = Form.useForm();
+    const languageValue = Form.useWatch('language', customForm);
 
     const fetchFlows = async () => {
         setLoading(true);
@@ -560,36 +561,34 @@ export default function FacebookAutoReply() {
                                 </Space>
                             </Divider>
                             <div style={{ display: "flex", justifyContent: "space-around", background: "#f8fafc", padding: "16px", borderRadius: "16px" }}>
-                                <Form.Item name="language" noStyle>
-                                    <Space direction="vertical" align="center">
-                                        <Text>Burmese</Text>
-                                        <Switch
-                                            size="small"
-                                            checked={customForm.getFieldValue('language') === 'my'}
-                                            onChange={(checked) => handleLanguageToggle('my', checked)}
-                                        />
-                                    </Space>
-                                    <Space direction="vertical" align="center">
-                                        <Text>English</Text>
-                                        <Switch
-                                            size="small"
-                                            checked={customForm.getFieldValue('language') === 'en'}
-                                            onChange={(checked) => handleLanguageToggle('en', checked)}
-                                        />
-                                    </Space>
-                                    <Space direction="vertical" align="center">
-                                        <Text>Thai</Text>
-                                        <Switch
-                                            size="small"
-                                            checked={customForm.getFieldValue('language') === 'th'}
-                                            onChange={(checked) => handleLanguageToggle('th', checked)}
-                                        />
-                                    </Space>
-                                </Form.Item>
+                                <Space direction="vertical" align="center">
+                                    <Text>Burmese</Text>
+                                    <Switch
+                                        size="small"
+                                        checked={languageValue === 'my'}
+                                        onChange={(checked) => handleLanguageToggle('my', checked)}
+                                    />
+                                </Space>
+                                <Space direction="vertical" align="center">
+                                    <Text>English</Text>
+                                    <Switch
+                                        size="small"
+                                        checked={languageValue === 'en'}
+                                        onChange={(checked) => handleLanguageToggle('en', checked)}
+                                    />
+                                </Space>
+                                <Space direction="vertical" align="center">
+                                    <Text>Thai</Text>
+                                    <Switch
+                                        size="small"
+                                        checked={languageValue === 'th'}
+                                        onChange={(checked) => handleLanguageToggle('th', checked)}
+                                    />
+                                </Space>
                             </div>
                             <div style={{ textAlign: "center", marginTop: "8px" }}>
                                 <Text type="secondary" style={{ fontSize: "12px" }}>
-                                    {customForm.getFieldValue('language')
+                                    {languageValue
                                         ? "Selected language is now FIXED for this flow."
                                         : "No language selected. Bot will auto-detect."}
                                 </Text>
