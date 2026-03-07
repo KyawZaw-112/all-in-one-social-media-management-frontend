@@ -33,7 +33,8 @@ import {
     ArrowLeftOutlined,
     SettingOutlined,
     InfoCircleOutlined,
-    CopyOutlined
+    CopyOutlined,
+    BgColorsOutlined
 } from "@ant-design/icons";
 import AuthGuard from "@/components/AuthGuard";
 import axios from "axios";
@@ -54,6 +55,7 @@ interface AutomationFlow {
     metadata?: {
         welcome_message?: string;
         completion_message?: string;
+        language?: string | null;
         steps?: Record<string, { question: string, enabled: boolean }>;
     };
 }
@@ -224,10 +226,19 @@ export default function FacebookAutoReply() {
             welcome_message: metadata.welcome_message || "",
             completion_message: metadata.completion_message || "",
             ai_prompt: flow.ai_prompt || "",
+            language: metadata.language || null,
             steps: stepsData
         });
 
         setCustomModalVisible(true);
+    };
+
+    const handleLanguageToggle = (lang: string, checked: boolean) => {
+        if (checked) {
+            customForm.setFieldValue('language', lang);
+        } else {
+            customForm.setFieldValue('language', null);
+        }
     };
 
     const handleCustomSubmit = async (values: any) => {
@@ -235,10 +246,10 @@ export default function FacebookAutoReply() {
 
         try {
             const token = localStorage.getItem("authToken");
-            const { welcome_message, completion_message, steps, ai_prompt } = values;
+            const { welcome_message, completion_message, steps, ai_prompt, language } = values;
 
             await axios.put(`${API_URL}/api/merchants/flows/${editingFlow.id}`, {
-                metadata: { welcome_message, completion_message, steps },
+                metadata: { welcome_message, completion_message, steps, language },
                 ai_prompt: ai_prompt
             }, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -539,6 +550,50 @@ export default function FacebookAutoReply() {
                                 placeholder={t.automation.aiPromptPlaceholder}
                                 style={{ borderRadius: "10px", border: "2px solid #dddfe2" }}
                             />
+                        </Form.Item>
+
+                        <Form.Item name="language" style={{ marginBottom: 0 }}>
+                            <Divider style={{ margin: "24px 0" }}>
+                                <Space>
+                                    <BgColorsOutlined style={{ color: "#3b82f6" }} />
+                                    <Text strong style={{ color: "#3b82f6" }}>Flow Language (ဘာသာစကား)</Text>
+                                </Space>
+                            </Divider>
+                            <div style={{ display: "flex", justifyContent: "space-around", background: "#f8fafc", padding: "16px", borderRadius: "16px" }}>
+                                <Form.Item name="language" noStyle>
+                                    <Space direction="vertical" align="center">
+                                        <Text>Burmese</Text>
+                                        <Switch
+                                            size="small"
+                                            checked={customForm.getFieldValue('language') === 'my'}
+                                            onChange={(checked) => handleLanguageToggle('my', checked)}
+                                        />
+                                    </Space>
+                                    <Space direction="vertical" align="center">
+                                        <Text>English</Text>
+                                        <Switch
+                                            size="small"
+                                            checked={customForm.getFieldValue('language') === 'en'}
+                                            onChange={(checked) => handleLanguageToggle('en', checked)}
+                                        />
+                                    </Space>
+                                    <Space direction="vertical" align="center">
+                                        <Text>Thai</Text>
+                                        <Switch
+                                            size="small"
+                                            checked={customForm.getFieldValue('language') === 'th'}
+                                            onChange={(checked) => handleLanguageToggle('th', checked)}
+                                        />
+                                    </Space>
+                                </Form.Item>
+                            </div>
+                            <div style={{ textAlign: "center", marginTop: "8px" }}>
+                                <Text type="secondary" style={{ fontSize: "12px" }}>
+                                    {customForm.getFieldValue('language')
+                                        ? "Selected language is now FIXED for this flow."
+                                        : "No language selected. Bot will auto-detect."}
+                                </Text>
+                            </div>
                         </Form.Item>
 
                         <Divider style={{ margin: "24px 0" }}>
