@@ -34,18 +34,19 @@ export default function ManualPage() {
                 : "Go to the Social Platforms page and click 'Connect Facebook Page'. Choose the page you want to automate."
         },
         {
-            title: language === 'my' ? "၂။ Flow များ ဖန်တီးခြင်း" : "2. Creating Flows",
+            title: language === 'my' ? "၂။ Flow များ စိတ်ကြိုက်ပြုပြင်ခြင်း" : "2. Editing Flows",
             icon: <RocketOutlined />,
             content: language === 'my'
-                ? "Auto-Reply Flows page တွင် 'Create New Flow' ကိုနှိပ်ပါ။ Trigger keyword (ဥပမာ- 'ဝယ်မယ်') ကို သတ်မှတ်ပြီး သိမ်းဆည်းပါ။"
-                : "Click 'Create New Flow' on the Auto-Reply Flows page. Set a trigger keyword (e.g., 'buy') and save."
+                ? `"အလိုအလျောက်ပြန်စာ စနစ်" ထဲ သို့ ဝင်ပြီး "Setting icon" ကို နှိပ်ပါ။ ထို့နောက် လူကြီးမင်း စိတ်တိုင်းကျ ပြုပြင်ပြောင်းလဲ၍ အသုံးပြုနိုင်ပါပြီ`
+                : `Go to "Auto Reply System" and click on the "Setting icon". Then you can customize it as you like.`
         },
         {
-            title: language === 'my' ? "၃။ AI Power-Up အသုံးပြုခြင်း" : "3. Using AI Power-Up",
+            title: language === 'my' ? "၃။ " : "3. Using AI Power-Up",
             icon: <RobotOutlined />,
             content: language === 'my'
                 ? "Flow configuration ထဲတွင် 'AI Prompt' ကဏ္ဍကို တွေ့ရပါမည်။ ထိုနေရာတွင် Gemini AI အတွက် ညွှန်ကြားချက်များ (ဥပမာ- ယဉ်ကျေးစွာ ပြန်ကြားပေးရန်) ကို ထည့်သွင်းနိုင်ပါသည်။"
-                : "In the flow configuration, you'll find the 'AI Prompt' section. You can enter instructions for Gemini AI (e.g., reply politely)."
+                : "In the flow configuration, you'll find the 'AI Prompt' section. You can enter instructions for Gemini AI (e.g., reply politely).",
+
         },
         {
             title: language === 'my' ? "၄။ အမှာစာများ စစ်ဆေးခြင်း" : "4. Checking Orders",
@@ -123,19 +124,12 @@ export default function ManualPage() {
                             <QuestionCircleOutlined /> {language === 'my' ? "အမေးများသော မေးခွန်းများ" : "Frequently Asked Questions"}
                         </Title>
 
-                        <Collapse ghost expandIconPosition="end">
+                        <Collapse ghost expandIconPlacement="end">
                             <Panel header={language === 'my' ? "ဘယ်လောက် ကုန်ကျမလဲ?" : "How much does it cost?"} key="1">
                                 <Text>
                                     {language === 'my'
-                                        ? "၇ ရက် အခမဲ့ စမ်းသပ်သုံးစွဲနိုင်ပါတယ်။ ထို့နောက် online shop များအတွက် တစ်လလျှင် ၅၀၀ ဘတ် (သို့မဟုတ်) ၄၀,၀၀၀ ကျပ် ဝန်းကျင် ကျသင့်မှာ ဖြစ်ပါတယ်။"
+                                        ? "၇ ရက် အခမဲ့ စမ်းသပ်သုံးစွဲနိုင်ပါတယ်။ ထို့နောက် online shop များအတွက် တစ်လလျှင် ၅၀၀ ဘတ် (သို့မဟုတ်) ၅၀,၀၀၀ ကျပ် ဝန်းကျင် ကျသင့်မှာ ဖြစ်ပါတယ်။"
                                         : "You can try it free for 7 days. After that, it costs around 500 Baht per month for online shops."}
-                                </Text>
-                            </Panel>
-                            <Panel header={language === 'my' ? "Gemini AI က ဘာတွေလုပ်ပေးတာလဲ?" : "What does Gemini AI do?"} key="2">
-                                <Text>
-                                    {language === 'my'
-                                        ? "Gemini AI က ဖောက်သည်တွေရဲ့ စကားပြောပုံကို နားလည်ပြီး လူကိုယ်တိုင် ပြန်သလိုမျိုး သဘာဝကျကျနဲ့ ယဉ်ကျေးစွာ ပြန်ပေးနိုင်ပါတယ်။ ပစ္စည်းအချက်အလက်တွေကိုလည်း အလိုအလျောက် ခွဲထုတ်ပေးနိုင်ပါတယ်။"
-                                        : "Gemini AI understands customer intent and replies naturally and politely, just like a human. It can also extract product details automatically from conversations."}
                                 </Text>
                             </Panel>
                         </Collapse>
