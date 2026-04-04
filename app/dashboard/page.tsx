@@ -345,6 +345,40 @@ export default function UserDashboard() {
                                 )}
                             </Row>
 
+                            {/* New Feature Cards */}
+                            <div style={{ marginTop: "32px", marginBottom: "16px" }}>
+                                <Title level={4} style={{ margin: 0, fontWeight: 400 }}>🚀 CRM & Marketing</Title>
+                            </div>
+                            <Row gutter={[16, 16]}>
+                                <Col xs={12} md={8}>
+                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #ec4899" }} onClick={() => router.push("/dashboard/customers")}>
+                                        <Space direction="vertical">
+                                            <UserOutlined style={{ fontSize: "24px", color: "#ec4899" }} />
+                                            <Text strong>{language === 'my' ? 'Customer CRM' : 'Customer CRM'}</Text>
+                                            <Text type="secondary" style={{ fontSize: "12px" }}>{language === 'my' ? 'Tag, Segment & Manage' : 'Tag, Segment & Manage'}</Text>
+                                        </Space>
+                                    </Card>
+                                </Col>
+                                <Col xs={12} md={8}>
+                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #f59e0b" }} onClick={() => router.push("/dashboard/broadcast")}>
+                                        <Space direction="vertical">
+                                            <SendOutlined style={{ fontSize: "24px", color: "#f59e0b" }} />
+                                            <Text strong>{language === 'my' ? 'Broadcast' : 'Broadcast'}</Text>
+                                            <Text type="secondary" style={{ fontSize: "12px" }}>{language === 'my' ? 'Campaign & Re‑engage' : 'Campaign & Re‑engage'}</Text>
+                                        </Space>
+                                    </Card>
+                                </Col>
+                                <Col xs={12} md={8}>
+                                    <Card hoverable bordered style={{ borderRadius: "12px", borderLeft: "4px solid #0ea5e9" }} onClick={() => router.push("/dashboard/analytics")}>
+                                        <Space direction="vertical">
+                                            <ShoppingCartOutlined style={{ fontSize: "24px", color: "#0ea5e9" }} />
+                                            <Text strong>{language === 'my' ? 'Analytics' : 'Analytics'}</Text>
+                                            <Text type="secondary" style={{ fontSize: "12px" }}>{language === 'my' ? 'Revenue & Insights' : 'Revenue & Insights'}</Text>
+                                        </Space>
+                                    </Card>
+                                </Col>
+                            </Row>
+
                         </Col>
 
                         <Col xs={24} md={8}>
